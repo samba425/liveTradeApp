@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  baseUrl:'https://livetradeapp1.onrender.com/'
+  baseUrl:'https://livetradeapp1.onrender.com/',
+  localUrl: 'localhost:5000/'
 };
 
 /*
