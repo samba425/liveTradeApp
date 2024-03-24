@@ -1,0 +1,27 @@
+<div class="jumbotron jumbotron-fluid " *ngIf='rowData && rowData.length'>
+  <!-- The AG Grid component -->
+
+<ul class="list-group m-3">
+ <li class="list-group-item list-group-item-success"><h3>SMA 20 & 50 & 200</h3></li>
+ </ul>
+ 
+<div class="example-wrapper"> 
+  <ag-grid-angular
+  class="ag-theme-dark"
+  style="height: 800px;width: auto"
+    [rowData]="rowData"
+    [rowSelection]="rowSelection"
+    [pagination]="true"
+    [defaultColDef]="defaultColDef"
+    [paginationPageSize]="paginationPageSize"
+    [columnDefs]="colDefs">
+  </ag-grid-angular>
+  <hr>
+  </div>
+  </div>
+  
+  
+  
+  <h3>NOTE:</h3> GOD FATHER diff % 
+  <h4>If + means still Below 200SMA</h4>
+  <h4>If - means already Above 200SMA</h4>

@@ -1,0 +1,85 @@
+{
+	"filter": [
+		{
+			"left": "type",
+			"operation": "in_range",
+			"right": [
+				"stock",
+				"dr",
+				"fund"
+			]
+		},
+		{
+			"left": "subtype",
+			"operation": "in_range",
+			"right": [
+				"common",
+				"foreign-issuer",
+				"",
+				"etf",
+				"etf,odd",
+				"etf,otc",
+				"etf,cfd"
+			]
+		},
+		{
+			"left": "is_primary",
+			"operation": "equal",
+			"right": true
+		},
+		{
+			"left": "active_symbol",
+			"operation": "equal",
+			"right": true
+		}
+	],
+	"options": {
+		"lang": "en"
+	},
+	"markets": [
+		"india"
+	],
+	"symbols": {
+		"query": {
+			"types": []
+		},
+		"tickers": []
+	},
+	"columns": [
+		"logoid",
+		"name",
+		"close|1W",
+		"change|1W",
+		"change_abs|1W",
+		"Recommend.All|1W",
+		"volume|1W",
+		"Value.Traded|1W",
+		"market_cap_basic",
+		"price_earnings_ttm",
+		"earnings_per_share_basic_ttm",
+		"number_of_employees",
+		"sector",
+		"SMA20|1W",
+		"description",
+		"type",
+		"subtype",
+		"update_mode|1W",
+		"pricescale",
+		"minmov",
+		"fractional",
+		"minmove2",
+		"currency",
+		"fundamental_currency_code"
+	],
+	"sort": {
+		"sortBy": "market_cap_basic",
+		"sortOrder": "desc"
+	},
+	"price_conversion": {
+		"to_symbol": false
+	},
+	"range": [
+		0,
+		150
+	]
+}:
