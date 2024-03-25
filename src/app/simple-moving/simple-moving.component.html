@@ -5,12 +5,19 @@
  <li class="list-group-item list-group-item-success"><h3>SMA 20 & 50 & 200</h3></li>
  </ul>
  
+ <div class="form-group mx-sm-3 mb-4">
+ <input class="form-control" type="text" [(ngModel)]="searchQuery" (input)="onSearchInputChange()" placeholder="Search...">
+ </div>
+ 
+ 
+ 
 <div class="example-wrapper"> 
   <ag-grid-angular
   class="ag-theme-dark"
   style="height: 800px;width: auto"
     [rowData]="rowData"
     [rowSelection]="rowSelection"
+    [gridOptions]="gridOptions" 
     [pagination]="true"
     [defaultColDef]="defaultColDef"
     [paginationPageSize]="paginationPageSize"

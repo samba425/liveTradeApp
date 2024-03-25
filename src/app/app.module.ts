@@ -8,6 +8,8 @@ import { AppRoutingModule } from './app.routing.module';
 import { VolumeshockersComponent } from './volumeshockers/volumeshockers.component';
 import { BankniftyComponent } from './banknifty/banknifty.component';
 import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
+import { FormsModule } from '@angular/forms';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -16,7 +18,7 @@ import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
     SimpleMovingComponent,
     BankniftyComponent
   ],
-  imports: [AppRoutingModule,
+  imports: [AppRoutingModule,FormsModule,
   AgGridModule.withComponents([]),BrowserModule,HttpClientModule
   ],
   providers: [],

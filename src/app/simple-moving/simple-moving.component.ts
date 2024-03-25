@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridOptions } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class SimpleMovingComponent implements OnInit {
     enableValue: true,
     filter: true,
     flex: 1,
-    minWidth: 100,
+    minWidth: 100
   };
   inputValue: any = []
   rowData = [];
@@ -72,7 +72,15 @@ export class SimpleMovingComponent implements OnInit {
  
   result = [];
   allData = []
+    
+  gridOptions: GridOptions;
+  searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
+    this.gridOptions = <GridOptions>{
+      serverSideFilteringAlwaysResets: false,
+      serverSideFiltering: true
+    };
+    
     setTimeout(() => {
       this.fetchLiveData()
     }, 100)
@@ -121,5 +129,11 @@ export class SimpleMovingComponent implements OnInit {
     this.rowData = this.allData
     },100)
     
+  }
+
+  onSearchInputChange() {
+    if (this.gridOptions.api) {
+      this.gridOptions.api.setQuickFilter(this.searchQuery);
+    }
   }
 }
