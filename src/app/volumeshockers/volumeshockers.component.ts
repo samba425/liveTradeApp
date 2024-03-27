@@ -32,7 +32,12 @@ export class VolumeshockersComponent implements OnInit {
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
     { field: "name" ,sortable: true},
-    { field: "close" ,sortable: true, valueFormatter: p =>  Math.floor(p.value).toLocaleString()},
+    { field: "close" ,sortable: true, valueFormatter: p =>  Math.floor(p.value).toLocaleString() ,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      numAlwaysVisibleConditions: 2,
+      defaultJoinOperator: "OR"
+    }},
     { field: "open" ,sortable: true, valueFormatter: p =>  Math.floor(p.value).toLocaleString()},
     { field: "high" ,sortable: true, valueFormatter: p =>  Math.floor(p.value).toLocaleString()},
     { field: "low" ,sortable: true, valueFormatter: p =>  Math.floor(p.value).toLocaleString()},
