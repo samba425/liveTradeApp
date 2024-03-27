@@ -34,11 +34,26 @@ export class OpenHighCloseComponent implements OnInit {
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
     { field: "name", sortable: true },
-    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      numAlwaysVisibleConditions: 2,
+      defaultJoinOperator: "OR"
+    }},
     { field: "open", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "SMADiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "SMADiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      numAlwaysVisibleConditions: 2,
+      defaultJoinOperator: "OR"
+    }},
     { field: "SMADiffChang", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() + '%' },
-    { field: "godFatherDiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "godFatherDiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      numAlwaysVisibleConditions: 2,
+      defaultJoinOperator: "OR"
+    }},
     { field: "godFatherDiffPer", filter: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
     { field: "godFather", filter: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
     { field: "volume", filter: true, sortable: true }
@@ -71,7 +86,7 @@ export class OpenHighCloseComponent implements OnInit {
 
   fetchLiveData() {
   this.commonservice.getData.subscribe(data => {
-    console.log('-dsadasdasdasdasdasdasdasd',data)
+    console.log('-fetchLiveData openhigh',data)
     this.inputValue = data
       this.getHighLow()
   } );
