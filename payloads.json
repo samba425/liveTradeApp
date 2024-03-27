@@ -293,7 +293,8 @@
 		"fractional",
 		"minmove2",
 		"currency",
-		"fundamental_currency_code"
+		"fundamental_currency_code",
+		"SMA50|5"
 	],
 	"sort": {
 		"sortBy": "market_cap_basic",

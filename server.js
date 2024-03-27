@@ -72,13 +72,15 @@ async function test1(indexType) {
 				"change_from_open",
 				"change_from_open_abs",
 				"EMA20",
-				"SMA20",
-				"SMA50",
+				"SMA20|5",
+				"SMA50|5",
 				"SMA200",
 				"average_volume_10d_calc",
 				"average_volume_30d_calc",
 				"VWAP",
-				"sector"
+				"sector",
+				"change_abs|5",
+		        "change|5"
 			],
 			"sort": {
 				"sortBy": "close",
