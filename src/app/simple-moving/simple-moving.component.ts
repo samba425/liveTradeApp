@@ -119,7 +119,7 @@ export class SimpleMovingComponent implements OnInit {
 
   fetchLiveData() {
   this.commonservice.getData.subscribe(data => {
-    console.log('-fetchLiveData',data)
+    // console.log('-fetchLiveData',data)
     this.inputValue = data
       this.getHighLow()
   } );
@@ -128,7 +128,7 @@ export class SimpleMovingComponent implements OnInit {
   getHighLow() {
     this.allData =[]
     this.inputValue.forEach((res) => {
-      if (Number(res['d'][1]) > 20 && Number(res['d'][1]) < 5000) {
+      if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
         this.allData.push({
           change_from_open: res['d'][9],
           change_from_open_abs: res['d'][10],
