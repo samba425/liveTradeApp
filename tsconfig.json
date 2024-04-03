@@ -1,5 +1,6 @@
 {
   "compileOnSave": false,
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
@@ -7,6 +8,8 @@
     "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
+    "strict": false,
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
