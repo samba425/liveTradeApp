@@ -35,7 +35,7 @@ export class AppComponent {
   sectorSelect(sector) {
     this.commonService.fetchLiveData(undefined,sector);
   }
-  refreshdata(index) {
+  refreshdata(index?) {
     this.commonService.fetchLiveData(index);
   }
 }
