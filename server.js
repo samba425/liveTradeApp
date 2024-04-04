@@ -71,7 +71,7 @@ async function test1(indexType) {
 				"Value.Traded",
 				"change_from_open",
 				"change_from_open_abs",
-				"EMA20",
+				"SMA20",
 				"SMA20|5",
 				"SMA50|5",
 				"SMA200",
