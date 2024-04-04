@@ -80,7 +80,7 @@ async function test1(indexType) {
 				"VWAP",
 				"sector",
 				"change_abs|5",
-		        "change|5"
+				"change|5"
 			],
 			"sort": {
 				"sortBy": "close",
@@ -94,15 +94,16 @@ async function test1(indexType) {
 			]
 		}
 	}
+	if (indexType && indexType['sector']) {
+		reqObj['body']['filter'].push(
+			{
+				"left": "sector",
+				"operation": "in_range",
+				"right": [indexType['sector']]
+			})
+	}
 
-	// var reqObj = {
-	// 	uri: 'https://3.129.46.124/dna/intent/api/v1/site?type=building',
-	// 	method: 'GET',
-	// 	headers:{
-	// 		'X-Auth-Token': 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDE5YmFmYzFlOGY5MzE3MTY0MzE4ZDAiLCJhdXRoU291cmNlIjoiaW50ZXJuYWwiLCJ0ZW5hbnROYW1lIjoiVE5UMCIsInJvbGVzIjpbIjY0YWZmNzM0ZGMyOWU1MjkyOTkyNjUwMCJdLCJ0ZW5hbnRJZCI6IjYzOWQ4ZDc0ZWE4NTJiMTNkODhiNTYzZCIsImV4cCI6MTcwODYwMDYzMiwiaWF0IjoxNzA4NTk3MDMyLCJqdGkiOiI2OWY2NjhlMi02NWM0LTQyNTUtYjA5Zi1iYTMyYjMyZjM3ZWQiLCJ1c2VybmFtZSI6Im5ldGFkbWluIn0.gyWwVzS5BloEuH_FtkuIMNUL477j-5fqr1rh5qyfVzcfjeqgPax11AoqJ67wLARM-29gzEQ8RW1nYBnkBkSqpiv6rKrfMpXv46UDA4aGYFR62Vs5eOxLpAQh7oF6XzuNxN0L4N8hsC5vxaeoJkth3xI_MD8CArRuCrsOK1yrarNSHmoAEauwvC7ro3kY6ttam7Eul0P9WqDgf6B29SKZowRaN3PbgJfA0G1NiXO0BQmwfR-cYxOE-u8oLJf8qMBjfIgHNr_5v0HvlRyyxkC0PlLw-s5SwiV72k8gUsIbLe90TDqRFjQp18fgrgX7X_ZrDp6llPgb-GktsRNDJNl4ZQ'
-	// 	},
-	// 	json: true
-	// };
+ 
 	let result = await request(reqObj);
 	// "data": [
 	// 	{

@@ -17,8 +17,14 @@ export class CommonserviceService {
   importUrl = environment.baseUrl;
    
  
-  fetchLiveData(index) { 
-    let url = index ? `${this.importUrl}getData?index=${index}`: `${this.importUrl}getData`
+  fetchLiveData(index,sector?) { 
+    let url;
+    if(sector) {
+    url = sector ? `${this.importUrl}getData?sector=${sector}`: `${this.importUrl}getData`
+    } else {
+    url = index ? `${this.importUrl}getData?index=${index}`: `${this.importUrl}getData`
+      
+    }
     this.http.get(url).subscribe((res) => {
       this.liveData  =  res['data']
       this.stockData.next(this.liveData); 
