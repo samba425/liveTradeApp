@@ -40,14 +40,23 @@
       <button type="button"   (click)="refreshdata('NIFTYJR')" class="btn m-1  btn-primary">Next Nifty</button>
       <button type="button"   (click)="refreshdata('CNXAUTO')" class="btn m-1  btn-info">AUTO</button>
       <button type="button"   (click)="refreshdata('CNXMETAL')" class="btn m-1   btn-warning">Metal</button>
+      <div class="btn-group">
+        <button type="button" class="btn m-1 btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sector Wise
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" *ngFor="let sector of sectorList" (click)="sectorSelect(sector)">{{sector}}</a>
+        </div>
+      </div>
     </div>
     <hr> 
   <!-- End Example Code -->
 </body>
 
 <div class="container-fluid">
-  <!-- <app-open-high-close></app-open-high-close>  -->
-  
 <router-outlet></router-outlet>
 </div>
-<a href="https://livetradeapp1.onrender.com/getData?index=BANKNIFTY" target="_blank" rel="noopener noreferrer">Base Link</a>
+<div class="m-3">
+  <button class='btn btn-primary'><a href="https://livetradeapp1.onrender.com/getData?index=BANKNIFTY" target="_blank" rel="noopener noreferrer"></a>Base Link</button>
+<h4>Designed By Samba siva</h4>
+</div>

@@ -146,7 +146,7 @@ export class SimpleMovingComponent implements OnInit {
   getHighLow() {
     this.allData =[]
     this.inputValue.forEach((res) => {
-      if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
+      // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
         this.allData.push({
           change_from_open: res['d'][9],
           change_from_open_abs: res['d'][10],
@@ -172,7 +172,7 @@ export class SimpleMovingComponent implements OnInit {
           ),
           volume: res['d'][7]
         });
-      } 
+      // } 
     });
     this.rowData  =[]
     setTimeout(() => {
