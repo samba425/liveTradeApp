@@ -38,12 +38,12 @@ export class SimpleMovingComponent implements OnInit {
       numAlwaysVisibleConditions: 2,
       defaultJoinOperator: "OR"
     }},
-    { field: "open", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() ,
-    filter: "agNumberColumnFilter",
-    filterParams: {
-      numAlwaysVisibleConditions: 2,
-      defaultJoinOperator: "OR"
-    }},
+    // { field: "open", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() ,
+    // filter: "agNumberColumnFilter",
+    // filterParams: {
+    //   numAlwaysVisibleConditions: 2,
+    //   defaultJoinOperator: "OR"
+    // }},
     { field: "change_from_open" ,sortable: true, valueFormatter: p =>  (Math.round(p.value * 100) / 100).toLocaleString() + '%',  cellStyle: function(params) {
       if (params.value > 0) {
           return {  backgroundColor: 'green'};
@@ -53,6 +53,18 @@ export class SimpleMovingComponent implements OnInit {
   }},
     { field: "preChange" ,sortable: true, valueFormatter: p =>  (Math.round(p.value * 100) / 100).toLocaleString() + '%'},
     { field: "change_from_open_abs" ,sortable: true, valueFormatter: p =>  (Math.round(p.value * 100) / 100).toLocaleString()},
+    { field: "sma20closeDiff", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' , filter: "agNumberColumnFilter",
+    cellStyle: function(params) {
+      if (params.value > 0) {
+          return {  backgroundColor: 'green'};
+      } else {
+        return {  backgroundColor: 'red'};
+      }
+    },
+    filterParams: {
+      numAlwaysVisibleConditions: 2,
+      defaultJoinOperator: "OR"
+    }},
     { field: "sma20", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() ,
     filter: "agNumberColumnFilter",
     filterParams: {
@@ -83,7 +95,13 @@ export class SimpleMovingComponent implements OnInit {
       defaultJoinOperator: "OR"
     }},
     { field: "godFatherDiffPer", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' , filter: "agNumberColumnFilter",
-    filterParams: {
+    cellStyle: function(params) {
+      if (params.value > 0) {
+          return {  backgroundColor: 'green'};
+      } else {
+        return {  backgroundColor: 'red'};
+      }
+    },filterParams: {
       numAlwaysVisibleConditions: 2,
       defaultJoinOperator: "OR"
     }},
@@ -134,16 +152,18 @@ export class SimpleMovingComponent implements OnInit {
           change_from_open_abs: res['d'][10],
           name: res['d'][0],
           close: res['d'][4],
-          open: res['d'][1],
-          high: res['d'][2],
-          low: res['d'][3],
+          // open: res['d'][1],
+          // high: res['d'][2],
+          // low: res['d'][3],
           preChange:res['d'][5],
           sma20: res['d'][12],
+          sma20closeDiff:  (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
+          ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
           sma50: res['d'][13],
           SMADiff: res['d'][13] - res['d'][12],
           godFatherDiff: res['d'][4] - res['d'][14],
           godFatherDiffPer:
-            (100 * (Number(res['d'][14]) - Number(res['d'][4]))) /
+            (100 * (Number(res['d'][4]) - Number(res['d'][14]))) /
               ((Number(res['d'][14]) + Number(res['d'][4])) / 2),
           godFather: res['d'][14],
           SMADiffChang: Math.abs(
