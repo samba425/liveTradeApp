@@ -159,5 +159,9 @@ export class VolumeshockersComponent implements OnInit {
   //  "average_volume_30d_calc"  16
 
 
+  onBtnExport() {
+    var d = new Date();
+    this.gridOptions.api.exportDataAsCsv({"fileName": `volumeShockers(${d.toLocaleDateString()}).csv`});
+  }
 
 }

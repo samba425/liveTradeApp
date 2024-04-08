@@ -204,4 +204,9 @@ export class SimpleMovingComponent implements OnInit {
       this.gridOptions.api.setQuickFilter(this.searchQuery);
     }
   }
+
+  onBtnExport() {
+    var d = new Date();
+    this.gridOptions.api.exportDataAsCsv({"fileName": `SMA(${d.toLocaleDateString()}).csv`});
+  }
 }

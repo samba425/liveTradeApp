@@ -18,6 +18,8 @@ export class CommonserviceService {
    
  
   fetchLiveData(index,sector?) { 
+    this.liveData  = []
+    this.stockData.next(this.liveData); 
     let url;
     if(sector) {
     url = sector ? `${this.importUrl}getData?sector=${sector}`: `${this.importUrl}getData`
