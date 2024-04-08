@@ -17,9 +17,6 @@ export class VolumeshockersComponent implements OnInit {
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
     editable: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    enableValue: true,
     filter: true,
     flex: 5,
     minWidth: 150,
@@ -89,7 +86,6 @@ export class VolumeshockersComponent implements OnInit {
   searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFilteringAlwaysResets: false,
       serverSideFiltering: true
     };
     this.fetchLiveData()

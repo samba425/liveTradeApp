@@ -16,9 +16,6 @@ export class BankniftyComponent implements OnInit {
   topBanks =['ICICIBANK','KOTAKBANK','SBIN','AXISBANK']
   public defaultColDef: ColDef = {
     editable: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    enableValue: true,
     filter: true,
     flex: 5,
     minWidth: 150,
