@@ -9,7 +9,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const port = process.env.port || 5000;
-// test1();
 
 async function test1(indexType) {
 	let query = []
@@ -150,7 +149,7 @@ app.all('/*', async (req, res) => {
 
 	}
 })
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Trade app listening on port ${port}!`))
 
 
 // { "filter": [{ "left": "type", "operation": "in_range", "right": ["stock", "dr", "fund"] },

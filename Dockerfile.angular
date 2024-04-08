@@ -1,6 +1,0 @@
-FROM node:16.20.0-alpine as trade_app
-
-WORKDIR /front-app
-
-# fetch dependencies
-RUN apk update && npm install -g @angular/cli
