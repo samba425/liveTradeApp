@@ -102,6 +102,9 @@ async function test1(indexType) {
 			})
 	}
 
+	if (indexType && indexType['indexs']) {
+		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX"]
+	}
  
 	let result = await request(reqObj);
 	// "data": [
@@ -149,7 +152,7 @@ app.all('/*', async (req, res) => {
 
 	}
 })
-app.listen(port, () => console.log(`Trade app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 
 // { "filter": [{ "left": "type", "operation": "in_range", "right": ["stock", "dr", "fund"] },
