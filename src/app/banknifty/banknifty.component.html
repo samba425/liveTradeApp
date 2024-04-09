@@ -1,14 +1,14 @@
 <div class="jumbotron jumbotron-fluid ">
 
   <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-3">
       <ul class="list-group m-3">
         <div class="list-group-item list-group-item-success">
-          <h3>Bank Nifty <button class="btn btn-warning" (click)="fetchBanks()"> Refresh</button></h3>
+          <h3>Bank Nifty</h3>
         </div>
       </ul>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-3">
       <ul class="list-group list-group-flush">
         <li class="list-group-item bg-success" *ngIf="hdfcTrend && banksTrend >=2">full Bullish Trend</li>
         <li class="list-group-item bg-danger" *ngIf="banksTrend >=2 && !hdfcTrend">Side Ways</li>
@@ -17,13 +17,37 @@
             class="badge rounded-pill bg-danger">{{allbankTrands}}</span></li>
         <li class="list-group-item bg-info">TOP 5 Banks: <span class="badge rounded-pill bg-success">{{banksTrend +
             hdfcTrend}}</span> </li>
+        <li class="list-group-item bg-secondary" (click)="fetchBanks()">Refresh </li>
+            
       </ul>
+    </div>
+    <div class="col-sm-4">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">VWAP</th>
+            <th scope="col">V.Diff</th>
+            <th scope="col">P.Diff</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of indexValues">
+            <td>{{item.name}}</td>
+            <td>{{item.close}}</td>
+            <td>{{item.vwap  | number : '1.2-2' }}</td>
+            <td>{{item.vwapDiff | number : '1.2-2' }} %</td>
+            <td>{{item.preChange | number : '1.2-2' }} %</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <hr>
   <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height: 800px;width: auto" [rowData]="rowData"
+    <ag-grid-angular class="ag-theme-dark" style="height:400px;width: auto" [rowData]="rowData"
       [rowSelection]="rowSelection" [pagination]="true" [defaultColDef]="defaultColDef"
       [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
     </ag-grid-angular>

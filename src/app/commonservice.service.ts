@@ -8,18 +8,18 @@ import { environment } from 'src/environments/environment';
 export class CommonserviceService {
 
   constructor(private http:HttpClient) { }
-  liveData;
-  liveBankData;
   private stockData = new BehaviorSubject<any>([]);
   private bankData = new BehaviorSubject<any>([]);
+  private liveIndexsData = new BehaviorSubject<any>([]);
+  
   getData = this.stockData.asObservable();
   getBankData = this.bankData.asObservable();
+  getliveIndexsData = this.liveIndexsData.asObservable();
   importUrl = environment.baseUrl;
    
  
   fetchLiveData(index,sector?) { 
-    this.liveData  = []
-    this.stockData.next(this.liveData); 
+    this.stockData.next([]); 
     let url;
     if(sector) {
     url = sector ? `${this.importUrl}getData?sector=${sector}`: `${this.importUrl}getData`
@@ -28,16 +28,20 @@ export class CommonserviceService {
       
     }
     this.http.get(url).subscribe((res) => {
-      this.liveData  =  res['data']
-      this.stockData.next(this.liveData); 
+      this.stockData.next(res['data']); 
     });
   }
   
   
   fetchBankNiftyData() { 
     this.http.get(`${this.importUrl}getData?index=BANKNIFTY`).subscribe((res) => {
-      this.liveBankData  =  res['data']
-      this.bankData.next(this.liveBankData); 
+      this.bankData.next(res['data']); 
+    });
+  }
+
+  fetchIndexsData() { 
+    this.http.get(`${this.importUrl}getData?indexs=true`).subscribe((res) => {
+      this.liveIndexsData.next(res['data']); 
     });
   }
 }

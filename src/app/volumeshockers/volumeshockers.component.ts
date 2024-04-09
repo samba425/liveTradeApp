@@ -118,7 +118,6 @@ export class VolumeshockersComponent implements OnInit {
   }
 
   fetchLiveData() {
-    //  console.log('-dadasdas',this.commonservice.liveData)
     this.commonservice.getData.subscribe(data => {
       console.log('-data', data)
       this.inputValue = data
