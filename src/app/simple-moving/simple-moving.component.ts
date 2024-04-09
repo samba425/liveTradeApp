@@ -15,9 +15,6 @@ export class SimpleMovingComponent implements OnInit {
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
     editable: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    enableValue: true,
     filter: true,
     flex: 1,
     minWidth: 100
@@ -143,7 +140,6 @@ export class SimpleMovingComponent implements OnInit {
   searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFilteringAlwaysResets: false,
       serverSideFiltering: true
     };
 

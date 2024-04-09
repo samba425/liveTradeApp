@@ -13,13 +13,9 @@ export class OpenHighCloseComponent implements OnInit {
 
   ngOnInit() {
   }
-  private gridApi!: GridApi;
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
     editable: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    enableValue: true,
     filter: true,
     flex: 1,
     minWidth: 100,

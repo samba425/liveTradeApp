@@ -103,7 +103,10 @@ async function test1(indexType) {
 			})
 	}
 
- 
+	if (indexType && indexType['indexs']) {
+		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX"]
+	}
+
 	let result = await request(reqObj);
 	// "data": [
 	// 	{
