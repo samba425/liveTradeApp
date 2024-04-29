@@ -4,6 +4,7 @@ import { OpenHighCloseComponent } from './open-high-close/open-high-close.compon
 import { VolumeshockersComponent } from './volumeshockers/volumeshockers.component';
 import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { BankniftyComponent } from './banknifty/banknifty.component';
+import { BBComponent } from './bb/bb.component';
 @NgModule({
   declarations: [ 
     
@@ -15,6 +16,7 @@ import { BankniftyComponent } from './banknifty/banknifty.component';
       { path: 'openhighlow', component: OpenHighCloseComponent },
       { path: 'sma', component: SimpleMovingComponent },
       { path: 'BankNifty', component: BankniftyComponent },
+      { path: 'bb', component: BBComponent },
     ])
   ],
   exports: [

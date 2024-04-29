@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BankniftyComponent } from './banknifty.component';
+import { BBComponent } from './bb.component';
 
-describe('BankniftyComponent', () => {
-  let component: BankniftyComponent;
-  let fixture: ComponentFixture<BankniftyComponent>;
+describe('BBComponent', () => {
+  let component: BBComponent;
+  let fixture: ComponentFixture<BBComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BankniftyComponent ]
+      declarations: [ BBComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BankniftyComponent);
+    fixture = TestBed.createComponent(BBComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
