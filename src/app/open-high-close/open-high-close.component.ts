@@ -89,24 +89,6 @@ export class OpenHighCloseComponent implements OnInit {
    
   }
 
-  // "name", 0
-  // "open", 1
-  // "high", 2
-  // "low",  3
-  // "close",4
-  // "change",5
-  // "change_abs",6
-  // "volume",7
-  // "Value.Traded",8
-  // "change_from_open", 9
-  // "change_from_open_abs",10
-  // "EMA20",11
-  // "SMA20",12
-  // "SMA50",13
-  // "SMA200",14
-
-  //  "average_volume_10d_calc", 15
-  //  "average_volume_30d_calc"  16
   getHighLow() {
     this.openHigh = [];
     this.openLow = [];

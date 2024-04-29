@@ -80,7 +80,8 @@ async function test1(indexType) {
 				"VWAP",
 				"sector",
 				"change_abs|5",
-				"change|5"
+				"change|5",
+				"BB.lower|1W"
 			],
 			"sort": {
 				"sortBy": "close",

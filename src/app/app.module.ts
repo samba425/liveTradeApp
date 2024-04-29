@@ -9,6 +9,7 @@ import { VolumeshockersComponent } from './volumeshockers/volumeshockers.compone
 import { BankniftyComponent } from './banknifty/banknifty.component';
 import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { FormsModule } from '@angular/forms';
+import { BBComponent } from './bb/bb.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FormsModule } from '@angular/forms';
     OpenHighCloseComponent,
     VolumeshockersComponent,
     SimpleMovingComponent,
-    BankniftyComponent
+    BankniftyComponent,
+    BBComponent
   ],
   imports: [AppRoutingModule,FormsModule,
   AgGridModule.withComponents([]),BrowserModule,HttpClientModule
