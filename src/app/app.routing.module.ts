@@ -11,12 +11,13 @@ import { BBComponent } from './bb/bb.component';
   ],
   imports: [
     RouterModule.forRoot([
-      { path: '', component: BankniftyComponent},
+      { path: '',redirectTo: '/BankNifty', pathMatch: 'full'},
       { path: 'volume-shocker', component: VolumeshockersComponent},
       { path: 'openhighlow', component: OpenHighCloseComponent },
       { path: 'sma', component: SimpleMovingComponent },
       { path: 'BankNifty', component: BankniftyComponent },
       { path: 'bb', component: BBComponent },
+      { path: '**', redirectTo: '/BankNifty', pathMatch: 'full' },
     ])
   ],
   exports: [
