@@ -9,6 +9,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 export class AppComponent {
   title = 'tradeApp';
   isbankNifty;
+  currentValue = "NIFTY"
   sectorList = [
     "Energy Minerals",
     "Non-Energy Minerals",
@@ -43,9 +44,11 @@ export class AppComponent {
     });
   }
   sectorSelect(sector) {
+    this.currentValue = sector;
     this.commonService.fetchLiveData(undefined,sector);
   }
   refreshdata(index?) {
+    this.currentValue = index ? index : "ALL";
     this.commonService.fetchLiveData(index);
   }
 }

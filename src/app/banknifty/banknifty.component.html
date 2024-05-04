@@ -1,26 +1,14 @@
 <div class="jumbotron jumbotron-fluid ">
 
   <div class="row">
-    <div class="col-sm-3">
-      <ul class="list-group m-3">
+    <div class="col-sm-4">
+      <ul class="list-group">
         <div class="list-group-item list-group-item-success">
           <h3>Bank Nifty</h3>
         </div>
       </ul>
     </div>
-    <div class="col-sm-3">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item bg-success" *ngIf="hdfcTrend && banksTrend >=2">full Bullish Trend</li>
-        <li class="list-group-item bg-danger" *ngIf="banksTrend >=2 && !hdfcTrend">Side Ways</li>
-        <li class="list-group-item bg-danger" *ngIf="banksTrend <=2 && !hdfcTrend">Bearish Trend with HDFC</li>
-        <li class="list-group-item bg-primary">Above VWAP all Banks: <span
-            class="badge rounded-pill bg-danger">{{allbankTrands}}</span></li>
-        <li class="list-group-item bg-info">TOP 5 Banks: <span class="badge rounded-pill bg-success">{{banksTrend +
-            hdfcTrend}}</span> </li>
-        <li class="list-group-item bg-secondary" (click)="fetchBanks()">Refresh </li>
-        <!-- <li class="list-group-item bg-secondary" (click)="stop()">Refresh </li> -->
-      </ul>
-    </div>
+
     <div class="col-sm-4">
       <table class="table table-striped">
         <thead>
@@ -44,13 +32,36 @@
       </table>
     </div>
   </div>
-
   <hr>
-  <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height:400px;width: auto" [rowData]="rowData"
+  <div class="row"> 
+    <div class="col-sm-8">
+      <div class="example-wrapper">
+        <ag-grid-angular class="ag-theme-dark" style="height:350px;width: auto" [rowData]="rowData"
+          [rowSelection]="rowSelection" [pagination]="true" [defaultColDef]="defaultColDef"
+          [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
+        </ag-grid-angular>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-success" *ngIf="hdfcTrend && banksTrend >=2">full Bullish Trend</li>
+        <li class="list-group-item bg-danger" *ngIf="banksTrend >=2 && !hdfcTrend">Side Ways</li>
+        <li class="list-group-item bg-danger" *ngIf="banksTrend <=2 && !hdfcTrend">Bearish Trend with HDFC</li>
+        <li class="list-group-item bg-primary">Above VWAP all Banks: <span
+            class="badge rounded-pill bg-danger">{{allbankTrands}}</span></li>
+        <li class="list-group-item bg-info">TOP 5 Banks: <span class="badge rounded-pill bg-success">{{banksTrend +
+            hdfcTrend}}</span> </li>
+        <!-- <li class="list-group-item bg-secondary" (click)="fetchBanks()">Refresh </li> -->
+        <!-- <li class="list-group-item bg-secondary" (click)="stop()">Refresh </li> -->
+      </ul>
+    </div> 
+  </div>
+  
+  <!-- <div class="example-wrapper">
+    <ag-grid-angular class="ag-theme-dark" style="height:350px;width: auto" [rowData]="rowData"
       [rowSelection]="rowSelection" [pagination]="true" [defaultColDef]="defaultColDef"
       [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
     </ag-grid-angular>
     <hr>
-  </div>
+  </div> -->
 </div>

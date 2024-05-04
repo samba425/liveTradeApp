@@ -61,16 +61,23 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   result = [];
   allData = []
   constructor(private commonservice: CommonserviceService) {
+    this.fetchIndex();
     this.fetchBankData()
     this.fetchIndexData()
+
     this.fetchBanks()
   }
   fetchBanks() {
     this.mySubscription = interval(10000).subscribe(x => {
       console.log('-calllll')
-      this.commonservice.fetchIndexsData();
-      this.commonservice.fetchBankNiftyData();
+      this.fetchIndex();
     });
+  }
+
+
+  fetchIndex() {
+    this.commonservice.fetchIndexsData();
+    this.commonservice.fetchBankNiftyData();
   }
 
   banks = []
