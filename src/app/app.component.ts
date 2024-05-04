@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonserviceService } from './commonservice.service';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -7,6 +8,7 @@ import { CommonserviceService } from './commonservice.service';
 })
 export class AppComponent {
   title = 'tradeApp';
+  isbankNifty;
   sectorList = [
     "Energy Minerals",
     "Non-Energy Minerals",
@@ -29,8 +31,16 @@ export class AppComponent {
     "Technology Services",
     "Transportation",
     "Utilities"]
-  constructor(private commonService: CommonserviceService) {
+  constructor(private commonService: CommonserviceService,private router: Router,private activatedRoute:ActivatedRoute) {
     this.refreshdata('NIFTY')
+    
+    
+    router.events.subscribe((event) => {
+      if(event instanceof NavigationEnd) {
+      console.log(router.routerState.snapshot.url);
+        this.isbankNifty = router.routerState.snapshot.url;
+      }
+    });
   }
   sectorSelect(sector) {
     this.commonService.fetchLiveData(undefined,sector);
@@ -63,3 +73,7 @@ export class AppComponent {
 // 19: "change_abs|5",
 // 20: "change|5"
 // 21 "BB|1W"
+// 22: "pen|1W",
+// 23: "high|1W",
+// 24: "low|1W",
+// 25: "close|1W"

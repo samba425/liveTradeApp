@@ -18,7 +18,7 @@
         <li class="list-group-item bg-info">TOP 5 Banks: <span class="badge rounded-pill bg-success">{{banksTrend +
             hdfcTrend}}</span> </li>
         <li class="list-group-item bg-secondary" (click)="fetchBanks()">Refresh </li>
-            
+        <!-- <li class="list-group-item bg-secondary" (click)="stop()">Refresh </li> -->
       </ul>
     </div>
     <div class="col-sm-4">
@@ -37,7 +37,7 @@
             <td>{{item.name}}</td>
             <td>{{item.close}}</td>
             <td>{{item.vwap  | number : '1.2-2' }}</td>
-            <td>{{item.vwapDiff | number : '1.2-2' }} %</td>
+            <td>{{item.vwapDiff | number : '1.2-2' }}</td>
             <td>{{item.preChange | number : '1.2-2' }} %</td>
           </tr>
         </tbody>

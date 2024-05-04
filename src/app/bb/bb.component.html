@@ -18,8 +18,33 @@
   </div>
 
   <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height: 800px;width: auto" [rowData]="rowData"
+    <ag-grid-angular class="ag-theme-dark" style="height:400px;width: auto" [rowData]="rowData"
       [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
+      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
+    </ag-grid-angular>
+  </div>
+  
+  <hr>
+  <div class="row m-2">
+    <div class="col-sm-5">
+      <ul class="list-group m-1">
+        <li class="list-group-item list-group-item-success">
+          <h3>BB Filetered List</h3>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-5">
+      <input class="form-control form-control-lg mt-1" type="text" [(ngModel)]="searchQuery1"
+        (input)="onSearchInputChangeFiltered()" placeholder="Search...">
+    </div>
+
+    <div class="col-sm-2">
+      <button class="btn btn-warning" (click)="onBtnExportFiltered()">Download CSV</button>
+    </div>
+  </div>
+  <div class="example-wrapper">
+    <ag-grid-angular class="ag-theme-dark" style="height: 300px;width: auto" [rowData]="filteredrowData"
+      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptionsfiltered" [pagination]="true"
       [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
     </ag-grid-angular>
   </div>
