@@ -81,7 +81,11 @@ async function test1(indexType) {
 				"sector",
 				"change_abs|5",
 				"change|5",
-				"BB.lower|1W"
+				"BB.lower|1W",
+				"open|1W",
+				"high|1W",
+				"low|1W",
+				"close|1W",
 			],
 			"sort": {
 				"sortBy": "close",

@@ -1,18 +1,18 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ColDef } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-banknifty',
   templateUrl: './banknifty.component.html',
   styleUrls: ['./banknifty.component.css']
 })
-export class BankniftyComponent implements OnInit {
+export class BankniftyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
   }
-  
+
   public rowSelection: 'single' | 'multiple' = 'multiple';
   topBanks = ['ICICIBANK', 'KOTAKBANK', 'SBIN', 'AXISBANK']
   public defaultColDef: ColDef = {
@@ -21,6 +21,9 @@ export class BankniftyComponent implements OnInit {
     flex: 5,
     minWidth: 150,
   };
+  mySubscription: Subscription
+  bankSubscription: Subscription
+  indexSubscription: Subscription
   inputValue: any = []
   indexValues: any = []
   rowData = [];
@@ -63,10 +66,13 @@ export class BankniftyComponent implements OnInit {
     this.fetchBanks()
   }
   fetchBanks() {
-    this.commonservice.fetchIndexsData();
-    this.commonservice.fetchBankNiftyData();
+    this.mySubscription = interval(10000).subscribe(x => {
+      console.log('-calllll')
+      this.commonservice.fetchIndexsData();
+      this.commonservice.fetchBankNiftyData();
+    });
   }
- 
+
   banks = []
   hdfcTrend = 0;
   banksTrend = 0;
@@ -106,16 +112,16 @@ export class BankniftyComponent implements OnInit {
   }
 
   fetchBankData() {
-    this.commonservice.getBankData.subscribe(data => {
-      console.log('-fetchBankData', data)
+    this.bankSubscription = this.commonservice.getBankData.subscribe(data => {
+      // console.log('-fetchBankData', data)
       this.inputValue = data
       this.volume()
     });
   }
 
   fetchIndexData() {
-    this.commonservice.getliveIndexsData.subscribe(data => {
-      console.log('index...', data)
+    this.indexSubscription = this.commonservice.getliveIndexsData.subscribe(data => {
+      // console.log('index...', data)
       this.indexValues = []
       data.forEach(res => {
         this.indexValues.push({
@@ -149,6 +155,9 @@ export class BankniftyComponent implements OnInit {
   //  "average_volume_10d_calc", 15
   //  "average_volume_30d_calc"  16 
   //  "VWAP" 17
-
-
+  ngOnDestroy() {
+    this.mySubscription.unsubscribe();
+    this.bankSubscription.unsubscribe();
+    this.indexSubscription.unsubscribe();
+  }
 }
