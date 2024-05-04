@@ -7,7 +7,9 @@ app.use(cors());
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 const port = process.env.PORT || 5000;
+// test1();
 
 async function test1(indexType) {
 	let query = []
@@ -79,7 +81,11 @@ async function test1(indexType) {
 				"sector",
 				"change_abs|5",
 				"change|5",
-				"BB.lower|1W"
+				"BB.lower|1W",
+				"open|1W",
+				"high|1W",
+				"low|1W",
+				"close|1W",
 			],
 			"sort": {
 				"sortBy": "close",
@@ -105,7 +111,7 @@ async function test1(indexType) {
 	if (indexType && indexType['indexs']) {
 		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX"]
 	}
- 
+
 	let result = await request(reqObj);
 	// "data": [
 	// 	{
