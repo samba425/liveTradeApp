@@ -57,18 +57,15 @@ export class BBComponent implements OnInit {
       }
     },
     {
-      field: "change_from_open", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
-        if (params.value > 0) {
-          return { backgroundColor: 'green' };
-        } else {
-          return { backgroundColor: 'red' };
-        }
+      field: "bb", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
       }
     },
-    { field: "preChange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { field: "change_from_open_abs", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
     {
-      field: "bb", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      field: "sma200", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -119,42 +116,57 @@ export class BBComponent implements OnInit {
     this.filteredallData = []
     this.inputValue.forEach((res) => {
       // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
+// 0: "name",
+// 1: "open",
+// 2: "high",
+// 3: "low",
+// 4: "close",
+// 5: "change",
+// 6: "change_abs",
+// 7: "volume",
+// 8: "Value.Traded",
+// 9: "change_from_open",
+// 10: "change_from_open_abs",
+// 11: "SMA20",
+// 12: "SMA20|5",
+// 13: "SMA50|5",
+// 14: "SMA200",
+// 15: "average_volume_10d_calc",
+// 16: "average_volume_30d_calc",
+// 17: "VWAP",
+// 18: "sector",
+// 19: "change_abs|5",
+// 20: "change|5"
+// 21 "BB(lower)|1W"
+// 22: "open|1W",
+// 23: "high|1W",
+// 24: "low|1W",
+// 25: "close|1W"
+// && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
+// if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
 
-      // 21 "BB|1W"
-      // 22: "open|1W",
-      // 23: "high|1W",
-      // 24: "low|1W",
-      // 25: "close|1W"
-      // && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
-      // if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
-
-
-
-      if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
-        this.allData.push({
-          change_from_open: res['d'][9],
-          change_from_open_abs: res['d'][10],
+      // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
+      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
+        this.allData.push({ 
           name: res['d'][0],
-          close: res['d'][4],
-          high: res['d'][2],
-          low: res['d'][3],
-          preChange: res['d'][5],
-          volume: res['d'][7],
-          bb: res['d'][21]
+          close: res['d'][25],
+          high: res['d'][23],
+          low: res['d'][24],
+          bb: res['d'][21],
+          sma200:res['d'][14],
+          volume: res['d'][7]
         });
       }
 
-      if ((res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) || (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) || ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]))) {
+      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) || (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) || ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]))) {
         this.filteredallData.push({
-          change_from_open: res['d'][9],
-          change_from_open_abs: res['d'][10],
           name: res['d'][0],
-          close: res['d'][4],
-          high: res['d'][2],
-          low: res['d'][3],
-          preChange: res['d'][5],
-          volume: res['d'][7],
-          bb: res['d'][21]
+          close: res['d'][25],
+          high: res['d'][23],
+          low: res['d'][24],
+          bb: res['d'][21],
+          sma200:res['d'][14],
+          volume: res['d'][7]
         });
       }
 
