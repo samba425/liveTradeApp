@@ -128,7 +128,7 @@ alertcondition(condition=shortCondition, title='Sell Alert', message='SELL')
 
 
 
-### 3) signal,BB,VWAP,200,50,20 SMA,oivot.camerlla
+### 3) signal,BB,VWAP,200,50,20 SMA,pivot.camerlla,IB,range table
 // @version=5
 // samba siva grow signal
 indicator(title='Grow More', overlay=true)
@@ -178,13 +178,13 @@ plotshape(showSignal?shortCondition:na, title='Sell Signal', text='S', textcolor
 // alertcondition(shortCondition, title='Sell Alert', message='SELL')
 
 // flags for showing (BB,SMA's,VWAP,Pivot,Camarilla )
-showBB = input(false, title='Show Bollinger Bands')
+showBB = input(false, title='BB')
 show200SMA = input(false, title='200 SMA')
 show50SMA = input(false, title='50 SMA')
 show20SMA = input(false, title='20 SMA')
 show9SMA = input(false, title='9 SMA')
 showVwap = input(false, title='VWAP')
-showPivot = input(false, title='Standard Pivot')
+showPivot = input(false, title='Pivots')
 showCamarilla = input(false, title='Camarilla')
 previousHL = input(false, title='PH/PL')
 
@@ -219,26 +219,56 @@ plot(showVwap?vwapVal:na, color=#6b6b6c, linewidth=2, title='VWAP')
 plot(showBB? upperBB: na, color=color.blue, title='Upper BB')
 plot(showBB? lowerBB: na, color=color.orange, title='Lower BB')
 
- 
-
 // Previous Day's High, Low, and Close
 highPrev = request.security(syminfo.tickerid, "D", high[1], lookahead=barmerge.lookahead_on)
 lowPrev = request.security(syminfo.tickerid, "D", low[1], lookahead=barmerge.lookahead_on)
 closePrev = request.security(syminfo.tickerid, "D", close[1], lookahead=barmerge.lookahead_on)
 
-
 // Calculate Pivot Points
 pivot = (highPrev + lowPrev + closePrev) / 3
+pivotBC = (highPrev + lowPrev) / 2
+pivotTC = pivot + (pivot - pivotBC)
+
+// Threshold to determine if the range is narrow or wide
+rangeThreshold = input.float(0.01, title="Range Threshold")
+
+// Determine if the CPR range is narrow or wide
+isNarrow = (pivotTC - pivotBC) < rangeThreshold
+rangeType = isNarrow ? "Narrow" : "Wide"
+
+// Create the table if it doesn't exist
+var table cprTable = table.new(position.top_right, 2, 5, border_width=1)
+
+// Update the table headers once
+if bar_index == 0
+    table.cell(cprTable, 0, 0, "Level", bgcolor=color.gray)
+    table.cell(cprTable, 1, 0, "Value", bgcolor=color.gray)
+
+// Update the CPR values every new bar
+// table.cell(cprTable, 0, 1, "Pivot", bgcolor=color.new(color.blue,0))
+// table.cell(cprTable, 1, 1, str.tostring(pivot, format.mintick), bgcolor=color.new(color.blue,0))
+
+// table.cell(cprTable, 0, 2, "BC", bgcolor=color.new(color.green,0))
+// table.cell(cprTable, 1, 2, str.tostring(pivotBC, format.mintick), bgcolor=color.new(color.green,0))
+
+// table.cell(cprTable, 0, 3, "TC", bgcolor=color.new(color.red,0))
+// table.cell(cprTable, 1, 3, str.tostring(pivotTC, format.mintick), bgcolor=color.new(color.red,0))
+
+table.cell(cprTable, 0, 4, "Range", bgcolor=color.new(color.yellow,0))
+table.cell(cprTable, 1, 4, rangeType, bgcolor=color.new(color.yellow,0))
+
+    
 r1 = 2 * pivot - lowPrev
 s1 = 2 * pivot - highPrev
 r2 = pivot + (highPrev - lowPrev)
 s2 = pivot - (highPrev - lowPrev)
 r3 = highPrev + 2 * (pivot - lowPrev)
 s3 = lowPrev -2 * (highPrev - pivot)
-
-
+ 
 // Plot Pivot Points
 plot(showPivot ? pivot : na, style=plot.style_circles, color=color.blue, title="P")
+plot(showPivot ? pivotBC : na, style=plot.style_circles, color=color.blue, title="BC")
+plot(showPivot ? pivotTC : na, style=plot.style_circles, color=color.blue, title="TC")
 plot(showPivot ? r1 : na, style=plot.style_circles, color=color.red, title="R1")
 plot(showPivot ? r2 : na, style=plot.style_circles, color=color.red, title="R2")
 plot(showPivot ? r3 : na, style=plot.style_circles, color=color.red, title="R3")
@@ -277,6 +307,7 @@ L4 = C - (H - L) * 1.1 / 2.0
 L5 = L / H * C  // Corrected formula for L5
 L6 = C - (H - L) * 1.1 / 1.0  // Additional level L5
 
+mid = (H3 + L3) / 2
 // Plot Camarilla Pivot Points
 plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP')
 
@@ -287,6 +318,8 @@ plot(showCamarilla?H4: na,style=plot.style_circles, color=color.red, title='H4')
 plot(showCamarilla?H5: na,style=plot.style_circles, color=color.red, title='H5')  // Plot R5
 plot(showCamarilla?H6: na,style=plot.style_circles, color=color.orange, title='H6')  // Plot R6 extra formula for R5 only from openAI
 
+plot(showCamarilla?mid: na,style=plot.style_circles, color=color.purple, title='SL',linewidth = 1) // mid range of H3 and L3 act lik SL
+
 // plot(showCamarilla?L1: na,style=plot.style_circles, color=color.green, title='L1')
 // plot(showCamarilla?L2: na,style=plot.style_circles, color=color.green, title='L2')
 plot(showCamarilla?L3: na,style=plot.style_circles, color=color.green, title='L3')
@@ -294,14 +327,86 @@ plot(showCamarilla?L4: na,style=plot.style_circles, color=color.green, title='L4
 plot(showCamarilla?L5: na,style=plot.style_circles, color=color.green, title='L5')  // Plot L5
 plot(showCamarilla?L6: na,style=plot.style_circles, color=color.orange, title='L6')  // Plot L6 extra formula for L5 only from openAI
 
+// Function to create labels next to the lines
+createLabel(price, a) =>
+    label.new(x=bar_index, y=price, text=a, color=#ffffff00, textcolor=color.gray, style=label.style_label_left, size=size.small, textalign=text.align_left)
 
 
-// Add labels at the end of the lines for R1 and S1
-// var label r1Label = na
-// var label s1Label = na
+// Remove previous labels
+var label pivotLabel = na
+var label bcLabel = na
+var label tcLabel = na
+var label sma200Label = na
+var label camP = na
+var label camH3 = na
+var label camH4 = na
+var label camH5 = na
+var label camH6 = na
+var label camL3 = na
+var label camL4 = na
+var label camL5 = na
+var label camL6 = na
+var label cammid = na
+plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP')
 
-// if (bar_index == last_bar_index)
-//     label.delete(r1Label)
-//     label.delete(s1Label)
-//     r1Label := label.new(x=bar_index, y=H3, text="H3", color=#ff525202, textcolor=color.white, style=label.style_label_upper_right, size=size.small)
-//     s1Label := label.new(x=bar_index, y=L3, text="H4", color=#ff525202, textcolor=color.white, style=label.style_label_right, size=size.small)
+// plot(showCamarilla?H1: na,style=plot.style_circles, color=color.red, title='H1')
+// plot(showCamarilla?H2: na,style=plot.style_circles, color=color.red, title='H2')
+plot(showCamarilla?H3: na,style=plot.style_circles, color=color.red, title='H3')
+plot(showCamarilla?H4: na,style=plot.style_circles, color=color.red, title='H4')
+plot(showCamarilla?H5: na,style=plot.style_circles, color=color.red, title='H5')  // Plot R5
+plot(showCamarilla?H6: na,style=plot.style_circles, color=color.orange, title='H6')  // Plot R6 extra formula for R5 only from openAI
+
+plot(showCamarilla?mid: na,style=plot.style_circles, color=color.purple, title='SL',linewidth = 1) // mid range of H3 and L3 act lik SL
+
+// plot(showCamarilla?L1: na,style=plot.style_circles, color=color.green, title='L1')
+// plot(showCamarilla?L2: na,style=plot.style_circles, color=color.green, title='L2')
+plot(showCamarilla?L3: na,style=plot.style_circles, color=color.green, title='L3')
+plot(showCamarilla?L4: na,style=plot.style_circles, color=color.green, title='L4')
+plot(showCamarilla?L5: na,style=plot.style_circles, color=color.green, title='L5')  // Plot L5
+plot(showCamarilla?L6: na,style=plot.style_circles, color=color.orange, title='L6')  // Plot L6 extra formula for L5 only from openAI
+
+if (not na(pivotLabel))
+    label.delete(pivotLabel)
+if (not na(bcLabel))
+    label.delete(bcLabel)
+if (not na(tcLabel))
+    label.delete(tcLabel)
+if (not na(sma200Label))
+    label.delete(sma200Label)
+if (not na(camP))
+    label.delete(camP)
+if (not na(camH3))
+    label.delete(camH3)
+if (not na(camH4))
+    label.delete(camH4)
+if (not na(camH5))
+    label.delete(camH5)
+if (not na(camH6))
+    label.delete(camH6)
+if (not na(camL3))
+    label.delete(camL3)
+if (not na(camL4))
+    label.delete(camL4)
+if (not na(camL5))
+    label.delete(camL5)
+if (not na(camL6))
+    label.delete(camL6)
+if (not na(cammid))
+    label.delete(cammid)
+
+// Create new labels
+pivotLabel := createLabel(showPivot?pivot:na, "P")
+bcLabel := createLabel(showPivot?pivotBC:na, "BC")
+tcLabel := createLabel(showPivot?pivotTC:na, "TC")
+sma200Label := createLabel(show200SMA?sma200:na, "200SMA")
+camP := createLabel(showCamarilla?PP:na, "CP")
+camH3 := createLabel(showCamarilla?H3:na, "H3")
+camH4 := createLabel(showCamarilla?H4:na, "H4")
+camH5 := createLabel(showCamarilla?H5:na, "H5")
+camH6 := createLabel(showCamarilla?H6:na, "H6")
+camL3 := createLabel(showCamarilla?L3:na, "L3")
+camL4:= createLabel(showCamarilla?L4:na, "L4")
+camL5:= createLabel(showCamarilla?L5:na, "L5")
+camL6:= createLabel(showCamarilla?L6:na, "L6")
+cammid:= createLabel(showCamarilla?mid:na, "SL")
+  
