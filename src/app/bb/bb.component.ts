@@ -208,3 +208,54 @@ export class BBComponent implements OnInit {
 // and ( {cash} ( ( {cash} ( weekly close - weekly open <= weekly high - weekly low * 0.32 and weekly close > weekly open and weekly high - weekly close <= weekly high - weekly low * 0.1 ) )
 //  or ( {cash} ( weekly open < weekly close and ( weekly open - weekly low ) / ( weekly high - weekly open ) >= 2 ) ) ) )
 //   and weekly low <= weekly lower bollinger band ( 20,2 ) and latest close > 500 ) ) 
+
+
+
+
+
+// // Function to check for Hammer
+// isHammer(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
+//     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
+//     [isBullishHammer, isBearishHammer]
+
+// showDoji = input.bool(false, title="Show Doji")
+// showHammer = input.bool(false, title="show Hammer")
+
+// // Function to check for Doji
+// isDoji(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     totalRange = high - low
+//     isDoji = (bodySize / totalRange) < 0.1 and upperShadow > bodySize and lowerShadow > bodySize
+//     isDoji
+
+// // Function to check for Hammer
+// isHammer(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     totalRange = high - low
+//     isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
+//     isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
+//     [isBullishHammer, isBearishHammer]
+
+
+// // Identify Doji and Hammers
+// doji = isDoji(open, high, low, close)
+// [bullishHammer, bearishHammer] = isHammer(open, high, low, close)
+
+// // Plot Doji
+// plotshape(showDoji? doji: na, location=location.abovebar, color=color.gray, style=shape.labeldown, text="D")
+
+// // Plot Bullish Hammer
+// plotshape(showHammer?bullishHammer:na, location=location.belowbar, color=color.green, style=shape.labelup, text="H")
+
+// // Plot Bearish Hammer
+// plotshape(showHammer?bearishHammer:na, location=location.abovebar, color=color.red, style=shape.labeldown, text="H")
+
+  
