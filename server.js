@@ -8,7 +8,7 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 // test1();
 
 async function test1(indexType) {
