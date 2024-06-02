@@ -464,8 +464,6 @@ plotshape(showHammer?bearishHammer:na, location=location.abovebar, color=color.r
 // @version=5
 // samba siva grow signal
 indicator(title='Grow More', overlay=true)
-// indicator(title='Combined Moving Averages and VWAP', overlay=true)
-// src = input(defval=close, title='Source',inline="patterns")
 src = close
 showSignal = input(false, title='Signal',inline="patterns")
 per = input.int(defval=100, minval=1, title='Sampling Period',inline="patterns")
@@ -620,25 +618,7 @@ L5 = L / H * C  // Corrected formula for L5
 L6 = C - (H - L) * 1.1 / 1.0  // Additional level L5
 
 mid = (H3 + L3) / 2
-// Plot Camarilla Pivot Points
-plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP',linewidth = 2)
-
-// plot(showCamarilla?H1: na,style=plot.style_circles, color=color.red, title='H1',linewidth = 2)
-// plot(showCamarilla?H2: na,style=plot.style_circles, color=color.red, title='H2',linewidth = 2)
-plot(showCamarilla?H3: na,style=plot.style_circles, color=color.red, title='H3',linewidth = 2)
-plot(showCamarilla?H4: na,style=plot.style_circles, color=color.red, title='H4',linewidth = 2)
-plot(showCamarilla?H5: na,style=plot.style_circles, color=color.red, title='H5',linewidth = 2)  // Plot R5
-plot(showCamarilla?H6: na,style=plot.style_circles, color=color.orange, title='H6',linewidth = 2)  // Plot R6 extra formula for R5 only from openAI
-
-plot(showCamarilla?mid: na,style=plot.style_circles, color=color.purple, title='SL',linewidth = 2) // mid range of H3 and L3 act lik SL
-
-// plot(showCamarilla?L1: na,style=plot.style_circles, color=color.green, title='L1',linewidth = 2)
-// plot(showCamarilla?L2: na,style=plot.style_circles, color=color.green, title='L2',linewidth = 2)
-plot(showCamarilla?L3: na,style=plot.style_circles, color=color.green, title='L3',linewidth = 2)
-plot(showCamarilla?L4: na,style=plot.style_circles, color=color.green, title='L4',linewidth = 2)
-plot(showCamarilla?L5: na,style=plot.style_circles, color=color.green, title='L5',linewidth = 2)  // Plot L5
-plot(showCamarilla?L6: na,style=plot.style_circles, color=color.orange, title='L6',linewidth = 2)  // Plot L6 extra formula for L5 only from openAI
-
+// Plot Camarilla Pivot Points 
 // Function to create labels next to the lines
 createLabel(price, a) =>
     label.new(x=bar_index, y=price, text=a, color=#ffffff00, textcolor=color.white, style=label.style_label_left, size=size.normal, textalign=text.align_left)
@@ -649,6 +629,8 @@ var label pivotLabel = na
 var label bcLabel = na
 var label tcLabel = na
 var label sma200Label = na
+var label sma20Label = na
+var label sma50Label = na
 var label camP = na
 var label camH3 = na
 var label camH4 = na
@@ -660,7 +642,6 @@ var label camL5 = na
 var label camL6 = na
 var label cammid = na
 plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP')
-
 // plot(showCamarilla?H1: na,style=plot.style_circles, color=color.red, title='H1')
 // plot(showCamarilla?H2: na,style=plot.style_circles, color=color.red, title='H2')
 plot(showCamarilla?H3: na,style=plot.style_circles, color=color.red, title='H3')
@@ -685,6 +666,10 @@ if (not na(tcLabel))
     label.delete(tcLabel)
 if (not na(sma200Label))
     label.delete(sma200Label)
+if (not na(sma50Label))
+    label.delete(sma50Label)
+if (not na(sma20Label))
+    label.delete(sma20Label)
 if (not na(camP))
     label.delete(camP)
 if (not na(camH3))
@@ -710,7 +695,9 @@ if (not na(cammid))
 pivotLabel := createLabel(showPivot?pivot:na, "P")
 bcLabel := createLabel(showPivot?pivotBC:na, "BC")
 tcLabel := createLabel(showPivot?pivotTC:na, "TC")
-sma200Label := createLabel(show200SMA?sma200:na, "200SMA")
+sma200Label := createLabel(show200SMA?sma200:na, "200 SMA")
+sma50Label := createLabel(show50SMA?sma50:na, "50 SMA")
+sma20Label := createLabel(show20SMA?sma20:na, "20 SMA")
 camP := createLabel(showCamarilla?PP:na, "CP")
 camH3 := createLabel(showCamarilla?H3:na, "H3 Entry")
 camH4 := createLabel(showCamarilla?H4:na, "H4 T1")
@@ -722,14 +709,6 @@ camL5:= createLabel(showCamarilla?L5:na, "L5 T2")
 camL6:= createLabel(showCamarilla?L6:na, "L6")
 cammid:= createLabel(showCamarilla?mid:na, "SL")
 
-// // Function to check for Hammer
-// isHammer(open, high, low, close) =>
-//     bodySize = math.abs(close - open)
-//     upperShadow = high - math.max(open, close)
-//     lowerShadow = math.min(open, close) - low
-//     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
-//     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
-//     [isBullishHammer, isBearishHammer]
 showBB = input(false, title='BB',inline="patterns")
 
 // Bollinger Bands (BB) Parameters
@@ -766,8 +745,8 @@ isHammer(open, high, low, close) =>
     upperShadow = high - math.max(open, close)
     lowerShadow = math.min(open, close) - low
     totalRange = high - low
-    isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
-    isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
+    isBullishHammer = (bodySize < lowerShadow and upperShadow < bodySize and (close > open)) or (lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3))
+    isBearishHammer = (bodySize < lowerShadow and upperShadow < bodySize and (close < open)) or (lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3))
     [isBullishHammer, isBearishHammer]
 
 
@@ -787,9 +766,9 @@ plotshape(showHammer?bearishHammer:na, location=location.abovebar, color=color.r
 
  // fair value 
  
-thresholdPer = 0.5
-// thresholdPer = input.float(0.5, "Threshold %", minval=0, maxval=100, step=0.1, inline='extend', group='FAIRVALUE')
-// tf = input.timeframe('', "Timeframe", inline='extend', group='FAIRVALUE')
+// thresholdPer = 0.5
+thresholdPer = input.float(0, "Threshold %", minval=0, maxval=100, step=0.1, inline='extend', group='FAIRVALUE')
+tf = input.timeframe('', "Timeframe", inline='extend', group='FAIRVALUE')
 showFairValue = input(false, "fairvalue", inline='extend', group='FAIRVALUE')
 extend = input.int(20, 'Extend', minval=0, inline='extend', group='FAIRVALUE') 
 
@@ -803,10 +782,25 @@ detect() =>
     
     [bull_fvg, bear_fvg, low, high[2], low[2], high]
 
-[bull_fvg, bear_fvg, bull_min, bull_max, bear_min, bear_max] = request.security(syminfo.tickerid, '', detect())
+[bull_fvg, bear_fvg, bull_min, bull_max, bear_min, bear_max] = request.security(syminfo.tickerid, tf, detect())
 
 if bull_fvg and showFairValue
     linefill.new(line.new(bar_index-2, bull_max, bar_index+extend, bull_max,color=#0899816e), line.new(bar_index-2, bull_min, bar_index+extend, bull_min,color=#0899816e), color=#0899812d)
 
 if bear_fvg and showFairValue
     linefill.new(line.new(bar_index-2, bear_max, bar_index+extend, bear_max,color=#f2364667), line.new(bar_index-2, bear_min, bar_index+extend, bear_min,color=#f2364667), color=#f236461a)
+
+
+
+// // Function to detect inside bars
+// isInsideBar = (high < high[1] and low > low[1])
+
+// // Plotting inside bars with different colors for bullish and bearish inside bars
+// bullishInsideBar = isInsideBar and close > open
+// bearishInsideBar = isInsideBar and close < open
+
+// plotshape(series=bullishInsideBar, location=location.belowbar, color=color.green, style=shape.triangleup, title="Bullish Inside Bar")
+// plotshape(series=bearishInsideBar, location=location.abovebar, color=color.red, style=shape.triangledown, title="Bearish Inside Bar")
+
+// // Highlight inside bars on the chart
+// // bgcolor(isInsideBar ? color.new(color.yellow, 90) : na)

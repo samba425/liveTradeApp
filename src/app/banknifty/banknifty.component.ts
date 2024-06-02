@@ -69,7 +69,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   }
   fetchBanks() {
     this.mySubscription = interval(10000).subscribe(x => {
-      console.log('-calllll')
+      // console.log('-calllll')
       this.fetchIndex();
     });
   }
