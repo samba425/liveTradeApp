@@ -158,20 +158,8 @@ app.all('/*', async (req, res) => {
 
 	}
 })
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-
-
-// { "filter": [{ "left": "type", "operation": "in_range", "right": ["stock", "dr", "fund"] },
-//  { "left": "subtype", "operation": "in_range", "right": ["common", "foreign-issuer", "", "etf", "etf,odd", "etf,otc", "etf,cfd"] }, 
-// { "left": "is_primary", "operation": "equal", "right": true }, { "left": "active_symbol", "operation": "equal", "right": true }],
-//  "options": { "lang": "en" }, "markets": ["india"], "symbols": { "query": { "types": [] }, "tickers": [] }, 
-//  "columns": ["logoid", "name", "premarket_close", "premarket_change", "premarket_gap", "premarket_volume", "close", "change", "volume", "postmarket_close", "postmarket_change", "postmarket_volume", "Recommend.All", "market_cap_basic", "change_from_open", "change_from_open_abs", "description", "type", "subtype", "update_mode", "pricescale", "minmov", "fractional", "minmove2", "currency", "fundamental_currency_code"], 
-//  "sort": { "sortBy": "market_cap_basic", "sortOrder": "desc" }, "price_conversion": { "to_symbol": false }, "range": [0, 150] }
-
-
-
-
-
+app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
+ 
 // Percentage Difference Calculator
 // Result: 50
 

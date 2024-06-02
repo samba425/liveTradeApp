@@ -1,17 +1,19 @@
 <div class="jumbotron jumbotron-fluid " *ngIf='rowData && rowData.length;else spinner'>
   <div class="row m-2">
-    <div class="col-sm-5">
+    <div class="col-sm-4">
       <ul class="list-group m-1">
         <li class="list-group-item list-group-item-success">
           <h3>SMA 20 & 50 & 200</h3>
         </li>
       </ul>
     </div>
-    <div class="col-sm-5">
+    <div class="col-sm-3">
       <input class="form-control form-control-lg mt-1" type="text" [(ngModel)]="searchQuery"
         (input)="onSearchInputChange()" placeholder="Search...">
     </div>
-
+    <div class="col-sm-2">
+      <button class="btn btn-success" (click)="nearSMA()">200 SMA filter</button>
+    </div>
     <div class="col-sm-2">
       <button class="btn btn-warning" (click)="onBtnExport()">Download CSV</button>
     </div>

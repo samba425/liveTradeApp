@@ -145,6 +145,23 @@ export class BBComponent implements OnInit {
 // && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
 // if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
 
+// isHammer(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
+//     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
+//     [isBullishHammer, isBearishHammer]
+
+//     isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
+//     isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
+
+let bodySize = Math.abs(res['d'][25]-res['d'][22])
+let upperShadow = res['d'][23] -  Math.max(res['d'][22], res['d'][25])
+let lowerShadow = Math.min(res['d'][22], res['d'][25]) - res['d'][24]
+let totalRange = res['d'][23] - res['d'][24]
+
+
       // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
       if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
         this.allData.push({ 
@@ -158,7 +175,13 @@ export class BBComponent implements OnInit {
         });
       }
 
-      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) || (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) || ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]))) {
+      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
+       (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
+       ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) || 
+       (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) || 
+       (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close > open) && (bodySize / totalRange < 0.3)) || 
+       (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) || 
+       ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize))) {
         this.filteredallData.push({
           name: res['d'][0],
           close: res['d'][25],
@@ -208,3 +231,38 @@ export class BBComponent implements OnInit {
 // and ( {cash} ( ( {cash} ( weekly close - weekly open <= weekly high - weekly low * 0.32 and weekly close > weekly open and weekly high - weekly close <= weekly high - weekly low * 0.1 ) )
 //  or ( {cash} ( weekly open < weekly close and ( weekly open - weekly low ) / ( weekly high - weekly open ) >= 2 ) ) ) )
 //   and weekly low <= weekly lower bollinger band ( 20,2 ) and latest close > 500 ) ) 
+
+
+
+
+
+// // Function to check for Hammer
+// isHammer(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
+//     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
+//     [isBullishHammer, isBearishHammer]
+
+// showDoji = input.bool(false, title="Show Doji")
+// showHammer = input.bool(false, title="show Hammer")
+
+// // Function to check for Doji
+// isDoji(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     totalRange = high - low
+//     isDoji = (bodySize / totalRange) < 0.1 and upperShadow > bodySize and lowerShadow > bodySize
+//     isDoji
+
+// // Function to check for Hammer
+// isHammer(open, high, low, close) =>
+//     bodySize = math.abs(close - open)
+//     upperShadow = high - math.max(open, close)
+//     lowerShadow = math.min(open, close) - low
+//     totalRange = high - low
+//     isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
+//     isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
+//     [isBullishHammer, isBearishHammer]

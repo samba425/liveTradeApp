@@ -25,6 +25,7 @@ export class SimpleMovingComponent implements OnInit {
   rowDataLow = [];
   pagination = true;
   paginationPageSize = 2500;
+  filterData = []
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
@@ -193,6 +194,19 @@ export class SimpleMovingComponent implements OnInit {
       this.rowData = this.allData
     }, 100)
 
+  }
+   
+  nearSMA() {
+    this.filterData = []
+    this.allData.forEach((res) => {
+      if (res['godFatherDiffPer'] >= -1 && res['godFatherDiffPer'] <= 1 && res['volume'] >= 100000) {
+      this.filterData.push(res);
+      }
+    });
+    this.rowData = []
+    setTimeout(() => {
+      this.rowData = this.filterData
+    }, 100)
   }
 
   onSearchInputChange() {
