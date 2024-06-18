@@ -31,10 +31,10 @@ export class BBComponent implements OnInit {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true },
+    { field: "name", sortable: true ,resizable:true },
     {
       field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
+      filter: "agNumberColumnFilter",resizable:true ,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -57,7 +57,7 @@ export class BBComponent implements OnInit {
       }
     },
     {
-      field: "bb", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      field: "bb", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -142,6 +142,11 @@ export class BBComponent implements OnInit {
 // 23: "high|1W",
 // 24: "low|1W",
 // 25: "close|1W"
+// 26: "SMA20|1w",
+// 27: "return_on_equity",
+// 28: "debt_to_equity",
+// 27: "price_earnings_ttm"
+
 // && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
 // if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
 
@@ -175,13 +180,14 @@ let totalRange = res['d'][23] - res['d'][24]
         });
       }
 
-      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
+      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
        (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
        ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) || 
        (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) || 
        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close > open) && (bodySize / totalRange < 0.3)) || 
        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) || 
-       ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize))) {
+       ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) ||  ( Math.abs(res['d'][22] - res['d'][25]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.3 &&  Math.abs(res['d'][23] - res['d'][24]) > 0 && 
+       ((  Math.abs(res['d'][23] - res['d'][22]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.2 || Math.abs(res['d'][23] - res['d'][25]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.2 ) ) ))) { 
         this.filteredallData.push({
           name: res['d'][0],
           close: res['d'][25],

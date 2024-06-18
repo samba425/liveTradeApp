@@ -28,20 +28,20 @@ export class VolumeshockersComponent implements OnInit {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true },
+    { field: "name", resizable:true ,sortable: true },
     {
-      field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString(),
+      field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
-    { field: "open", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "high", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "low", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "open", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "high", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "low", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
     {
-      field: "change_from_open", sortable: true, filter: "agNumberColumnFilter",
+      field: "change_from_open", resizable:true ,sortable: true, filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -55,7 +55,7 @@ export class VolumeshockersComponent implements OnInit {
       }
     },
     {
-      field: "preChange", sortable: true, filter: "agNumberColumnFilter",
+      field: "preChange", resizable:true ,sortable: true, filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -68,9 +68,9 @@ export class VolumeshockersComponent implements OnInit {
         }
       }
     },
-    { field: "change_from_open_abs", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "change_from_open_abs", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
     {
-      field: "volume", sortable: true,
+      field: "volume", resizable:true ,sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,

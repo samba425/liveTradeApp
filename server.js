@@ -9,9 +9,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const port = process.env.PORT || 5000;
-// test1();
 
-async function test1(indexType) {
+async function fetchTradingViewData(indexType) {
 	let query = []
 	if (indexType && indexType['index']) {
 		query = [
@@ -86,6 +85,10 @@ async function test1(indexType) {
 				"high|1W",
 				"low|1W",
 				"close|1W",
+				"SMA20|1W",
+				"return_on_equity",
+				"debt_to_equity",
+				"price_earnings_ttm"
 			],
 			"sort": {
 				"sortBy": "close",
@@ -113,27 +116,18 @@ async function test1(indexType) {
 	}
 
 	let result = await request(reqObj);
-	// "data": [
-	// 	{
-	// 		"s": "NSE:MARUTI",
-	// 		"d": [
-	// 			"MARUTI",
-	// 			11442.1,
-	// 			11333.093122,
-
-	// let filterEMa = result['data'].filter((res) => res['d'][2] > res['d'][1] )
-	// let result = []
-	// filterEMa.array.forEach(element => {
-	// 	let data = (element['d'][2] - element['d'][1])*100%
-	// });
-	// console.log('-dsadasdas', result.data.length, JSON.stringify(result))
 	return result
 }
 app.get('/getData', async (req, res) => {
 	// res.send('hello...')
 	console.log('-req.query', req.query, req.params)
-	let result = await test1(req.query);
-	res.send(result)
+	try {
+		let result = await fetchTradingViewData(req.query);
+	    res.send(result)
+	} catch(err) {
+		console.error('fetch error -->',err)
+		res.send({})
+	}
 })
 app.all('/*', async (req, res) => {
 	console.log('url:', req.url.substring(1))
@@ -183,3 +177,30 @@ app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
 		// NIFTYJR
 		// SENSEX
 		// CNXMETAL
+
+		
+// 		Current price  < 2000 AND
+//  ((Return on equity >= 15 AND
+// Return on capital employed >=15 AND
+// Debt to equity  < 0.2 AND
+// (Sales growth >=10 OR
+// Sales growth 3Years >=10) AND
+// Profit growth >=10 AND
+// Pledged percentage =0 AND
+//  Price to Earning < Industry PE 
+// ) AND
+// ((Sales 2quarters back >   Sales 3quarters back AND
+// Sales preceding quarter > Sales 2quarters back) OR
+
+// Sales latest quarter > Sales preceding quarter OR
+
+// (Net profit 2quarters back > Net profit 3quarters back AND
+// Net Profit preceding quarter > Net profit 2quarters back AND
+// Net Profit latest quarter > Net Profit preceding year)))
+
+
+// 1) return_on_equity >= 15
+// 2) debt_to_equity < 0.2
+
+// 3) Price to Earning 20 to 25
+

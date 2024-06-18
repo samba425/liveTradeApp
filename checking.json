@@ -1,0 +1,93 @@
+{
+	"filter": [
+		{
+			"left": "type",
+			"operation": "in_range",
+			"right": [
+				"stock",
+				"dr",
+				"fund"
+			]
+		},
+		{
+			"left": "subtype",
+			"operation": "in_range",
+			"right": [
+				"common",
+				"foreign-issuer",
+				"",
+				"etf",
+				"etf,odd",
+				"etf,otc",
+				"etf,cfd"
+			]
+		},
+		{
+			"left": "is_primary",
+			"operation": "equal",
+			"right": true
+		},
+		{
+			"left": "active_symbol",
+			"operation": "equal",
+			"right": true
+		}
+	],
+	"options": {
+		"lang": "en"
+	},
+	"markets": [
+		"india"
+	],
+	"symbols": {
+		"query": {
+			"types": []
+		},
+		"tickers": [
+			"NSE:INDIAVIX",
+			"NSE:BANKNIFTY",
+			"NSE:NIFTY",
+			"NSE:NIFTY1!",
+			"NSE:BANKNIFTY1!",
+			"TVC:DJI",
+			"NASDAQ:CSCO",
+			"NSE:FINNIFTY1!",
+			"NSE:MIDCPNIFTY1!",
+			"MCX:CRUDEOIL1!",
+			"NSE:IRCTC",
+			"NSE:RENUKA",
+			"NSE:SYMPHONY",
+			"NSE:BBOX",
+			"NSE:JBMA"
+		]
+	},
+	"columns": [
+		"logoid",
+		"name",
+		"Recommend.All",
+		"volume",
+		"Value.Traded",
+		"price_earnings_ttm",
+		"sector",
+		"BB.lower",
+		"BB.upper",
+		"description",
+		"type",
+		"subtype",
+		"update_mode",
+		"close",
+		"currency",
+		"fundamental_currency_code"
+	],
+	"sort": {
+		"sortBy": "market_cap_basic",
+		"sortOrder": "desc"
+	},
+	"price_conversion": {
+		"to_symbol": false
+	},
+	"range": [
+		0,
+		150
+	]
+}:
