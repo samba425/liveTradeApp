@@ -29,46 +29,46 @@ export class OpenHighCloseComponent implements OnInit {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true },
-    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    { field: "name", resizable:true ,sortable: true },
+    { field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
     filter: "agNumberColumnFilter",
     filterParams: {
       numAlwaysVisibleConditions: 2,
       defaultJoinOperator: "OR"
     }},
-    { field: "open", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "SMADiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    { field: "open", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "SMADiff", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
     filter: "agNumberColumnFilter",
     filterParams: {
       numAlwaysVisibleConditions: 2,
       defaultJoinOperator: "OR"
     }},
-    { field: "SMADiffChang", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() + '%' },
-    { field: "godFatherDiff", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
+    { field: "SMADiffChang", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() + '%' },
+    { field: "godFatherDiff", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString()  ,
     filter: "agNumberColumnFilter",
     filterParams: {
       numAlwaysVisibleConditions: 2,
       defaultJoinOperator: "OR"
     }},
-    { field: "godFatherDiffPer", filter: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { field: "godFather", filter: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "volume", filter: true, sortable: true }
+    { field: "godFatherDiffPer", filter: true, resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    { field: "godFather", filter: true, resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "volume", filter: true, resizable:true ,sortable: true }
   ];
   colDefsOpenHigh: ColDef[] = [
-    { field: "name", sortable: true },
-    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "open", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "high", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { headerName: 'prev-present %', field: "change", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { headerName: 'High-low %',field: "daychange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' }
+    { field: "name", resizable:true ,sortable: true },
+    { field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "open", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "high", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { headerName: 'prev-present %', field: "change", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    { headerName: 'High-low %',field: "daychange", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' }
   ];
   colDefsOpenLow: ColDef[] = [
-    { field: "name", sortable: true },
-    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "open", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "low", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { headerName: 'prev-present %', field: "change", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { headerName: 'High-low %',field: "daychange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    { field: "name", resizable:true ,sortable: true },
+    { field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "open", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "low", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { headerName: 'prev-present %', field: "change", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    { headerName: 'High-low %',field: "daychange", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
   ];
   openHigh = [];
   openLow = [];

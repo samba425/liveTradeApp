@@ -32,11 +32,11 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true },
-    { field: "close", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "vwap", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
+    { field: "name", resizable:true ,sortable: true },
+    { field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "vwap", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
     {
-      field: "vwapDiff", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), cellStyle: function (params) {
+      field: "vwapDiff", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), cellStyle: function (params) {
         if (params.value > 0) {
           return { backgroundColor: 'green' };
         } else {
@@ -45,7 +45,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
       }
     },
     {
-      field: "change_from_open", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
+      field: "change_from_open", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
         if (params.value > 0) {
           return { backgroundColor: 'green' };
         } else {
@@ -53,8 +53,8 @@ export class BankniftyComponent implements OnInit, OnDestroy {
         }
       }
     },
-    { field: "preChange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { field: "change_from_open_abs", sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "preChange", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    { field: "change_from_open_abs", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
   ];
   openHigh = [];
   openLow = [];

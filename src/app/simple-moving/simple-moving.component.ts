@@ -29,10 +29,10 @@ export class SimpleMovingComponent implements OnInit {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true },
+    { field: "name", sortable: true,resizable:true },
     {
-      field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
+      headerName: "C.Price",field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter",resizable:true,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -45,7 +45,7 @@ export class SimpleMovingComponent implements OnInit {
     //   defaultJoinOperator: "OR"
     // }},
     {
-      field: "change_from_open", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
+      headerName: "open %",field: "change_from_open", resizable:true,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
         if (params.value > 0) {
           return { backgroundColor: 'green' };
         } else {
@@ -53,10 +53,10 @@ export class SimpleMovingComponent implements OnInit {
         }
       }
     },
-    { field: "preChange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { field: "change_from_open_abs", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
+    // { field: "preChange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
+    // { field: "change_from_open_abs", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
     {
-      field: "sma20closeDiff", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
+      headerName: "SMA20Close%", field: "sma20closeDiff",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
       cellStyle: function (params) {
         if (params.value > 0) {
           return { backgroundColor: 'green' };
@@ -70,7 +70,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      field: "sma20", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      headerName: "20 SMA",field: "sma20", resizable:true,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -78,7 +78,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      field: "sma50", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      headerName: "50 SMA",field: "sma50",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -91,21 +91,28 @@ export class SimpleMovingComponent implements OnInit {
     //   numAlwaysVisibleConditions: 2,
     //   defaultJoinOperator: "OR"
     // }},
-    {
-      field: "SMADiffChang", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%',
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
+    // {
+    //   field: "SMADiffChang", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%',
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
     // { field: "godFatherDiff", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() ,filter: "agNumberColumnFilter",
     // filterParams: {
     //   numAlwaysVisibleConditions: 2,
     //   defaultJoinOperator: "OR"
     // }},
     {
-      field: "godFatherDiffPer", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
+      headerName: "200 SMA",field: "godFather",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "200SMAClose%",field: "godFatherDiffPer",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
       cellStyle: function (params) {
         if (params.value > 0) {
           return { backgroundColor: 'green' };
@@ -118,20 +125,33 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      field: "godFather", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      field: "volume", sortable: true,
+      field: "volume", resizable:true,sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
+    {
+      field: "stockPts",resizable:true, sortable: true,
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    { headerName: "scannerLink",resizable:true,field: 'name', sortable: true,
+    cellRenderer: function(params) {
+      let keyData = params.data.name;
+      let newLink = 
+      `<a href= https://www.screener.in/company/${keyData}
+      target="_blank">${keyData}</a>`;
+      return newLink;
+  }
+}
+    // onCellClicked: (event: CellClickedEvent) =>
+    //   window.open( `https://www.screener.in/company/${event.value}/`)
+    // },
   ];
 
   result = [];
@@ -161,31 +181,40 @@ export class SimpleMovingComponent implements OnInit {
   getHighLow() {
     this.allData = []
     this.inputValue.forEach((res) => {
+// 27: "return_on_equity",
+// 28: "debt_to_equity",
+// 27: "price_earnings_ttm"
+// 1) return_on_equity >= 15
+// 2) debt_to_equity < 0.2
       // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
+       let stockpts = 0;
+       if(res['d'][27] >= 15) {
+           stockpts++
+       }
+       if(res['d'][28] < 0.2) {
+        stockpts++
+        }
+    
       this.allData.push({
         change_from_open: res['d'][9],
-        change_from_open_abs: res['d'][10],
+        // change_from_open_abs: res['d'][10],
         name: res['d'][0],
         close: res['d'][4],
-        // open: res['d'][1],
-        // high: res['d'][2],
-        // low: res['d'][3],
-        preChange: res['d'][5],
+        // preChange: res['d'][5],
         sma20: res['d'][12],
         sma20closeDiff: (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
           ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
         sma50: res['d'][13],
-        // SMADiff: res['d'][13] - res['d'][12],
-        // godFatherDiff: res['d'][4] - res['d'][14],
         godFatherDiffPer:
           (100 * (Number(res['d'][4]) - Number(res['d'][14]))) /
           ((Number(res['d'][14]) + Number(res['d'][4])) / 2),
         godFather: res['d'][14],
-        SMADiffChang: Math.abs(
-          (100 * (Number(res['d'][13]) - Number(res['d'][12]))) /
-          ((Number(res['d'][13]) + Number(res['d'][12])) / 2)
-        ),
-        volume: res['d'][7]
+        // SMADiffChang: Math.abs(
+        //   (100 * (Number(res['d'][13]) - Number(res['d'][12]))) /
+        //   ((Number(res['d'][13]) + Number(res['d'][12])) / 2)
+        // ),
+        volume: res['d'][7],
+        stockPts: stockpts
       });
       // } 
     });
