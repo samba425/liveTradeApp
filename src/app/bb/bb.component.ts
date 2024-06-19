@@ -101,10 +101,10 @@ export class BBComponent implements OnInit {
   searchQuery1: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
     this.gridOptionsfiltered = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
 
     setTimeout(() => {
@@ -115,7 +115,6 @@ export class BBComponent implements OnInit {
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
-      // console.log('-fetchLiveData',data)
       this.inputValue = data
       this.getHighLow()
     });

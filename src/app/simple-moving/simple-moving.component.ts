@@ -162,7 +162,7 @@ export class SimpleMovingComponent implements OnInit {
   searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
 
     setTimeout(() => {
@@ -173,7 +173,6 @@ export class SimpleMovingComponent implements OnInit {
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
-      // console.log('-fetchLiveData',data)
       this.inputValue = data
       this.getHighLow()
     });
