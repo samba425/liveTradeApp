@@ -145,7 +145,8 @@ export class SimpleMovingComponent implements OnInit {
       let keyData = params.data.name;
       let newLink = 
       `<a href= https://www.screener.in/company/${keyData}
-      target="_blank">${keyData}</a>`;
+      target="_blank">sceener</a>  |  <a href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+      target="_blank">chart</a>`;
       return newLink;
   }
 }
@@ -161,7 +162,7 @@ export class SimpleMovingComponent implements OnInit {
   searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
 
     setTimeout(() => {
@@ -172,7 +173,6 @@ export class SimpleMovingComponent implements OnInit {
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
-      // console.log('-fetchLiveData',data)
       this.inputValue = data
       this.getHighLow()
     });

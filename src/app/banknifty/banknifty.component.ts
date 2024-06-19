@@ -69,7 +69,6 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   }
   fetchBanks() {
     this.mySubscription = interval(10000).subscribe(x => {
-      // console.log('-calllll')
       this.fetchIndex();
     });
   }
@@ -93,7 +92,6 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     //  let result =  this.inputValue.filter(element => element['d'][7] > element['d'][16]*5);
     this.inputValue.forEach(res => {
       if (res['d'][0] == 'HDFCBANK' && (res['d'][4] - res['d'][17]) > 0) {
-        console.log((res['d'][4] - res['d'][17]))
         this.hdfcTrend++
       } else {
         if (this.topBanks.includes(res['d'][0]) && (res['d'][4] - res['d'][17]) > 0) {
@@ -120,7 +118,6 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   fetchBankData() {
     this.bankSubscription = this.commonservice.getBankData.subscribe(data => {
-      // console.log('-fetchBankData', data)
       this.inputValue = data
       this.volume()
     });
@@ -128,7 +125,6 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   fetchIndexData() {
     this.indexSubscription = this.commonservice.getliveIndexsData.subscribe(data => {
-      // console.log('index...', data)
       this.indexValues = []
       data.forEach(res => {
         this.indexValues.push({

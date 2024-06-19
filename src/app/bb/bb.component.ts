@@ -80,6 +80,16 @@ export class BBComponent implements OnInit {
         defaultJoinOperator: "OR"
       }
     },
+    { headerName: "scannerLink",resizable:true,field: 'name', sortable: true,
+    cellRenderer: function(params) {
+      let keyData = params.data.name;
+      let newLink = 
+      `<a href= https://www.screener.in/company/${keyData}
+      target="_blank">sceener</a>  |  <a href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+      target="_blank">chart</a>`;
+      return newLink;
+  }
+}
   ];
 
   result = [];
@@ -91,10 +101,10 @@ export class BBComponent implements OnInit {
   searchQuery1: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
     this.gridOptionsfiltered = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
 
     setTimeout(() => {
@@ -105,7 +115,6 @@ export class BBComponent implements OnInit {
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
-      // console.log('-fetchLiveData',data)
       this.inputValue = data
       this.getHighLow()
     });

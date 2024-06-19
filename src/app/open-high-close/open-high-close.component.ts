@@ -82,7 +82,6 @@ export class OpenHighCloseComponent implements OnInit {
 
   fetchLiveData() {
   this.commonservice.getData.subscribe(data => {
-    console.log('-fetchLiveData openhigh',data)
     this.inputValue = data
       this.getHighLow()
   } );

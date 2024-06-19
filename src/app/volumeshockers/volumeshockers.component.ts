@@ -86,7 +86,7 @@ export class VolumeshockersComponent implements OnInit {
   searchQuery: string = '';
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      serverSideFiltering: true
+      // serverSideFiltering: true
     };
     this.fetchLiveData()
   }
@@ -119,7 +119,6 @@ export class VolumeshockersComponent implements OnInit {
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
-      console.log('-data', data)
       this.inputValue = data
       setTimeout(() => {
         this.volume()

@@ -38,7 +38,6 @@ export class AppComponent {
     
     router.events.subscribe((event) => {
       if(event instanceof NavigationEnd) {
-      console.log(router.routerState.snapshot.url);
         this.isbankNifty = router.routerState.snapshot.url;
       }
     });
