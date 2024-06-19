@@ -145,7 +145,8 @@ export class SimpleMovingComponent implements OnInit {
       let keyData = params.data.name;
       let newLink = 
       `<a href= https://www.screener.in/company/${keyData}
-      target="_blank">${keyData}</a>`;
+      target="_blank">sceener</a>  |  <a href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+      target="_blank">chart</a>`;
       return newLink;
   }
 }
