@@ -86,9 +86,7 @@ async function fetchTradingViewData(indexType) {
 				"low|1W",
 				"close|1W",
 				"SMA20|1W",
-				"return_on_equity",
-				"debt_to_equity",
-				"price_earnings_ttm"
+				"RSI"
 			],
 			"sort": {
 				"sortBy": "close",
