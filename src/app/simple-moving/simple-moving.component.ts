@@ -133,8 +133,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      field: "RSI",resizable:true, sortable: true,
-      filter: "agNumberColumnFilter",
+      headerName: "RSI",field: "RSI",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -214,7 +213,7 @@ export class SimpleMovingComponent implements OnInit {
   nearSMA() {
     this.filterData = []
     this.allData.forEach((res) => {
-      if (res['godFatherDiffPer'] >= -1 && res['godFatherDiffPer'] <= 1 && res['volume'] >= 100000) {
+      if (res['godFatherDiffPer'] >= -0.5 && res['godFatherDiffPer'] <= 1 && res['volume'] >= 200000 && res['d'][4] > 40 && res['d'][4] < 2500) {
       this.filterData.push(res);
       }
     });
