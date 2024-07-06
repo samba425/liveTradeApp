@@ -133,7 +133,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      field: "stockPts",resizable:true, sortable: true,
+      field: "RSI",resizable:true, sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -181,20 +181,6 @@ export class SimpleMovingComponent implements OnInit {
   getHighLow() {
     this.allData = []
     this.inputValue.forEach((res) => {
-// 27: "return_on_equity",
-// 28: "debt_to_equity",
-// 27: "price_earnings_ttm"
-// 1) return_on_equity >= 15
-// 2) debt_to_equity < 0.2
-      // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
-       let stockpts = 0;
-       if(res['d'][27] >= 15) {
-           stockpts++
-       }
-       if(res['d'][28] < 0.2) {
-        stockpts++
-        }
-    
       this.allData.push({
         change_from_open: res['d'][9],
         // change_from_open_abs: res['d'][10],
@@ -214,7 +200,7 @@ export class SimpleMovingComponent implements OnInit {
         //   ((Number(res['d'][13]) + Number(res['d'][12])) / 2)
         // ),
         volume: res['d'][7],
-        stockPts: stockpts
+        RSI: res['d'][27]
       });
       // } 
     });

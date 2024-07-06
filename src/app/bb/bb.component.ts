@@ -152,9 +152,7 @@ export class BBComponent implements OnInit {
 // 24: "low|1W",
 // 25: "close|1W"
 // 26: "SMA20|1w",
-// 27: "return_on_equity",
-// 28: "debt_to_equity",
-// 27: "price_earnings_ttm"
+// 27: "RSI"
 
 // && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
 // if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
