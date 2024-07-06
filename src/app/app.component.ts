@@ -80,6 +80,4 @@ export class AppComponent {
 // 24: "low|1W",
 // 25: "close|1W"
 // 26: "SMA20|1W",
-// 27: "return_on_equity",
-// 28: "debt_to_equity",
-// 27: "price_earnings_ttm"
+// 27: "RSI"
