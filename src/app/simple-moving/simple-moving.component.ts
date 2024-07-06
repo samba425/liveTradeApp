@@ -213,7 +213,7 @@ export class SimpleMovingComponent implements OnInit {
   nearSMA() {
     this.filterData = []
     this.allData.forEach((res) => {
-      if (res['godFatherDiffPer'] >= -0.5 && res['godFatherDiffPer'] <= 1 && res['volume'] >= 200000 && res['d'][4] > 40 && res['d'][4] < 2500) {
+      if (res['godFatherDiffPer'] >= -0.5 && res['godFatherDiffPer'] <= 1 && res['volume'] >= 200000 && res['d'][4] && res['d'][4] > 40 && res['d'][4] < 2500) {
       this.filterData.push(res);
       }
     });
