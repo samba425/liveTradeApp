@@ -10,6 +10,7 @@ import { BankniftyComponent } from './banknifty/banknifty.component';
 import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { FormsModule } from '@angular/forms';
 import { BBComponent } from './bb/bb.component';
+import { LearnComponent } from './learn/learn.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { BBComponent } from './bb/bb.component';
     VolumeshockersComponent,
     SimpleMovingComponent,
     BankniftyComponent,
-    BBComponent
+    BBComponent,
+    LearnComponent
   ],
   imports: [AppRoutingModule,FormsModule,
   AgGridModule.withComponents([]),BrowserModule,HttpClientModule
