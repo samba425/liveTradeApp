@@ -121,7 +121,7 @@ async function fetchTradingViewData(indexType) {
 }
 app.get('/getData', async (req, res) => {
 	// res.send('hello...')
-	console.log('-req.query', req.query, req.params)
+	console.log('req.query=======>', req.query, req.params)
 	try {
 		let result = await fetchTradingViewData(req.query);
 	    res.send(result)
