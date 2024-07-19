@@ -139,12 +139,27 @@ export class SimpleMovingComponent implements OnInit {
         defaultJoinOperator: "OR"
       }
     },
+    {
+      headerName: "MACD",field: "MACD",resizable:true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "52 High",field: "HIGH52",resizable:true, sortable: true,
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
     { headerName: "scannerLink",resizable:true,field: 'name', sortable: true,
     cellRenderer: function(params) {
       let keyData = params.data.name;
       let newLink = 
-      `<a href= https://www.screener.in/company/${keyData}
-      target="_blank">sceener</a>  |  <a href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+      `<a style="color:white;" href= https://www.screener.in/company/${keyData}
+      target="_blank">sceener</a>  |  <a style="color:white;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
       target="_blank">chart</a>`;
       return newLink;
   }
@@ -177,6 +192,8 @@ export class SimpleMovingComponent implements OnInit {
     });
   }
 
+ 
+  
   getHighLow() {
     this.allData = []
     this.inputValue.forEach((res) => {
@@ -199,7 +216,9 @@ export class SimpleMovingComponent implements OnInit {
         //   ((Number(res['d'][13]) + Number(res['d'][12])) / 2)
         // ),
         volume: res['d'][7],
-        RSI: res['d'][27]
+        RSI: res['d'][27],
+        MACD: Math.abs(Math.abs(res['d'][29]) -  Math.abs(res['d'][30])),
+        HIGH52: res['d'][28]
       });
       // } 
     });

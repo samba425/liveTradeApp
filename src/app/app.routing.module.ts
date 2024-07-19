@@ -5,6 +5,7 @@ import { VolumeshockersComponent } from './volumeshockers/volumeshockers.compone
 import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { BankniftyComponent } from './banknifty/banknifty.component';
 import { BBComponent } from './bb/bb.component';
+import { LearnComponent } from './learn/learn.component';
 @NgModule({
   declarations: [ 
     
@@ -17,6 +18,7 @@ import { BBComponent } from './bb/bb.component';
       { path: 'sma', component: SimpleMovingComponent },
       { path: 'BankNifty', component: BankniftyComponent },
       { path: 'bb', component: BBComponent },
+      { path: 'learn', component: LearnComponent },
       { path: '**', redirectTo: '/BankNifty', pathMatch: 'full' },
     ])
   ],

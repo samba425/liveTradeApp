@@ -81,3 +81,6 @@ export class AppComponent {
 // 25: "close|1W"
 // 26: "SMA20|1W",
 // 27: "RSI"
+// 28: "price_52_week_high",
+// 29: "MACD.macd",
+// 30: "MACD.signal"
