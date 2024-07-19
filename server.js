@@ -130,29 +130,29 @@ app.get('/getData', async (req, res) => {
 		res.send({})
 	}
 })
-app.all('/*', async (req, res) => {
-	console.log('url:', req.url.substring(1))
-	if (req.url) {
-		try {
-			var reqObj = {
-				uri: req.url.substring(1),
-				method: req.method,
-				body: req.body,
-				json: true
-			};
+// app.all('/*', async (req, res) => {
+// 	console.log('url:', req.url.substring(1))
+// 	if (req.url) {
+// 		try {
+// 			var reqObj = {
+// 				uri: req.url.substring(1),
+// 				method: req.method,
+// 				body: req.body,
+// 				json: true
+// 			};
 
-			if (req['headers']) {
-				reqObj['headers'] = req.headers
-			}
-			console.log('--external payload', reqObj)
-			let result = await request(reqObj);
-			return res.status(200).json(result)
-		} catch (e) {
-			return res.status(e['statusCode']).json(e['error'] ? e['error'] : e)
-		}
+// 			if (req['headers']) {
+// 				reqObj['headers'] = req.headers
+// 			}
+// 			console.log('--external payload', reqObj)
+// 			let result = await request(reqObj);
+// 			return res.status(200).json(result)
+// 		} catch (e) {
+// 			return res.status(e['statusCode']).json(e['error'] ? e['error'] : e)
+// 		}
 
-	}
-})
+// 	}
+// })
 app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
  
 // Percentage Difference Calculator
