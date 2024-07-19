@@ -86,7 +86,10 @@ async function fetchTradingViewData(indexType) {
 				"low|1W",
 				"close|1W",
 				"SMA20|1W",
-				"RSI"
+				"RSI",
+				"price_52_week_high",
+				"MACD.macd",
+				"MACD.signal"
 			],
 			"sort": {
 				"sortBy": "close",
@@ -202,3 +205,10 @@ app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
 
 // 3) Price to Earning 20 to 25
 
+
+// "price_earnings_ttm",(15 to 10)
+//         "earnings_per_share_basic_ttm",
+//         "basic_eps_net_income",(high)
+//         "price_book_ratio",(<1)
+//         "Perf.5Y", (postive high)
+//         "return_on_equity" (ROE 15 to 20)
