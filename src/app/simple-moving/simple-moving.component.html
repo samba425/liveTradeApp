@@ -12,14 +12,14 @@
         (input)="onSearchInputChange()" placeholder="Search...">
     </div> 
     <div class="col-sm-3">
-      <textarea class="form-control form-control-lg mt-1" type="text"  rows="1" [(ngModel)]="query"
+      <textarea class="form-control form-control-lg  textStyle" type="text"  rows="1" [(ngModel)]="query"
          placeholder="Query Search..."></textarea>
          <p class="font-italic">search with res, keys:low,close,sma20,sma50,
           godFather,volume,RSI,MACD,HIGH52</p>
     </div> 
     
     <div  class="col-sm-2" role="group" >
-      <button type="button" (click)=querySearch()  class="btn  m-1 btn-secondary">Query</button>
+      <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
       <button type="button" (click)="nearSMA()"  class="btn m-1  btn-danger">SMA filter</button>
       <button type="button" (click)="onBtnExport()" class="btn m-1  btn-warning">CSV</button>
       </div>
