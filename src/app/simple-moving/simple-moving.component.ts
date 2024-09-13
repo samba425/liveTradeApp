@@ -181,6 +181,8 @@ export class SimpleMovingComponent implements OnInit {
       this.allData.push({
         change_from_open: res['d'][9],
         low: res['d'][3],
+        high: res['d'][2],
+        open: res['d'][1],
         name: res['d'][0],
         close: res['d'][4],
         sma20: res['d'][12],
@@ -288,3 +290,19 @@ export class SimpleMovingComponent implements OnInit {
     this.gridOptions.api.exportDataAsCsv({"fileName": `SMA(${d.toLocaleDateString()}).csv`});
   }
 }
+
+// // Calculate Pivot Points
+// pivot = (highPrev + lowPrev + closePrev) / 3
+// pivotBC = (highPrev + lowPrev) / 2
+// pivotTC = pivot + (pivot - pivotBC)
+// r1 = 2 * pivot - lowPrev
+// s1 = 2 * pivot - highPrev
+// r2 = pivot + (highPrev - lowPrev)
+// s2 = pivot - (highPrev - lowPrev)
+// r3 = highPrev + 2 * (pivot - lowPrev)
+// s3 = lowPrev -2 * (highPrev - pivot)
+// // Calculate Pivot Point (P)
+// // Calculate Bottom Central Pivot (BC)
+// bc = (highPrev + lowPrev) / 2
+// // Calculate Top Central Pivot (TC)
+// tc = pivot + (pivot - bc)

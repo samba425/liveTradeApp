@@ -115,7 +115,10 @@ async function fetchTradingViewData(indexType) {
 	if (indexType && indexType['indexs']) {
 		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX"]
 	}
-
+	
+	if (indexType && indexType['nseTop']) {
+		reqObj['body']['symbols']['tickers'] = ["NSE:HDFCBANK","NSE:RELIANCE","NSE:ICICIBANK","NSE:INFY","NSE:ITC","NSE:TCS","NSE:LT","NSE:BHARTIARTL","NSE:AXISBANK","NSE:SBIN"] 
+	}
 	let result = await request(reqObj);
 	return result
 }
