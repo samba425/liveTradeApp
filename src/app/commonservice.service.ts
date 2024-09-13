@@ -11,10 +11,12 @@ export class CommonserviceService {
   private stockData = new BehaviorSubject<any>([]);
   private bankData = new BehaviorSubject<any>([]);
   private liveIndexsData = new BehaviorSubject<any>([]);
+  private nseTopData = new BehaviorSubject<any>([]);
   
   getData = this.stockData.asObservable();
   getBankData = this.bankData.asObservable();
   getliveIndexsData = this.liveIndexsData.asObservable();
+  getnseTopData = this.nseTopData.asObservable();
   importUrl = environment.baseUrl;
    
  
@@ -38,6 +40,12 @@ export class CommonserviceService {
       this.bankData.next(res['data']); 
     });
   }
+  
+  fetchNiftyTopData() { 
+    this.http.get(`${this.importUrl}getData?nseTop=true`).subscribe((res) => {
+      this.nseTopData.next(res['data']); 
+    });
+  } 
 
   fetchIndexsData() { 
     this.http.get(`${this.importUrl}getData?indexs=true`).subscribe((res) => {

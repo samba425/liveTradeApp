@@ -84,3 +84,21 @@ export class AppComponent {
 // 28: "price_52_week_high",
 // 29: "MACD.macd",
 // 30: "MACD.signal"
+
+
+
+// // Calculate Pivot Points
+// pivot = (highPrev + lowPrev + closePrev) / 3
+// pivotBC = (highPrev + lowPrev) / 2
+// pivotTC = pivot + (pivot - pivotBC)
+// r1 = 2 * pivot - lowPrev
+// s1 = 2 * pivot - highPrev
+// r2 = pivot + (highPrev - lowPrev)
+// s2 = pivot - (highPrev - lowPrev)
+// r3 = highPrev + 2 * (pivot - lowPrev)
+// s3 = lowPrev -2 * (highPrev - pivot)
+// // Calculate Pivot Point (P)
+// // Calculate Bottom Central Pivot (BC)
+// bc = (highPrev + lowPrev) / 2
+// // Calculate Top Central Pivot (TC)
+// tc = pivot + (pivot - bc)

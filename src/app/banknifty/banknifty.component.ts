@@ -15,18 +15,22 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   public rowSelection: 'single' | 'multiple' = 'multiple';
   topBanks = ['ICICIBANK', 'KOTAKBANK', 'SBIN', 'AXISBANK']
+  nifty50Top = ["HDFCBANK","RELIANCE","ICICIBANK","INFY","ITC","TCS","LT","BHARTIARTL","AXISBANK","SBIN"]
   public defaultColDef: ColDef = {
     editable: true,
     filter: true,
     flex: 5,
     minWidth: 150,
   };
-  mySubscription: Subscription
-  bankSubscription: Subscription
-  indexSubscription: Subscription
+  mySubscription: Subscription;
+  bankSubscription: Subscription;
+  nifySubscription: Subscription;
+  indexSubscription: Subscription;
   inputValue: any = []
+  nseTopCompaines: any = []
   indexValues: any = []
   rowData = [];
+  rowTopData = [];
   pagination = true;
   paginationPageSize = 2500;
   paginationPageSizeSelector = [200, 500, 1000];
@@ -62,8 +66,9 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   allData = []
   constructor(private commonservice: CommonserviceService) {
     this.fetchIndex();
-    this.fetchBankData()
-    this.fetchIndexData()
+    this.fetchBankData();
+    this.fetchnseTopData();
+    this.fetchIndexData();
 
     this.fetchBanks()
   }
@@ -77,14 +82,17 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   fetchIndex() {
     this.commonservice.fetchIndexsData();
     this.commonservice.fetchBankNiftyData();
+    this.commonservice.fetchNiftyTopData()
   }
 
   banks = []
+  topCompanies = [];
   hdfcTrend = 0;
   banksTrend = 0;
   allbankTrands = 0
+  niftyaboveVwap = 0
   // latest Volume > latest Sma ( volume,20 ) * 5 
-  volume() {
+  fetchBank() {
     this.hdfcTrend = 0;
     this.banksTrend = 0;
     this.allbankTrands = 0
@@ -113,13 +121,45 @@ export class BankniftyComponent implements OnInit, OnDestroy {
       });
     });
     this.rowData = this.banks
-
   }
+  
+  fetchTopCompanies() { 
+    this.topCompanies = []
+    this.niftyaboveVwap = 0
+    this.nifty50Top.forEach(res => {
+      let getCompany = this.nseTopCompaines.find(i => i['d'][0] == res);
+      if(getCompany) {
+        if ((getCompany['d'][4] - getCompany['d'][17]) > 0) {
+          this.niftyaboveVwap++
+        }
+        this.topCompanies.push({
+          name: getCompany['d'][0],
+          close: getCompany['d'][4],
+          preChange: getCompany['d'][5],
+          vwapDiff: getCompany['d'][4] - getCompany['d'][17],
+          vwap: getCompany['d'][17],
+          change_from_open: getCompany['d'][9],
+          change_from_open_abs: getCompany['d'][10],
+        }); 
+      }else {
+        console.log('-not found',res)
+      }
+
+    });
+    this.rowTopData = this.topCompanies
+  }
+  
 
   fetchBankData() {
     this.bankSubscription = this.commonservice.getBankData.subscribe(data => {
       this.inputValue = data
-      this.volume()
+      this.fetchBank()
+    });
+  }
+  fetchnseTopData() {
+    this.nifySubscription = this.commonservice.getnseTopData.subscribe(data => {
+      this.nseTopCompaines = data
+      this.fetchTopCompanies()
     });
   }
 
@@ -161,6 +201,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.mySubscription.unsubscribe();
     this.bankSubscription.unsubscribe();
+    this.nifySubscription.unsubscribe();
     this.indexSubscription.unsubscribe();
   }
 }
