@@ -1,33 +1,27 @@
 <div class="jumbotron jumbotron-fluid " *ngIf='rowData && rowData.length;else spinner'>
   <div class="row m-2">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <ul class="list-group">
         <li class="list-group-item list-group-item-success">
           <h4>SMA 20 & 50 & 200</h4>
         </li>
       </ul>
-    </div>
-    <div class="col-sm-2">
       <input class="form-control form-control-lg mt-1" type="text" [(ngModel)]="searchQuery"
         (input)="onSearchInputChange()" placeholder="Search...">
     </div> 
-    <div class="col-sm-3">
+    <div class="col-sm-4">
       <textarea class="form-control form-control-lg  textStyle" type="text"  rows="1" [(ngModel)]="query"
          placeholder="Query Search..."></textarea>
          <p class="font-italic">search with res, keys:low,close,sma20,sma50,
-          godFather,volume,RSI,MACD,HIGH52</p>
+          godFather,volume,RSI,MACD,HIGH52,VWAP,sector,MACDSignal</p>
     </div> 
     
-    <div  class="col-sm-2" role="group" >
+    <div  class="col-sm-4" role="group" >
       <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
       <button type="button" (click)="nearSMA()"  class="btn m-1  btn-danger">SMA filter</button>
-      <button type="button" (click)="onBtnExport()" class="btn m-1  btn-warning">CSV</button>
+      <button type="button" (click)="near2050SMA()"  class="btn m-1 btn-danger">SMA 20-50</button>
+      <button type="button" (click)="onBtnExport()" class="btn m-1 btn-warning">CSV</button>
       </div>
-    <!-- <div class="col-sm-3">
-         <button class="btn btn-success mr-1" (click)="querySearch()">Query</button>
-         <button class="btn btn-success mr-1" (click)="nearSMA()">filter</button>
-         <button class="btn btn-warning" (click)="onBtnExport()"> CSV</button>
-    </div>  -->
   </div>
 
   <div class="example-wrapper">
