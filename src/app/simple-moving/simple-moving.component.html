@@ -1,4 +1,4 @@
-<div class="jumbotron jumbotron-fluid " *ngIf='rowData && rowData.length;else spinner'>
+<div class="jumbotron jumbotron-fluid " >
   <div class="row m-2">
     <div class="col-sm-3">
       <ul class="list-group">
@@ -18,13 +18,14 @@
     
     <div  class="col-sm-4" role="group" >
       <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
-      <button type="button" (click)="nearSMA()"  class="btn m-1  btn-danger">SMA filter</button>
-      <button type="button" (click)="near2050SMA()"  class="btn m-1 btn-danger">SMA 20-50</button>
-      <button type="button" (click)="onBtnExport()" class="btn m-1 btn-warning">CSV</button>
+      <button type="button" (click)="nearSMA()"  class="btn m-1  btn-primary">SMA filter</button>
+      <button type="button" (click)="near2050SMA()"  class="btn m-1 btn-info">SMA 20/50</button>
+      <button type="button" (click)="onBtnExport()" class="btn m-1 btn-dark">CSV</button>
+      <button type="button" (click)="reset()" class="btn m-1 btn-danger">Reset</button>
       </div>
   </div>
 
-  <div class="example-wrapper">
+  <div *ngIf='rowData && rowData.length;else spinner' class="example-wrapper">
     <ag-grid-angular class="ag-theme-dark" style="height: 800px;width: auto" [rowData]="rowData"
       [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
       [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
@@ -48,10 +49,10 @@
         <h4>If - means Below 200 SMA</h4>
     </div>
   </div>
-  <div class="col-sm-6">
+  <!-- <div class="col-sm-6">
       <div class="card-body">
         <h4>NOTE:</h4> Daily after 2.30 % (20SMA %)
         <h4>Highest -% take entry for 3-5% target</h4>
       </div>
-  </div>
+  </div> -->
 </div>
