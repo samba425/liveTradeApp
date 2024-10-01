@@ -120,6 +120,13 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
+      headerName: "S-MACD", field: "MACDSignal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
       headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -127,7 +134,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "scannerLink", resizable: true, field: 'name', sortable: true,
+      headerName: "scannerLink", resizable: true, field: 'name', sortable: true,minWidth: 150,
       cellRenderer: function (params) {
         let keyData = params.data.name;
         let newLink =
@@ -136,7 +143,15 @@ export class SimpleMovingComponent implements OnInit {
       target="_blank">chart</a>`;
         return newLink;
       }
+    },
+    {
+      headerName: "sector", field: "sector", resizable: true, sortable: true, filter: "agNumberColumnFilter",minWidth: 150,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
     }
+    
     // onCellClicked: (event: CellClickedEvent) =>
     //   window.open( `https://www.screener.in/company/${event.value}/`)
     // },
@@ -170,6 +185,8 @@ export class SimpleMovingComponent implements OnInit {
 
   // low,close,sma20,sma50,godFather,volume,RSI,MACD,HIGH52
   getStocks() {
+    this.searchQuery = ''
+    this.query = ''
     this.allData = []
     this.inputValue.forEach((res) => {
       this.allData.push({
@@ -203,6 +220,14 @@ export class SimpleMovingComponent implements OnInit {
       this.rowData = this.allData
     }, 100)
 
+  }
+  
+  reset() {
+    this.rowData = []
+    
+    setTimeout(() => {
+      this.rowData = this.allData
+    }, 100)
   }
   // 0: "name",
   // 1: "0pen",
