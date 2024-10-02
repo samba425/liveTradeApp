@@ -120,12 +120,19 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "S-MACD", field: "MACDSignal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "MACDBlue", field: "MACDMacd", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
+    // {
+    //   headerName: "S-MACD", field: "MACDSignal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
     {
       headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
@@ -209,6 +216,7 @@ export class SimpleMovingComponent implements OnInit {
         volume: res['d'][7],
         RSI: res['d'][27],
         MACD: Math.abs(Math.abs(res['d'][29]) - Math.abs(res['d'][30])),
+        MACDMacd: res['d'][29],
         MACDSignal: res['d'][30],
         HIGH52: res['d'][28],
         VWAP: res['d'][17],
@@ -264,7 +272,7 @@ export class SimpleMovingComponent implements OnInit {
   nearSMA() {
     this.filterData = []
     this.allData.forEach((res) => {
-      if (res['low'] < res['godFather'] && res['close'] >= res['godFather'] && res['volume'] >= 200000) {
+      if (res['low'] <= res['godFather'] && res['close'] >= res['godFather'] && res['volume'] >= 200000) {
         this.filterData.push(res);
       }
     });
