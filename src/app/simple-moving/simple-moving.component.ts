@@ -152,7 +152,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "sector", field: "sector", resizable: true, sortable: true, filter: "agNumberColumnFilter",minWidth: 150,
+      headerName: "industry", field: "industry", resizable: true, sortable: true, filter: "agNumberColumnFilter",minWidth: 150,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -220,7 +220,8 @@ export class SimpleMovingComponent implements OnInit {
         MACDSignal: res['d'][30],
         HIGH52: res['d'][28],
         VWAP: res['d'][17],
-        sector: res['d'][18]
+        sector: res['d'][18],
+        industry:res['d'][31]
       });
     });
     this.rowData = []
@@ -268,7 +269,8 @@ export class SimpleMovingComponent implements OnInit {
   // 28: "price_52_week_high",
   // 29: "MACD.macd",
   // 30: "MACD.signal"
-
+  // 31: "industry"
+  
   nearSMA() {
     this.filterData = []
     this.allData.forEach((res) => {
