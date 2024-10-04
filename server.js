@@ -125,7 +125,7 @@ async function fetchTradingViewData(indexType) {
 }
 app.get('/getData', async (req, res) => {
 	// res.send('hello...')
-	console.log('-req.query', req.query, req.params)
+	console.log('req.query:', req.query, req.params)
 	try {
 		let result = await fetchTradingViewData(req.query);
 	    res.send(result)
@@ -148,9 +148,13 @@ app.all('/*', async (req, res) => {
 			if (req['headers']) {
 				reqObj['headers'] = req.headers
 			}
+			if(reqObj['url']) {
 			console.log('--external payload', reqObj)
 			let result = await request(reqObj);
 			return res.status(200).json(result)
+			} else {
+				return res.status(500).json()
+			}
 		} catch (e) {
 			return res.status(e['statusCode']).json(e['error'] ? e['error'] : e)
 		}
