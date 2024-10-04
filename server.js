@@ -89,7 +89,8 @@ async function fetchTradingViewData(indexType) {
 				"RSI",
 				"price_52_week_high",
 				"MACD.macd",
-				"MACD.signal"
+				"MACD.signal",
+		        "industry.tr"
 			],
 			"sort": {
 				"sortBy": "close",
