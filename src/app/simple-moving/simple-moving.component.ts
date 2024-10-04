@@ -239,7 +239,7 @@ export class SimpleMovingComponent implements OnInit {
     }, 100)
   }
   // 0: "name",
-  // 1: "0pen",
+  // 1: "open",
   // 2: "high",
   // 3: "low",
   // 4: "close",
@@ -260,7 +260,7 @@ export class SimpleMovingComponent implements OnInit {
   // 19: "change_abs|5",
   // 20: "change|5"
   // 21 "BB|1W"
-  // 22: "pen|1W",
+  // 22: "open|1W",
   // 23: "high|1W",
   // 24: "low|1W",
   // 25: "close|1W"

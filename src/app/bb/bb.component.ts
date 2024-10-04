@@ -31,10 +31,10 @@ export class BBComponent implements OnInit {
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true ,resizable:true },
+    { field: "name", sortable: true, resizable: true },
     {
       field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",resizable:true ,
+      filter: "agNumberColumnFilter", resizable: true,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -42,7 +42,7 @@ export class BBComponent implements OnInit {
     },
     {
       field: "high", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
+      filter: "agNumberColumnFilter", resizable: true,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -50,6 +50,29 @@ export class BBComponent implements OnInit {
     },
     {
       field: "low", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "bb", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "volume", resizable: true, sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -57,39 +80,23 @@ export class BBComponent implements OnInit {
       }
     },
     {
-      field: "bb", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
+      headerName: "scannerLink", resizable: true, field: 'name', sortable: true, minWidth: 150,
+      cellRenderer: function (params) {
+        let keyData = params.data.name;
+        let newLink =
+          `<a style="color:white;" href= https://www.screener.in/company/${keyData}
+    target="_blank">sceener</a>  |  <a style="color:white;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+    target="_blank">chart</a>`;
+        return newLink;
       }
     },
     {
-      field: "sma200", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
+      headerName: "industry", field: "industry", resizable: true, sortable: true, filter: "agNumberColumnFilter", minWidth: 150,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
-    },
-    {
-      field: "volume", sortable: true,
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    { headerName: "scannerLink",resizable:true,field: 'name', sortable: true,
-    cellRenderer: function(params) {
-      let keyData = params.data.name;
-      let newLink = 
-      `<a href= https://www.screener.in/company/${keyData}
-      target="_blank">sceener</a>  |  <a href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
-      target="_blank">chart</a>`;
-      return newLink;
-  }
-}
+    }
   ];
 
   result = [];
@@ -125,84 +132,89 @@ export class BBComponent implements OnInit {
     this.filteredallData = []
     this.inputValue.forEach((res) => {
       // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
-// 0: "name",
-// 1: "open",
-// 2: "high",
-// 3: "low",
-// 4: "close",
-// 5: "change",
-// 6: "change_abs",
-// 7: "volume",
-// 8: "Value.Traded",
-// 9: "change_from_open",
-// 10: "change_from_open_abs",
-// 11: "SMA20",
-// 12: "SMA20|5",
-// 13: "SMA50|5",
-// 14: "SMA200",
-// 15: "average_volume_10d_calc",
-// 16: "average_volume_30d_calc",
-// 17: "VWAP",
-// 18: "sector",
-// 19: "change_abs|5",
-// 20: "change|5"
-// 21 "BB(lower)|1W"
-// 22: "open|1W",
-// 23: "high|1W",
-// 24: "low|1W",
-// 25: "close|1W"
-// 26: "SMA20|1w",
-// 27: "RSI"
+      // 0: "name",
+      // 1: "open",
+      // 2: "high",
+      // 3: "low",
+      // 4: "close",
+      // 5: "change",
+      // 6: "change_abs",
+      // 7: "volume",
+      // 8: "Value.Traded",
+      // 9: "change_from_open",
+      // 10: "change_from_open_abs",
+      // 11: "SMA20",
+      // 12: "SMA20|5",
+      // 13: "SMA50|5",
+      // 14: "SMA200",
+      // 15: "average_volume_10d_calc",
+      // 16: "average_volume_30d_calc",
+      // 17: "VWAP",
+      // 18: "sector",
+      // 19: "change_abs|5",
+      // 20: "change|5"
+      // 21 "BB(lower)|1W"
+      // 22: "open|1W",
+      // 23: "high|1W",
+      // 24: "low|1W",
+      // 25: "close|1W"
+      // 26: "SMA20|1w",
+      // 27: "RSI"
 
-// && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
-// if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
+      // && ( res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005 ) 
+      // if((res['d'][2] > res['d'][21]  && res['d'][1] <= res['d'][21]) ) {
 
-// isHammer(open, high, low, close) =>
-//     bodySize = math.abs(close - open)
-//     upperShadow = high - math.max(open, close)
-//     lowerShadow = math.min(open, close) - low
-//     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
-//     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
-//     [isBullishHammer, isBearishHammer]
+      // isHammer(open, high, low, close) =>
+      //     bodySize = math.abs(close - open)
+      //     upperShadow = high - math.max(open, close)
+      //     lowerShadow = math.min(open, close) - low
+      //     isBullishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close > open)
+      //     isBearishHammer = bodySize < lowerShadow and upperShadow < bodySize and (close < open)
+      //     [isBullishHammer, isBearishHammer]
 
-//     isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
-//     isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
+      //     isBullishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close > open) and (bodySize / totalRange < 0.3)
+      //     isBearishHammer = lowerShadow > 2 * bodySize and upperShadow < bodySize and (close < open) and (bodySize / totalRange < 0.3)
 
-let bodySize = Math.abs(res['d'][25]-res['d'][22])
-let upperShadow = res['d'][23] -  Math.max(res['d'][22], res['d'][25])
-let lowerShadow = Math.min(res['d'][22], res['d'][25]) - res['d'][24]
-let totalRange = res['d'][23] - res['d'][24]
+      let bodySize = Math.abs(res['d'][25] - res['d'][22])
+      let upperShadow = res['d'][23] - Math.max(res['d'][22], res['d'][25])
+      let lowerShadow = Math.min(res['d'][22], res['d'][25]) - res['d'][24]
+      let totalRange = res['d'][23] - res['d'][24]
 
 
       // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
       if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
-        this.allData.push({ 
+        this.allData.push({
           name: res['d'][0],
           close: res['d'][25],
           high: res['d'][23],
           low: res['d'][24],
           bb: res['d'][21],
-          sma200:res['d'][14],
-          volume: res['d'][7]
+          volume: res['d'][7],
+          HIGH52: res['d'][28],
+          VWAP: res['d'][17],
+          sector: res['d'][18],
+          industry: res['d'][31]
         });
       }
 
       if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
-       (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
-       ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) || 
-       (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) || 
-       (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close > open) && (bodySize / totalRange < 0.3)) || 
-       (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) || 
-       ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) ||  ( Math.abs(res['d'][22] - res['d'][25]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.3 &&  Math.abs(res['d'][23] - res['d'][24]) > 0 && 
-       ((  Math.abs(res['d'][23] - res['d'][22]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.2 || Math.abs(res['d'][23] - res['d'][25]) <=  Math.abs(res['d'][23] - res['d'][24]) * 0.2 ) ) ))) { 
+        (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
+        ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) ||
+        (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) ||
+        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close > open) && (bodySize / totalRange < 0.3)) ||
+        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) ||
+        ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) || (Math.abs(res['d'][22] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.3 && Math.abs(res['d'][23] - res['d'][24]) > 0 &&
+          ((Math.abs(res['d'][23] - res['d'][22]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2 || Math.abs(res['d'][23] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2))))) {
         this.filteredallData.push({
           name: res['d'][0],
           close: res['d'][25],
           high: res['d'][23],
           low: res['d'][24],
           bb: res['d'][21],
-          sma200:res['d'][14],
-          volume: res['d'][7]
+          volume: res['d'][7],
+          HIGH52: res['d'][28],
+          sector: res['d'][18],
+          industry: res['d'][31]
         });
       }
 
