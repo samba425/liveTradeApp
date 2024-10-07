@@ -90,7 +90,11 @@ async function fetchTradingViewData(indexType) {
 				"price_52_week_high",
 				"MACD.macd",
 				"MACD.signal",
-		        "industry.tr"
+		        "industry.tr",
+				// for mommentan stocks intrda day for pivot logic
+				"average_volume_90d_calc", // > 500k if less stocks there means > 300k
+				"relative_volume_10d_calc", // > 1.2 or 1.5
+				"market_cap_basic" // > 2B to 2000B
 			],
 			"sort": {
 				"sortBy": "close",

@@ -33,7 +33,7 @@ export class AppComponent {
     "Transportation",
     "Utilities"]
   constructor(private commonService: CommonserviceService,private router: Router,private activatedRoute:ActivatedRoute) {
-    this.refreshdata('NIFTY')
+    this.refreshdata()
     
     
     router.events.subscribe((event) => {

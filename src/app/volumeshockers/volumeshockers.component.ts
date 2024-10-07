@@ -10,38 +10,39 @@ import { CommonserviceService } from '../commonservice.service';
   styleUrls: ['./volumeshockers.component.css']
 })
 export class VolumeshockersComponent implements OnInit {
-  
+
   ngOnInit() {
   }
-  
+
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
     editable: true,
     filter: true,
     flex: 5,
-    minWidth: 150,
+    minWidth: 100,
   };
   inputValue: any = []
   rowData = [];
+  rowStockData = [];
   pagination = true;
   paginationPageSize = 2500;
   paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", resizable:true ,sortable: true },
+    { field: "name", resizable: true, sortable: true },
     {
-      field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString(),
+      field: "close", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
-    { field: "open", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "high", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "low", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "open", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "high", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "low", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
     {
-      field: "change_from_open", resizable:true ,sortable: true, filter: "agNumberColumnFilter",
+      field: "change_from_open", resizable: true, sortable: true, filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -55,7 +56,7 @@ export class VolumeshockersComponent implements OnInit {
       }
     },
     {
-      field: "preChange", resizable:true ,sortable: true, filter: "agNumberColumnFilter",
+      field: "preChange", resizable: true, sortable: true, filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -68,9 +69,9 @@ export class VolumeshockersComponent implements OnInit {
         }
       }
     },
-    { field: "change_from_open_abs", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { field: "change_from_open_abs", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
     {
-      field: "volume", resizable:true ,sortable: true,
+      field: "volume", resizable: true, sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -78,15 +79,94 @@ export class VolumeshockersComponent implements OnInit {
       }
     }
   ];
+  colStocksDefs: ColDef[] = [
+    { field: "name", sortable: true, resizable: true },
+    {
+      headerName: "C.Price", field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "20-50%", field: "sma2050Diff", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "200 SMA", field: "godFather", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "volume", resizable: true, sortable: true,
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "RSI", field: "RSI", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "MACD", field: "MACD", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "avgVol(90DD)", field: "avgVol_90", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "relVol", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "markVal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+  ];
   openHigh = [];
   openLow = [];
   result = [];
   allData = []
   gridOptions: GridOptions;
+  gridStockOptions: GridOptions;
   searchQuery: string = '';
+  searchStockQuery: string = '';
+  filteredData = []
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
-      // serverSideFiltering: true
+    };
+    this.gridStockOptions = <GridOptions>{
     };
     this.fetchLiveData()
   }
@@ -97,7 +177,8 @@ export class VolumeshockersComponent implements OnInit {
   // latest Volume > latest Sma ( volume,20 ) * 5 
   volume() {
     this.volumeShockers = []
-
+    this.filteredData = []
+    this.allData = []
     //  let result =  this.inputValue.filter(element => element['d'][7] > element['d'][16]*5);
     let result = this.inputValue.filter(element => element['d'][7] > element['d'][15] * 2 && (element['d'][5] > 5 || element['d'][5] < -5));
 
@@ -114,8 +195,50 @@ export class VolumeshockersComponent implements OnInit {
         change_from_open_abs: res['d'][10],
       });
     });
-    this.rowData = this.volumeShockers
+    this.inputValue.forEach((res) => {
+        let record = {
+          change_from_open: res['d'][9],
+          low: res['d'][3],
+          high: res['d'][2],
+          open: res['d'][1],
+          name: res['d'][0],
+          close: res['d'][4],
+          sma20: res['d'][12],
+          sma20closeDiff: (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
+            ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
+          sma2050Diff: ((Math.abs(Number(res['d'][12]) - Number(res['d'][13]))) /
+            ((Number(res['d'][12]) + Number(res['d'][13])) / 2) * 100),
+          sma50: res['d'][13],
+          godFatherDiffPer:
+            (100 * (Number(res['d'][4]) - Number(res['d'][14]))) /
+            ((Number(res['d'][14]) + Number(res['d'][4])) / 2),
+          godFather: res['d'][14],
+          volume: res['d'][7],
+          RSI: res['d'][27],
+          MACD: Math.abs(Math.abs(res['d'][29]) - Math.abs(res['d'][30])),
+          MACDMacd: res['d'][29],
+          MACDSignal: res['d'][30],
+          HIGH52: res['d'][28],
+          VWAP: res['d'][17],
+          sector: res['d'][18],
+          industry: res['d'][31],
+          avgVol_90: res['d'][32],
+          relVol: res['d'][33],
+          markVal: res['d'][34]
+        }
+        if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
+          this.filteredData.push(record)
+        }
+        this.allData.push(record);
+
+    });
+    this.rowData = this.volumeShockers;
+    this.rowStockData = this.allData;
   }
+  // 1bilon = 100cr
+  // 32 "average_volume_90d_calc", // > 500k if less stocks there means > 300k
+  // 33 "relative_volume_10d_calc", // > 1.2 or 1.5
+  // "34 market_cap_basic" // > 2B to 2000B
 
   fetchLiveData() {
     this.commonservice.getData.subscribe(data => {
@@ -133,29 +256,59 @@ export class VolumeshockersComponent implements OnInit {
     }
   }
 
-  // "name", 0
-  // "open", 1
-  // "high", 2
-  // "low",  3
-  // "close",4
-  // "change",5
-  // "change_abs",6
-  // "volume",7
-  // "Value.Traded",8
-  // "change_from_open", 9
-  // "change_from_open_abs",10
-  // "SMA20",11
-  // "SMA20|5",12
-  // "SMA50| 5",13
-  // "SMA200",14
-
-  //  "average_volume_10d_calc", 15
-  //  "average_volume_30d_calc"  16
+  onSearchStockInputChange() {
+    if (this.gridStockOptions.api) {
+      this.gridStockOptions.api.setQuickFilter(this.searchStockQuery);
+    }
+  }
 
 
+  // 0: "name",
+  // 1: "open",
+  // 2: "high",
+  // 3: "low",
+  // 4: "close",
+  // 5: "change",
+  // 6: "change_abs",
+  // 7: "volume",
+  // 8: "Value.Traded",
+  // 9: "change_from_open",
+  // 10: "change_from_open_abs",
+  // 11: "SMA20",
+  // 12: "SMA20|5",
+  // 13: "SMA50|5",
+  // 14: "SMA200",
+  // 15: "average_volume_10d_calc",
+  // 16: "average_volume_30d_calc",
+  // 17: "VWAP",
+  // 18: "sector",
+  // 19: "change_abs|5",
+  // 20: "change|5"
+  // 21 "BB|1W"
+  // 22: "open|1W",
+  // 23: "high|1W",
+  // 24: "low|1W",
+  // 25: "close|1W"
+  // 26: "SMA20|1W",
+  // 27: "RSI"
+  // 28: "price_52_week_high",
+  // 29: "MACD.macd",
+  // 30: "MACD.signal"
+  // 31: "industry"
+  // 32 "average_volume_90d_calc", // > 500k if less stocks there means > 300k
+  // 33 "relative_volume_10d_calc", // > 1.2 or 1.5
+  // "34 market_cap_basic" // > 500B to 2000B
+
+  querySearch() {
+    // avgVolume_90:res['d'][32],
+    // relVolume:res['d'][33],
+    // markVal:res['d'][34]
+this.rowStockData = this.filteredData;
+
+  }
   onBtnExport() {
     var d = new Date();
-    this.gridOptions.api.exportDataAsCsv({"fileName": `volumeShockers(${d.toLocaleDateString()}).csv`});
+    this.gridOptions.api.exportDataAsCsv({ "fileName": `volumeShockers(${d.toLocaleDateString()}).csv` });
   }
 
 }

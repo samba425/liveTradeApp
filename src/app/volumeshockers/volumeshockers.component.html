@@ -1,4 +1,4 @@
-<div class="jumbotron jumbotron-fluid ">
+ 
 
   <div class="row">
     <div class="col-sm-5">
@@ -32,3 +32,50 @@
     </ag-grid-angular>
     <hr>
   </div>
+  
+  <hr>
+  <div class="row">
+    <div class="col-sm-5">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-success">
+          <h3>Momentum Stocks</h3>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <input class="form-control form-control-lg" type="text" [(ngModel)]="searchStockQuery"
+        (input)="onSearchStockInputChange()" placeholder="Search...">
+    </div> 
+    <div  class="col-sm-3" role="group" >
+      <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
+      </div>
+  </div>
+  
+  <div *ngIf="rowStockData.length < 1">   
+    <div class="d-flex justify-content-center">
+      <div class="spinner-grow text-success" role="status">
+      </div>
+    </div>
+  </div>
+  <hr>
+  
+  <div class="example-wrapper">
+    <ag-grid-angular class="ag-theme-dark" style="height: 500px;width: auto" [rowData]="rowStockData"
+      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridStockOptions" [pagination]="true"
+      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colStocksDefs">
+    </ag-grid-angular>
+    <hr>
+  </div>
+  
+  
+  <span>
+    if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] > 1.2 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000)  
+    <br>
+    // 32 "average_volume_90d_calc", // > 500k if less stocks there means > 300k
+    <br>
+    // 33 "relative_volume_10d_calc", // > 1.2 or 1.5
+    <br>
+    // "34 market_cap_basic" // > 2B to 2000B (1 Billon = 100cr)
+    <br>
+    select pivot weekly monthy,yearly ranges and trade traditional pivot logic
+  </span>

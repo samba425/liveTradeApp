@@ -951,13 +951,13 @@ plot(onlyPivot ? pivot : na, style=plot.style_circles, color=color.blue, title="
 plot(onlyPivot ? pivotBC : na, style=plot.style_circles, color=color.blue, title="BC")
 plot(onlyPivot ? pivotTC : na, style=plot.style_circles, color=color.blue, title="TC")
 
-plot(showPivot ? r1 : na, style=plot.style_circles, color=color.red, title="R1")
-plot(showPivot ? r2 : na, style=plot.style_circles, color=color.red, title="R2")
-plot(showPivot ? r3 : na, style=plot.style_circles, color=color.red, title="R3")
+plot(showPivot ? r1 : na, style=plot.style_circles, color=color.green, title="R1")
+plot(showPivot ? r2 : na, style=plot.style_circles, color=color.green, title="R2")
+plot(showPivot ? r3 : na, style=plot.style_circles, color=color.green, title="R3")
 // plot(showPivot ? r4 : na, style=plot.style_circles, color=color.red, title="R4")
-plot(showPivot ? s1 : na, style=plot.style_circles, color=color.green, title="S1")
-plot(showPivot ? s2 : na, style=plot.style_circles, color=color.green, title="S2")
-plot(showPivot ? s3 : na, style=plot.style_circles, color=color.green, title="S3")
+plot(showPivot ? s1 : na, style=plot.style_circles, color=color.red, title="S1")
+plot(showPivot ? s2 : na, style=plot.style_circles, color=color.red, title="S2")
+plot(showPivot ? s3 : na, style=plot.style_circles, color=color.red, title="S3")
 // plot(showPivot ? s4: na, style=plot.style_circles, color=color.green, title="S4")
 // plotshape(showPivot?r1:na, title='R1', text='R1', textcolor=color.white, style=shape.labelup, size=size.tiny,location=location, color=color.new(color.green, 0))
  
@@ -1018,6 +1018,12 @@ var label camL6 = na
 var label cammid = na
 var label prevHigh = na
 var label prevLow = na
+var label R1 = na
+var label R2 = na
+var label R3 = na
+var label S1 = na
+var label S2 = na
+var label S3 = na
 plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP',linewidth = 1)
 // plot(showCamarilla?H1: na,style=plot.style_circles, color=color.green, title='H1')
 // plot(showCamarilla?H2: na,style=plot.style_circles, color=color.green, title='H2')
@@ -1073,24 +1079,43 @@ if (not na(prevHigh))
     label.delete(prevHigh)
 if (not na(prevLow))
     label.delete(prevLow)
+if (not na(R1))
+    label.delete(R1)
+if (not na(R2))
+    label.delete(R2)
+if (not na(R3))
+    label.delete(R3)
+if (not na(S1))
+    label.delete(S1)
+if (not na(S2))
+    label.delete(S2)
+if (not na(S3))
+    label.delete(S3)
+
 
 // Create new labels
-pivotLabel := createLabel(showPivot?pivot:na, "     P")
-bcLabel := createLabel(showPivot?pivotBC:na, "      BC")
-tcLabel := createLabel(showPivot?pivotTC:na, "      TC")
-sma200Label := createLabel(show200SMA?sma200:na, "     200 SMA")
-sma50Label := createLabel(show50SMA?sma50:na, "        50 SMA")
-sma20Label := createLabel(show20SMA?sma20:na, "        20 SMA")
+R1 := createLabel(showPivot?r1:na, "         R1")
+R2 := createLabel(showPivot?r2:na, "         R2")
+R3 := createLabel(showPivot?r3:na, "         R3")
+S1 := createLabel(showPivot?s1:na, "         S1")
+S2 := createLabel(showPivot?s2:na, "         S2")
+S3 := createLabel(showPivot?s3:na, "         S3")
+pivotLabel := createLabel(showPivot?pivot:na, "")
+bcLabel := createLabel(showPivot?pivotBC:na, "         BC")
+tcLabel := createLabel(showPivot?pivotTC:na, "         TC")
+sma200Label := createLabel(show200SMA?sma200:na, "         200 SMA")
+sma50Label := createLabel(show50SMA?sma50:na, "         50 SMA")
+sma20Label := createLabel(show20SMA?sma20:na, "         20 SMA")
 camP := createLabel(showCamarilla?PP:na,  "         CP")
 camH3 := createLabel(showCamarilla?H3:na, "         CE")
 camH4 := createLabel(showCamarilla?H4:na, "         T1")
 camH5 := createLabel(showCamarilla?H5:na, "         T2")
-camH6 := createLabel(showCamarilla?H6:na, "         H6")
+// camH6 := createLabel(showCamarilla?H6:na, "         H6")
 camL3 := createLabel(showCamarilla?L3:na, "         PE")
-camL4:= createLabel(showCamarilla?L4:na, "          T1")
-camL5:= createLabel(showCamarilla?L5:na, "          T2 " + ' '+ str.tostring(L5, "#.##"))
-camL6:= createLabel(showCamarilla?L6:na, "          L6")
-cammid:= createLabel(showCamarilla?mid:na, "        SL")
+camL4:= createLabel(showCamarilla?L4:na, "         T1")
+camL5:= createLabel(showCamarilla?L5:na, "         T2 " + ' '+ str.tostring(L5, "#.##"))
+// camL6:= createLabel(showCamarilla?L6:na, "          L6")
+cammid:= createLabel(showCamarilla?mid:na, "         SL")
 prevHigh:= createLabel(previousHL?highPrev:na, "    PH")
 prevLow:= createLabel(previousHL?lowPrev:na, "      PL")
 
