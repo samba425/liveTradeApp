@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ColDef, GridOptions } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
-
+import { options } from './optionsStocks';
 @Component({
   selector: 'app-volumeshockers',
   templateUrl: './volumeshockers.component.html',
@@ -163,6 +163,7 @@ export class VolumeshockersComponent implements OnInit {
   searchQuery: string = '';
   searchStockQuery: string = '';
   filteredData = []
+  optionsSTock = []
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
     };
@@ -178,6 +179,7 @@ export class VolumeshockersComponent implements OnInit {
   volume() {
     this.volumeShockers = []
     this.filteredData = []
+    this.optionsSTock = []
     this.allData = []
     //  let result =  this.inputValue.filter(element => element['d'][7] > element['d'][16]*5);
     let result = this.inputValue.filter(element => element['d'][7] > element['d'][15] * 2 && (element['d'][5] > 5 || element['d'][5] < -5));
@@ -230,6 +232,8 @@ export class VolumeshockersComponent implements OnInit {
           this.filteredData.push(record)
         }
         this.allData.push(record);
+       let findSTock =  options.data.UnderlyingList.find((idex) => { idex['symbol'] == record['name']}) 
+       if(findSTock) this.optionsSTock.push(record);
 
     });
     this.rowData = this.volumeShockers;
@@ -310,5 +314,9 @@ this.rowStockData = this.filteredData;
     var d = new Date();
     this.gridOptions.api.exportDataAsCsv({ "fileName": `volumeShockers(${d.toLocaleDateString()}).csv` });
   }
+  queryOptions() {
+    this.rowStockData = this.optionsSTock
+
+}
 
 }
