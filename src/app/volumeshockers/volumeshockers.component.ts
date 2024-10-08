@@ -232,7 +232,7 @@ export class VolumeshockersComponent implements OnInit {
           this.filteredData.push(record)
         }
         this.allData.push(record);
-       let findSTock =  options.data.UnderlyingList.find((idex) => { idex['symbol'] == record['name']}) 
+       let findSTock =  options.data.UnderlyingList.find((idex) => idex['symbol'] == record['name']);
        if(findSTock) this.optionsSTock.push(record);
 
     });
