@@ -94,7 +94,8 @@ async function fetchTradingViewData(indexType) {
 				// for mommentan stocks intrda day for pivot logic
 				"average_volume_90d_calc", // > 500k if less stocks there means > 300k
 				"relative_volume_10d_calc", // > 1.2 or 1.5
-				"market_cap_basic" // > 2B to 2000B
+				"market_cap_basic", // > 2B to 2000B,
+				"float_shares_outstanding"
 			],
 			"sort": {
 				"sortBy": "close",
