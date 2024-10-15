@@ -147,6 +147,13 @@ export class VolumeshockersComponent implements OnInit {
       }
     },
     {
+      field: "float", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
       field: "markVal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -198,42 +205,43 @@ export class VolumeshockersComponent implements OnInit {
       });
     });
     this.inputValue.forEach((res) => {
-        let record = {
-          change_from_open: res['d'][9],
-          low: res['d'][3],
-          high: res['d'][2],
-          open: res['d'][1],
-          name: res['d'][0],
-          close: res['d'][4],
-          sma20: res['d'][12],
-          sma20closeDiff: (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
-            ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
-          sma2050Diff: ((Math.abs(Number(res['d'][12]) - Number(res['d'][13]))) /
-            ((Number(res['d'][12]) + Number(res['d'][13])) / 2) * 100),
-          sma50: res['d'][13],
-          godFatherDiffPer:
-            (100 * (Number(res['d'][4]) - Number(res['d'][14]))) /
-            ((Number(res['d'][14]) + Number(res['d'][4])) / 2),
-          godFather: res['d'][14],
-          volume: res['d'][7],
-          RSI: res['d'][27],
-          MACD: Math.abs(Math.abs(res['d'][29]) - Math.abs(res['d'][30])),
-          MACDMacd: res['d'][29],
-          MACDSignal: res['d'][30],
-          HIGH52: res['d'][28],
-          VWAP: res['d'][17],
-          sector: res['d'][18],
-          industry: res['d'][31],
-          avgVol_90: res['d'][32],
-          relVol: res['d'][33],
-          markVal: res['d'][34]
-        }
-        if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
-          this.filteredData.push(record)
-        }
-        this.allData.push(record);
-       let findSTock =  options.data.UnderlyingList.find((idex) => idex['symbol'] == record['name']);
-       if(findSTock) this.optionsSTock.push(record);
+      let record = {
+        change_from_open: res['d'][9],
+        low: res['d'][3],
+        high: res['d'][2],
+        open: res['d'][1],
+        name: res['d'][0],
+        close: res['d'][4],
+        sma20: res['d'][12],
+        sma20closeDiff: (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
+          ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
+        sma2050Diff: ((Math.abs(Number(res['d'][12]) - Number(res['d'][13]))) /
+          ((Number(res['d'][12]) + Number(res['d'][13])) / 2) * 100),
+        sma50: res['d'][13],
+        godFatherDiffPer:
+          (100 * (Number(res['d'][4]) - Number(res['d'][14]))) /
+          ((Number(res['d'][14]) + Number(res['d'][4])) / 2),
+        godFather: res['d'][14],
+        volume: res['d'][7],
+        RSI: res['d'][27],
+        MACD: Math.abs(Math.abs(res['d'][29]) - Math.abs(res['d'][30])),
+        MACDMacd: res['d'][29],
+        MACDSignal: res['d'][30],
+        HIGH52: res['d'][28],
+        VWAP: res['d'][17],
+        sector: res['d'][18],
+        industry: res['d'][31],
+        avgVol_90: res['d'][32],
+        relVol: res['d'][33],
+        float: res['d'][35],
+        markVal: res['d'][34]
+      }
+      if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
+        this.filteredData.push(record)
+      }
+      this.allData.push(record);
+      let findSTock = options.data.UnderlyingList.find((idex) => idex['symbol'] == record['name']);
+      if (findSTock) this.optionsSTock.push(record);
 
     });
     this.rowData = this.volumeShockers;
@@ -307,16 +315,26 @@ export class VolumeshockersComponent implements OnInit {
     // avgVolume_90:res['d'][32],
     // relVolume:res['d'][33],
     // markVal:res['d'][34]
-this.rowStockData = this.filteredData;
+    this.rowStockData = this.filteredData;
 
   }
   onBtnExport() {
     var d = new Date();
     this.gridOptions.api.exportDataAsCsv({ "fileName": `volumeShockers(${d.toLocaleDateString()}).csv` });
   }
+  Options() {
+    this.rowStockData = this.optionsSTock;
+  }
   queryOptions() {
-    this.rowStockData = this.optionsSTock
+   let filteredData = []
+    this.optionsSTock.forEach((res => {
+      if (res['avgVol_90'] > 100000 && res['relVol'] >= 1.5 && res['float'] < 2000000000) {
+        filteredData.push(res)
+      }
+    }))
 
-}
+    this.rowStockData = filteredData;
+  }
+
 
 }
