@@ -29,11 +29,11 @@ async function fetchTradingViewData(indexType) {
 		'url': 'https://scanner.tradingview.com/india/scan',
 		'body': {
 			"filter": [
-				{
-					"left": "exchange",
-					"operation": "equal",
-					"right": "NSE"
-				},
+				// {
+				// 	"left": "exchange",
+				// 	"operation": "equal",
+				// 	"right": "NSE"
+				// },
 				{
 					"left": "is_primary",
 					"operation": "equal",
@@ -95,7 +95,14 @@ async function fetchTradingViewData(indexType) {
 				"average_volume_90d_calc", // > 500k if less stocks there means > 300k
 				"relative_volume_10d_calc", // > 1.2 or 1.5
 				"market_cap_basic", // > 2B to 2000B,
-				"float_shares_outstanding"
+				"float_shares_outstanding",
+				"price_52_week_low",
+				"EMA5|5",
+				"EMA10|5",
+				"EMA14|60",
+				"EMA21|60",
+				"EMA50|60",
+				"RSI|60"
 			],
 			"sort": {
 				"sortBy": "close",
