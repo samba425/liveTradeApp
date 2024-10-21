@@ -40,6 +40,10 @@
         <li class="list-group-item list-group-item-success">
           <h3>Momentum Stocks</h3>
         </li>
+          <textarea class="form-control form-control-lg  textStyle" type="text"  rows="1" [(ngModel)]="query"
+             placeholder="Query Search..."></textarea>
+             <p class="font-italic">search with res, keys:low,close,sma20,sma50,
+              godFather,volume,RSI,MACD,HIGH52,VWAP,sector,MACDSignal,EMA5|5,EMA10|5,EMA14|1H,EMA21|1H,EMA50|1H</p>
       </ul>
     </div>
     <div class="col-sm-3">
@@ -47,7 +51,8 @@
         (input)="onSearchStockInputChange()" placeholder="Search...">
     </div> 
     <div  class="col-sm-3" role="group" >
-      <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
+      <button type="button" (click)=querySearch()  class="btn  m-1 btn-danger">Query</button>
+      <button type="button" (click)=searchQuerys()  class="btn  m-1 btn-success">M.search</button>
       <button type="button" (click)=Options()  class="btn  m-1 btn-info">Options</button>
       <button type="button" (click)=queryOptions()  class="btn  m-1 btn-warning">Options Query</button>
       </div>
@@ -78,6 +83,8 @@
     // 33 "relative_volume_10d_calc", // > 1.2 or 1.5
     <br>
     // "34 market_cap_basic" // > 2B to 2000B (1 Billon = 100cr)
+    <br>
+    position serach res['EMA14|1H'] > res['EMA21|1H'] && res['EMA21|1H'] > res['EMA50|1H'] 
     <br>
     select pivot weekly monthy,yearly ranges and trade traditional pivot logic
   </span>

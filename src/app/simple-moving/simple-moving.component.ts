@@ -141,6 +141,13 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
+      headerName: "52 Low", field: "Low52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
       headerName: "scannerLink", resizable: true, field: 'name', sortable: true,minWidth: 150,
       cellRenderer: function (params) {
         let keyData = params.data.name;
@@ -221,7 +228,13 @@ export class SimpleMovingComponent implements OnInit {
         HIGH52: res['d'][28],
         VWAP: res['d'][17],
         sector: res['d'][18],
-        industry:res['d'][31]
+        industry:res['d'][31],
+        LOW52: res['d'][35],
+        "EMA5": res['d'][37],
+        "EMA10": res['d'][38],
+        "EMA14|1H": res['d'][39],
+        "EMA21|1H": res['d'][40],
+        "EMA50|1H": res['d'][41]
       });
     });
     this.rowData = []

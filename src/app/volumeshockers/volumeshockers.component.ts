@@ -13,7 +13,7 @@ export class VolumeshockersComponent implements OnInit {
 
   ngOnInit() {
   }
-
+  query;
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
     editable: true,
@@ -97,13 +97,6 @@ export class VolumeshockersComponent implements OnInit {
       }
     },
     {
-      headerName: "200 SMA", field: "godFather", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
       field: "volume", resizable: true, sortable: true,
       filter: "agNumberColumnFilter",
       filterParams: {
@@ -113,13 +106,6 @@ export class VolumeshockersComponent implements OnInit {
     },
     {
       headerName: "RSI", field: "RSI", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "MACD", field: "MACD", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -155,6 +141,48 @@ export class VolumeshockersComponent implements OnInit {
     },
     {
       field: "markVal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "EMA5|5", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "EMA10|5", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "EMA14|1H", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "EMA21|1H", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "EMA50|1H", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      field: "RSI|1H", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -234,7 +262,13 @@ export class VolumeshockersComponent implements OnInit {
         avgVol_90: res['d'][32],
         relVol: res['d'][33],
         float: res['d'][35],
-        markVal: res['d'][34]
+        markVal: res['d'][34],
+       	"EMA5": res['d'][37],
+       	"EMA10": res['d'][38],
+       	"EMA14|1H": res['d'][39],
+       	"EMA21|1H": res['d'][40],
+       	"EMA50|1H": res['d'][41],
+				"RSI|1H":res['d'][42]
       }
       if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
         this.filteredData.push(record)
@@ -309,15 +343,43 @@ export class VolumeshockersComponent implements OnInit {
   // 31: "industry"
   // 32 "average_volume_90d_calc", // > 500k if less stocks there means > 300k
   // 33 "relative_volume_10d_calc", // > 1.2 or 1.5
-  // "34 market_cap_basic" // > 500B to 2000B
-
-  querySearch() {
-    // avgVolume_90:res['d'][32],
-    // relVolume:res['d'][33],
-    // markVal:res['d'][34]
+  // 34 market_cap_basic" // > 500B to 2000B
+	// 35 "float_shares_outstanding",
+	// 36	"price_52_week_low"
+	// 37		"EMA5|5",
+	// 38		"EMA10|5",
+	// 39		"EMA14|60",
+	// 40		"EMA21|60",
+	// 41		"EMA50|60",
+  searchQuerys() {
     this.rowStockData = this.filteredData;
 
   }
+  
+  
+  querySearch() {
+      if (this.query) {
+        let filterData = []
+        try {
+          this.query ? this.query : "res['close'] > 1"
+          this.allData.forEach((res) => {
+            if (eval(`${this.query}`)) {
+              console.log('-eval(`${this.query}`)',eval(`${this.query}`))
+              filterData.push(res);
+            }
+          });
+  
+          this.rowStockData = []
+          setTimeout(() => {
+            this.rowStockData = filterData
+          }, 100)
+        } catch (err) {
+          alert('invalid Query')
+        }
+      } else {
+        alert('Empty Query')
+      }
+    }
   onBtnExport() {
     var d = new Date();
     this.gridOptions.api.exportDataAsCsv({ "fileName": `volumeShockers(${d.toLocaleDateString()}).csv` });
