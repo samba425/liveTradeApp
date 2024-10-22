@@ -1,39 +1,6 @@
  
 
-  <div class="row">
-    <div class="col-sm-5">
-      <ul class="list-group">
-        <li class="list-group-item list-group-item-success">
-          <h3>Volume shockers</h3>
-        </li>
-      </ul>
-    </div>
-    <div class="col-sm-5">
-      <input class="form-control form-control-lg" type="text" [(ngModel)]="searchQuery"
-        (input)="onSearchInputChange()" placeholder="Search...">
-    </div>
-    <div class="col-sm-2">
-      <button class="btn btn-warning" (click)="onBtnExport()">Download CSV</button>
-    </div>
-  </div>
-  
-  <div *ngIf="rowData.length < 1">   
-    <div class="d-flex justify-content-center">
-      <div class="spinner-grow text-success" role="status">
-      </div>
-    </div>
-  </div>
-  <hr>
-  
-  <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height: 500px;width: auto" [rowData]="rowData"
-      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
-      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
-    </ag-grid-angular>
-    <hr>
-  </div>
-  
-  <hr>
+
   <div class="row">
     <div class="col-sm-5">
       <ul class="list-group">
@@ -73,6 +40,44 @@
     </ag-grid-angular>
     <hr>
   </div>
+  
+  <hr>
+  
+  <div class="row">
+    <div class="col-sm-5">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-success">
+          <h3>Volume shockers</h3>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-5">
+      <input class="form-control form-control-lg" type="text" [(ngModel)]="searchQuery"
+        (input)="onSearchInputChange()" placeholder="Search...">
+    </div>
+    <div class="col-sm-2">
+      <button class="btn btn-warning" (click)="onBtnExport()">Download CSV</button>
+    </div>
+  </div>
+  
+  <div *ngIf="rowData.length < 1">   
+    <div class="d-flex justify-content-center">
+      <div class="spinner-grow text-success" role="status">
+      </div>
+    </div>
+  </div>
+  <hr>
+  
+  <div class="example-wrapper">
+    <ag-grid-angular class="ag-theme-dark" style="height: 500px;width: auto" [rowData]="rowData"
+      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
+      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
+    </ag-grid-angular>
+    <hr>
+  </div>
+  
+  <hr>
+
   
   
   <span>
