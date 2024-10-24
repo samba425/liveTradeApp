@@ -61,6 +61,13 @@ export class OpenHighCloseComponent implements OnInit {
       }
     },
     {
+      headerName: "change_from_open", field: "change_from_open", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
       headerName: "20-50%", field: "sma2050Diff", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -69,20 +76,6 @@ export class OpenHighCloseComponent implements OnInit {
     },
     {
       headerName: "RSI", field: "RSI", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "MACD", field: "MACD", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "MACDBlue", field: "MACDMacd", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -149,10 +142,10 @@ export class OpenHighCloseComponent implements OnInit {
     this.inputValue.forEach((res) => { 
       if (
         !(Number(res['d'][1]) - Number(res['d'][2])) &&
-        Number(res['d'][1]) < 3000 && /^\d+$/.test((res['d'][1]).toString())
+        Number(res['d'][1]) < 3000 && Number(res['d'][7]) > 300000
       ) {
         this.openHigh.push({
-          change_from_open: res['d'][9],
+          change_from_open: Math.abs(res['d'][9]),
           change_from_open_abs: res['d'][10],
           name: res['d'][0],
           close: res['d'][4],
