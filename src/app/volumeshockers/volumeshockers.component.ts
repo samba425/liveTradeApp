@@ -308,6 +308,19 @@ export class VolumeshockersComponent implements OnInit {
     }
   }
 
+  near2050SMA() {
+    let filterData = []
+    this.allData.forEach((res) => {
+      if (res['avgVol_90'] > 100000 && res['relVol'] >= 1 && res['float'] < 2000000000 && res['close'] < 2500 && res['close'] >= 200 && res['sma2050Diff'] >= 0.4 && res['sma2050Diff'] <= 2 && res['volume'] >= 300000) {
+        filterData.push(res)
+      }
+    });
+    this.rowStockData = []
+    setTimeout(() => {
+      this.rowStockData = filterData
+    }, 100)
+  }
+  
 
   // 0: "name",
   // 1: "open",
