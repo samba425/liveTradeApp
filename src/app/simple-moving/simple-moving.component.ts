@@ -230,11 +230,13 @@ export class SimpleMovingComponent implements OnInit {
         sector: res['d'][18],
         industry:res['d'][31],
         LOW52: res['d'][35],
-        "EMA5": res['d'][37],
-        "EMA10": res['d'][38],
+        "EMA5|5": res['d'][37],
+        "EMA10|5": res['d'][38],
         "EMA14|1H": res['d'][39],
         "EMA21|1H": res['d'][40],
-        "EMA50|1H": res['d'][41]
+        "EMA50|1H": res['d'][41],
+        "RSI|1H":res['d'][42],
+        "exchange":res['d'][43]
       });
     });
     this.rowData = []

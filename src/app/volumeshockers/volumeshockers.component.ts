@@ -268,7 +268,8 @@ export class VolumeshockersComponent implements OnInit {
        	"EMA14|1H": res['d'][39],
        	"EMA21|1H": res['d'][40],
        	"EMA50|1H": res['d'][41],
-				"RSI|1H":res['d'][42]
+				"RSI|1H":res['d'][42],
+        "exchange":res['d'][43]
       }
       if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
         this.filteredData.push(record)
@@ -364,6 +365,8 @@ export class VolumeshockersComponent implements OnInit {
 	// 39		"EMA14|60",
 	// 40		"EMA21|60",
 	// 41		"EMA50|60",
+	// 42		"RSI|60",
+	// 43		"exchange|60",
   searchQuerys() {
     this.rowStockData = this.filteredData;
 
