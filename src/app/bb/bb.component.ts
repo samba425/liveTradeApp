@@ -132,6 +132,7 @@ export class BBComponent implements OnInit {
     this.filteredallData = []
     this.inputValue.forEach((res) => {
       // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
+        // if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
       // 0: "name",
       // 1: "open",
       // 2: "high",
@@ -182,7 +183,7 @@ export class BBComponent implements OnInit {
 
 
       // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
-      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
+      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] &&  Number(res['d'][7]) > 200000) {
         this.allData.push({
           name: res['d'][0],
           close: res['d'][25],
@@ -197,7 +198,7 @@ export class BBComponent implements OnInit {
         });
       }
 
-      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
+      if ((Number(res['d'][7]) > 200000 && res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
         (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
         ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) ||
         (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) ||
