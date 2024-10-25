@@ -169,7 +169,7 @@ export class OpenHighCloseComponent implements OnInit {
           
         });
       } else if (!(Number(res['d'][1]) - Number(res['d'][3])) &&
-        Number(res['d'][1]) < 3000 && /^\d+$/.test((res['d'][1]).toString())) {
+      Number(res['d'][1]) > 30 && Number(res['d'][1]) < 3000 && Number(res['d'][7]) > 300000) {
         this.openLow.push({
           change_from_open: res['d'][9],
           change_from_open_abs: res['d'][10],
