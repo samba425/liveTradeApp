@@ -141,7 +141,7 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "52 Low", field: "Low52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "52 Low", field: "LOW52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
