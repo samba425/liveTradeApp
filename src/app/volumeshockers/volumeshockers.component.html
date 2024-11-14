@@ -90,7 +90,9 @@
     <br>
     // "34 market_cap_basic" // > 2B to 2000B (1 Billon = 100cr)
     <br>
-    position serach res['EMA14|1H'] > res['EMA21|1H'] && res['EMA21|1H'] > res['EMA50|1H'] 
+    position serach res['EMA14|1H'] > res['EMA21|1H'] && res['EMA21|1H'] > res['EMA50|1H'] && res['volume'] >= 200000
+    <br>
+    res['low'] <= res['godFather'] && res['close'] >= res['godFather'] && res['volume'] >= 200000
     <br>
     select pivot weekly monthy,yearly ranges and trade traditional pivot logic
   </span>
