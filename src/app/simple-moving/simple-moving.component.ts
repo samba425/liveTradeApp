@@ -229,7 +229,7 @@ export class SimpleMovingComponent implements OnInit {
         VWAP: res['d'][17],
         sector: res['d'][18],
         industry:res['d'][31],
-        LOW52: res['d'][35],
+        LOW52: res['d'][36],
         "EMA5|5": res['d'][37],
         "EMA10|5": res['d'][38],
         "EMA14|1H": res['d'][39],
