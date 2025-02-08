@@ -183,7 +183,7 @@ export class BBComponent implements OnInit {
 
 
       // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
-      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] &&  Number(res['d'][7]) > 200000) {
+      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
         this.allData.push({
           name: res['d'][0],
           close: res['d'][25],
@@ -198,7 +198,22 @@ export class BBComponent implements OnInit {
         });
       }
 
-      if ((Number(res['d'][7]) > 200000 && res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
+      // ( {cash} ( weekly open / weekly close >= 0.9995 and weekly open / weekly close <= 1.0005 ) ) 
+      
+// 18: "sector",
+// 19: "change_abs|5",
+// 20: "change|5"
+// 21 "BB(lower)|1W"
+// 22: "open|1W",
+// 23: "high|1W",
+// 24: "low|1W",
+// 25: "close|1W"
+// 26: "SMA20|1w",
+// 27: "RSI"
+// console.log('-checlk thsi...',typeof (res['d'][22] / res['d'][25]),res['d'][22] / res['d'][25])
+// (low <= bb low && hign  > bb low && high <= sma20 ) && (open / close)
+
+      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
         (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
         ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) ||
         (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) ||
@@ -206,6 +221,10 @@ export class BBComponent implements OnInit {
         (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) ||
         ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) || (Math.abs(res['d'][22] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.3 && Math.abs(res['d'][23] - res['d'][24]) > 0 &&
           ((Math.abs(res['d'][23] - res['d'][22]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2 || Math.abs(res['d'][23] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2))))) {
+            // if((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) && res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) {
+            //   console.log('-checlk thsi..111.',res['d'][0], (res['d'][22] / res['d'][25]),res['d'][7])
+                
+            //   }
         this.filteredallData.push({
           name: res['d'][0],
           close: res['d'][25],

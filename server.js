@@ -103,7 +103,8 @@ async function fetchTradingViewData(indexType) {
 				"EMA21|60",
 				"EMA50|60",
 				"RSI|60",
-				"exchange"
+				"exchange",
+				"debt_to_equity"
 			],
 			"sort": {
 				"sortBy": "close",

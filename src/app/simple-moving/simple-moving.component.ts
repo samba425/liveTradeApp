@@ -164,7 +164,15 @@ export class SimpleMovingComponent implements OnInit {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
-    }
+    },
+    {
+      headerName: "DOE", field: "debt_to_equity", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    
     
     // onCellClicked: (event: CellClickedEvent) =>
     //   window.open( `https://www.screener.in/company/${event.value}/`)
@@ -236,7 +244,8 @@ export class SimpleMovingComponent implements OnInit {
         "EMA21|1H": res['d'][40],
         "EMA50|1H": res['d'][41],
         "RSI|1H":res['d'][42],
-        "exchange":res['d'][43]
+        "exchange":res['d'][43],
+        "debt_to_equity":res['d'][44]
       });
     });
     this.rowData = []
