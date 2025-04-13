@@ -38,8 +38,9 @@
         (input)="onSearchInputChangeFiltered()" placeholder="Search...">
     </div>
 
-    <div class="col-sm-2">
-      <button class="btn btn-warning" (click)="onBtnExportFiltered()">Download CSV</button>
+    <div class="col-sm-2" role="group" >
+      <button class="btn m-1  btn-warning" (click)="onBtnExportFiltered()">Download CSV</button>
+      <button class="btn  m-1 btn-success" (click)="onlyDojiHammer()">filter</button> 
     </div>
   </div>
   <div class="example-wrapper">
