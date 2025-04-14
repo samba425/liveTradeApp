@@ -23,6 +23,7 @@ export class BBComponent implements OnInit {
   inputValue: any = []
   rowData = [];
   filteredrowData = []
+  dojjiHammer = []
   filteredallData = []
   rowDataHigh = [];
   rowDataLow = [];
@@ -130,6 +131,7 @@ export class BBComponent implements OnInit {
   getHighLow() {
     this.allData = []
     this.filteredallData = []
+    this.dojjiHammer = []
     this.inputValue.forEach((res) => {
       // if (Number(res['d'][1]) > 10 && Number(res['d'][1]) < 5000) {
         // if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
@@ -225,7 +227,21 @@ export class BBComponent implements OnInit {
             //   console.log('-checlk thsi..111.',res['d'][0], (res['d'][22] / res['d'][25]),res['d'][7])
                 
             //   }
-        this.filteredallData.push({
+          this.filteredallData.push({
+          name: res['d'][0],
+          close: res['d'][25],
+          high: res['d'][23],
+          low: res['d'][24],
+          bb: res['d'][21],
+          volume: res['d'][7],
+          HIGH52: res['d'][28],
+          sector: res['d'][18],
+          industry: res['d'][31]
+          });
+            
+            // best dojji,hammer logic
+            if(this.isDoji(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) || this.isHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25])) {
+        this.dojjiHammer.push({
           name: res['d'][0],
           close: res['d'][25],
           high: res['d'][23],
@@ -236,6 +252,7 @@ export class BBComponent implements OnInit {
           sector: res['d'][18],
           industry: res['d'][31]
         });
+      }
       }
 
       // } 
@@ -269,6 +286,33 @@ export class BBComponent implements OnInit {
   onBtnExportFiltered() {
     var d = new Date();
     this.gridOptionsfiltered.api.exportDataAsCsv({ "fileName": `SMA(${d.toLocaleDateString()}).csv` });
+  }
+  
+   isDoji(open, high, low, close) {
+    const bodySize = Math.abs(open - close);
+    const range = high - low;
+    return bodySize <= range * 0.1;
+  }
+  
+   isHammer(open, high, low, close) {
+    const realBody = Math.abs(open - close);
+    const lowerShadow = Math.min(open, close) - low;
+    const upperShadow = high - Math.max(open, close);
+    const totalRange = high - low;
+  
+    return (
+      lowerShadow >= 2 * realBody &&
+      upperShadow <= realBody * 0.3 &&
+      realBody <= totalRange * 0.4
+    );
+  }
+  
+  onlyDojiHammer() {
+    this.filteredrowData = []
+    setTimeout(() => {
+      this.filteredrowData = this.dojjiHammer
+    }, 100)
+
   }
 }
 
