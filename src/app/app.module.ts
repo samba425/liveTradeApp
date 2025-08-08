@@ -11,7 +11,7 @@ import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { FormsModule } from '@angular/forms';
 import { BBComponent } from './bb/bb.component';
 import { LearnComponent } from './learn/learn.component';
-
+import { MarkdownModule } from 'ngx-markdown';
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,8 +22,8 @@ import { LearnComponent } from './learn/learn.component';
     BBComponent,
     LearnComponent
   ],
-  imports: [AppRoutingModule,FormsModule,
-  AgGridModule.withComponents([]),BrowserModule,HttpClientModule
+  imports: [AppRoutingModule, FormsModule,
+    AgGridModule.withComponents([]), BrowserModule, HttpClientModule, MarkdownModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

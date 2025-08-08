@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider ng serve",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -26,6 +26,8 @@
     "core-js": "^2.5.4",
     "cors": "^2.8.5",
     "express": "^4.17.2",
+    "marked": "^0.6.2",
+    "ngx-markdown": "^6.1.0",
     "request-promise": "^4.2.2",
     "rxjs": "6.0.0",
     "zone.js": "~0.8.26"

@@ -1,0 +1,54 @@
+#gc-doc h1.gc-header {
+  cursor: pointer;
+  background: #f6f8ff;
+  padding: 10px 14px;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  border-left: 6px solid #1e64ff;
+  color: #32bf0b;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+}
+
+#gc-doc .gc-toggle-icon {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #cfe1ff;
+  color: #17bf0b;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+#gc-doc .gc-collapsed {
+  display: none !important;
+}
+
+#gc-doc h1.gc-header:hover {
+  background: #eef4ff;
+}
+
+
+.gc-collapsed {
+  display: none;
+}
+ 
+.gc-toggle-icon {
+  cursor: pointer;
+  margin-right: 8px;
+  font-weight: bold;
+  user-select: none;
+}
+
+.gc-copy-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 16px;
+  user-select: none;
+}
