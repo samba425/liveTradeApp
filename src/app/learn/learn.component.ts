@@ -153,7 +153,7 @@ ngAfterViewInit() {
       var text = header.textContent ? header.textContent.trim() : '';
       if (text.indexOf('GC ') === 0) {
         // Make clickable
-        header.setAttribute('style', 'cursor: pointer; color: #e6adb0;');
+        header.setAttribute('style', 'cursor: pointer; color: #ac1fd2c4;font-size: x-large;');
         
         header.addEventListener('click', function () {
           var next = header.nextElementSibling;
