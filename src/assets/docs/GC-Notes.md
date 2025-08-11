@@ -1498,12 +1498,275 @@ Trading plan focuses on:
 - Gap entries can be **pink zone safe-side sells** or **demand buys**.
 - Simplify your approach:
   - Block creation → Demand/Supply marking → Execution.
-
-
-
+ 
 ************************************END***************************************
 
+# GC 82: 🎯 Key Topics Summary
 
+## 📌 Key Concepts Discussed
+- **Pullback Patterns** → Multiple examples of how pullbacks occur before major moves.
+- **Price Action** → Recognizing *high price* and *clear structure* before entry.
+- **Powerful Demand Zones** → High-grade demand areas that trigger strong reversals.
+- **Gap & Liquidity** → Identifying gaps with liquidity pools and combining with pullback analysis.
+
+## 🕒 Timeframe Considerations
+- Use **20-minute charts** for clear observation of gaps and inside candles.
+- *Multiple timeframe approach*:
+  - Higher timeframe to identify demand/supply.
+  - Lower timeframe for precise entry.
+
+## 🏹 Trade Execution Points
+- **Inside Candle Gaps** → Look for low product gap as confirmation.
+- **Direct Single Move** → Single strong impulse followed by pullback.
+- **High Block Creation** → Price retests after forming a strong block.
+- **Lowest Candle Observation** → Study the lowest candle before reversal.
+
+## 🔑 Key Notes
+- Close-based entry is often more reliable.
+- Pullback into *most powerful demand zone* can give high-probability setups.
+- Gaps + liquidity = better clarity for planning trades.
+- Always wait for **pullback confirmation** before entering.
+
+---
+✅ *End of video — next session continues with more advanced setups.*
+
+*******************************************END*******************************************
+# GC 83: 📊 Gap Entry & Naked Candle Strategy
+
+## 📌 Key Concepts
+- **Local Under Cavity Gap Entry** → Enter trades based on identified gap areas in the market.
+- **Pending Inquiry Model** → Wait for confirmation before gap entry.
+- **Structured Low & Key Areas** → Focus on important support/resistance zones.
+- **Different Market Views** → Consider alternative perspectives before deciding on trade direction.
+
+## 🕯 Naked Candle Strategy
+- **Naked Candle** → Strong candle without wicks showing decisive price action.
+- **Master Candle** → Large, powerful candle signaling strong momentum.
+- **Profit Booking**:
+  - Book profits when a naked candle appears after a strong move.
+  - Avoid holding trades too long after such candles.
+- **Option Buying**:
+  - Powerful naked candles can be good signals for option buying.
+  - Quick close entries based on candle structure.
+
+## 🎯 Trade Execution & Exit Plan
+- Always **target and plan exits** before entry.
+- Check for **closing candle strength** before holding positions.
+- Watch for **strong hosting candles** (momentum candles) for possible reversals.
+
+## 📐 Structure & Line Chart Techniques
+- Use **12-3-1-A2** type structures for identifying trade setups.
+- **Block Levels**:
+  - BL1 & BL2 act as important structure points.
+- **Line Drawing**:
+  - Draw consistent lines to track structure levels.
+  - Identify bullish/supply zones for pullbacks.
+- **Pullback Blocks**:
+  - Look for repeated block formations before continuation.
+
+## ⚡ Additional Notes
+- **Gap Down Trades** → Direct entries can be made after a confirmed gap down.
+- **Supply Areas** → Watch for price reaction at supply blocks before entering.
+- Maintain **discipline in exits** to secure profits.
+
+---
+✅ *End of strategy notes — focus on combining gap entry with candle-based confirmation for better trade outcomes.*
+
+
+*******************************************END*******************************************
+# GC 84: 🎯 Style 1 & Style 2 Trading Plans
+
+## 📌 Overview
+- **Two main trading styles**:
+  - **Style 1** → Simple, basic execution plan.
+  - **Style 2** → Advanced, multi-step approach.
+- **Objective**: Detailed planning and execution for scalpers, day traders, and investors in GLD using structured price action.
+
+---
+
+## 📝 Style 1 — Simple Planning
+- Direct and clear trade plan.
+- Focus on **entry clarity** without over-complication.
+- Works best for quick decision making.
+- **Suitable for**:
+  - Scalpers in GLD
+  - Day traders in GLD
+  - Investors who want straightforward execution
+
+---
+
+## 📝 Style 2 — Advanced Planning
+- Multi-layer planning: **B1 → B2 → B3** structure.
+- **B1**:
+  - Most powerful demand zone.
+  - Primary buying area.
+  - Direct plan execution possible (B1 AD Plan).
+- **B2**:
+  - Based on structure pullbacks.
+  - Requires confirmation before entry.
+- **B3**:
+  - Secondary refinement layer.
+  - Typically after B2 setups.
+
+---
+
+## 🔍 Key Concepts in Style 2
+- **Demand Loops**:
+  - Identify most powerful demand loops for buying.
+- **Pullbacks**:
+  - Use structure-based pullbacks for safer entries.
+- **Closing Candle Entries**:
+  - Wait for candle close confirmation before buying.
+- **Body Cut Technique**:
+  - Enter after a decisive candle body break.
+- **Father Candle Line**:
+  - Major reference candle for structure.
+
+---
+
+## 🕯 Candle Entry Plans
+- **One-Minute Candle Option Trading**:
+  - High risk — only for aggressive traders.
+- **Lower Time Frame Shift**:
+  - Entry refinements on shorter time frames.
+- **Higher Time Frame Planning**:
+  - Weekly / Monthly for major liquidity & targets.
+- **Swing Entry Planning**:
+  - Combine higher TF structure with lower TF execution.
+
+---
+
+## 📊 Execution Notes
+- **Aggressive Planning**:
+  - B1 + Body Cut + Father Candle → Direct plan.
+  - B2 → Round structure entries.
+- **Major Targets**:
+  - Always align with daily/weekly/monthly liquidity zones.
+- **Gap & Shift Planning**:
+  - Gap entries must align with pullback and structure shifts.
+
+---
+
+✅ *End of Summary — Use Style 1 for simplicity, Style 2 for detailed structured execution.*
+
+
+*******************************************END*******************************************
+
+# GC 85: 📈 high-probability buying areas
+
+## 📌 Overview
+- Focus on **high-probability buying areas** using higher time frame analysis.
+- Emphasis on **Style 1 execution** with candle level splits.
+- Core idea: Identify perfect buy zones by aligning daily, weekly, and monthly structure.
+
+---
+
+## 🏦 Buying Area Planning
+- Use **higher time frames** to find strong buying zones.
+- Perfect plan = High TF confirmation + precise entry.
+- Always check **left side price history** for key support zones.
+
+---
+
+## 🕰 Time Frame Strategy
+- **Higher Time Frames**:
+  - Daily: Blue color candles (main structure reference).
+  - Weekly: Dark green candles (core liquidity areas).
+  - Monthly: Black candle highs & lows (major market levels).
+- **Multi-Time Frame Confirmation**:
+  - Daily high & low lines for precision.
+  - Weekly core areas for demand.
+  - Monthly extremes for long-term targets.
+
+---
+
+## 📊 Liquidity Mapping
+- Mark liquidity lines on:
+  - **Weekly Core Area**.
+  - **Daily Candle Highs & Lows**.
+  - **Monthly Candle Highs & Lows**.
+- These act as major entry/exit reference points.
+
+---
+
+## ⚡ Special Notes
+- **Most Powerful Entry**:
+  - Comes from **daily candle lows** with strong buying strength.
+- **Three-Month Rule**:
+  - Watch for the last 3 months’ levels — considered the most dangerous & volatile zone.
+- Style 1 approach:
+  - Candle level split planning for clean execution.
+  - Focus on **strength-based daily candle buys**.
+
+---
+
+✅ *End of Summary — Core focus is on mapping multi-time frame liquidity and executing with Style 1 precision.*
+
+
+*******************************************END*******************************************
+
+# GC 86: 📈 Universal Time Frame Structure** for Style 1 & Style 2 planning.
+
+## 📌 Overview 
+- Focus: **Universal Time Frame Structure** for Style 1 & Style 2 planning.
+- Emphasis on **pullback-based entries** and candle hunting.
+
+---
+
+## 🕰 Universal Time Frame Structure
+- **Style 1 & Style 2** combined with a universal framework.
+- Weight ratio: **33% importance per key time frame**.
+- Works for:
+  - Higher TF trend analysis.
+  - Lower TF entry precision.
+
+---
+
+## 📊 Pullback Candle Recognition
+- Identify **pullback candles** in any time frame.
+- **B2 Plan**:
+  - Direct candle close entries.
+  - Simple and effective for live markets.
+- **Hunting Candles**:
+  - Look for direct or indirect candle closings near key levels.
+
+---
+
+## 🎯 Key Entry Zones
+- **B1 Support**:
+  - Direct buy plans from major support.
+- **B2 Planning**:
+  - Easier, normal entries after pullback confirmation.
+- Powerful signals:
+  - **1H Single Bullish Candle**: Use high–low as breakout zone.
+  - **1H Single Bearish Candle**: Use low–low as breakdown zone.
+
+---
+
+## 🔍 Practice & Analysis Flow
+1. Start with **basic structure mapping**.
+2. Move to **precise entry targeting**.
+3. Maintain same TF for analysis, then refine in lower TF.
+4. Example:  
+   - Higher TF trend → Lower TF (1H) entry → Market watch over 6 hours.
+5. Test in **Nifty / Bank Nifty** for practice.
+
+---
+
+## ⚖ Risk & Trade Management
+- Always combine:
+  - Correct higher TF trend direction.
+  - Lower TF execution window.
+  - Proper **risk management**.
+- Follow planned structure for next-day trades.
+
+---
+
+✅ *Final takeaway: Universal time frame mapping + pullback candle hunting = high-probability setups.*
+
+
+*******************************************END*******************************************
+*******************************************END*******************************************
 # GC 99 Swing Trading Strategy Guide: Star Rating System
 
 ## Overview
