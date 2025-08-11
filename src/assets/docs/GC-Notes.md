@@ -428,7 +428,7 @@ It also touches on the **importance of timeframe alignment**, **liquidity streng
 
 ****************************END***************************************************
 
-# GC 71 Swing Trading Quality Assessment - Star Rating System
+# GC 71: Swing Trading Quality Assessment - Star Rating System
  
 ---
 
@@ -697,7 +697,7 @@ This comprehensive system provides a structured, professional approach to swing 
 
 *********************************************END*************************************************************** 
 
-# GC 72 Advanced Trading Entry Model: Hunting Candle Strategy
+# GC 72: Advanced Trading Entry Model: Hunting Candle Strategy
 
 ## Overview
 This guide covers the **Hunting Candle Entry Model** - an advanced trading strategy that focuses on identifying the most powerful entry points through aggressive market manipulation patterns. This is the second entry model in the series, specifically designed for high-probability trades.
@@ -900,7 +900,7 @@ Remember: **Quality over quantity** - wait for the perfect hunting setups at maj
 
 ************************************************END******************************************
 
-# GC 73 Entry Model 3: Father Candle with Baby Inside
+# GC 73: Entry Model 3: Father Candle with Baby Inside
 
 ## 1. Core Concept
 - Identify a **large candle** (“Father”) with:
@@ -957,6 +957,549 @@ Remember: **Quality over quantity** - wait for the perfect hunting setups at maj
 
 
 *************************************END***************************************************
+
+# GC 74: Entry Model
+ 
+**🎯 Topic:** EVD Entry Model
+
+---
+
+## 📝 Overview
+- Focuses on the **EVD Entry Model** within the Game Changer framework.
+- Builds upon **previous entry models** covered in earlier videos.
+- Explains **market structure, candle patterns, and demand/supply zones** for precise entries.
+
+---
+
+## 🕯 Candle Concepts
+
+### 🔹 Candle Relationships
+- **Father Candle / Mother Candle**  
+  Large candle that sets the reference range.
+- **Inside Candle (Intermodal Candle)**  
+  Opens within the previous candle’s high/low range.
+- **Bullish/Bearish Creation**  
+  Identify when a bullish candle forms after a bearish one (and vice versa) for signals.
+
+### 📏 Key Candle Levels
+- **High Line & Low Line Weighting** – Mark significant highs and lows of the reference candle.  
+- **Candle Close Inside / Gap Up Close** – Check for closing behavior relative to prior highs/lows.  
+- Avoid **gap-up opens** that skip liquidity zones.
+
+---
+
+## 📊 Market Structure & Liquidity
+
+### 📈 Higher Timeframe Bias
+- **1H → 15m → 5m → 3m → 1m**  
+  - Align lower timeframe entries with higher timeframe bias.
+  - Prefer **bullish control** on higher timeframe for buying setups.
+
+### 💧 Liquidity Zones
+- Identify liquidity above highs or below lows before planning entries.
+- Avoid entering **directly into liquidity traps**.
+
+---
+
+## 🗺 Demand & Supply Zones
+
+### 🟢 Most Powerful Demand Zones
+- Found in bullish structures.
+- Look for **pullbacks** into demand with confirmation.
+- Prefer **clean left-side price action** (no messy wicks or consolidations).
+
+### 🔴 Most Powerful Supply Zones
+- Found in bearish structures.
+- Strong rejection candles at supply = high-probability short.
+- Same clean-structure principle applies.
+
+---
+
+## 🎯 Entry Model Plan
+
+1. **Confirm Higher Timeframe Direction** (HTF bullish → only buy / HTF bearish → only sell).
+2. **Mark Most Powerful Demand/Supply Zones**.
+3. **Wait for Price to Retrace** into zone.
+4. **Check for Candle Confirmation** (inside candle, bullish close, shift in market structure).
+5. **Enter on Lower Timeframe** (5m, 3m, or 1m) for precision.
+
+---
+
+## ⚠ Avoid & Be Cautious
+- Do not enter if **structure is unclear**.
+- Skip trades if **gap up/down skips key zones**.
+- Avoid **direct counter-trend trades** without confirmation.
+
+---
+
+## 💡 Key Takeaways
+- **Structure First, Entry Later** – Never rush into trades without HTF confirmation.
+- **Most Powerful Zones** outperform random demand/supply.
+- **Candle Clarity** is essential: clean, decisive closes give better entries.
+- **Right Side Bias** – Trade in the direction of the dominant structure.
+
+---
+************************************END******************************************
+
+# GC 75: Entry Model
+
+## 🕵️ Overview 
+- Focus on **intermodal candle patterns** and **precise entry techniques**.
+
+---
+
+## 🕯️ Candle Importance
+- Identify **key candles** – bullish & bearish.
+- Pay attention to:
+  - Mother candle / Father candle.
+  - High–Low lines.
+  - Candle closing inside prior candle.
+- **Most powerful candles** = strong demand or supply creation.
+
+---
+
+## 📈 Demand & Supply Zones
+- **Demand zone**:
+  - Created by bullish momentum after sweep/liquidity grab.
+  - Look for bullish candle close after hunting.
+- **Supply zone**:
+  - Created by bearish moves after sweep.
+  - Mirror concept of demand.
+
+---
+
+## 🔍 Entry Triggers
+- Entry when:
+  - Candle closes in the zone after sweep.
+  - Price pulls back into demand/supply.
+- Avoid chasing price — wait for confirmation close.
+- **Sweep → Close → Enter** = high-probability sequence.
+
+---
+
+## 🎯 Target & Risk
+- **Stop Loss**:
+  - Just below demand zone (for buys).
+  - Just above supply zone (for sells).
+- **Target**:
+  - Structure highs/lows.
+  - Next key block in market structure.
+
+---
+
+## 🗺️ Timeframe Alignment
+- **Higher TF Analysis**:
+  - 1H, 15M → overall trend & structure.
+- **Lower TF Execution**:
+  - 5M, 3M, 1M → refine entries.
+- Trade only with **higher TF direction**.
+
+---
+
+## ⚡ Key Rules
+1. Structure-first approach.
+2. Only take entries in **most powerful demand/supply zones**.
+3. Wait for **candle close confirmation**.
+4. Avoid low-quality setups or chasing.
+5. Practice across multiple sessions for consistency.
+
+************************************END***************************************
+
+# GC 76: 📊 Entry Models & Candle Patterns
+- **Models Reference**: Using "e n t" models, already on Model 5.
+- **Key Candle Types**:
+  - 🟨 *First Two Candles*: Identify highest bullish & lowest bearish candle.
+  - 🐻 *Lowest Bearish Candle*: Acts as swing key.
+  - 🐂 *Highest Bullish Candle*: For intermodal entry setups.
+- **Hunting Candle**:
+  - Purpose: Identify strong breakout points.
+  - Appears before key break moves in consolidation zones.
+  - Multiple repetitions indicate strong buildup.
+
+---
+
+## 🎯 Entry Planning & Risk
+- **On-the-Spot Entry**: Execute as soon as the setup confirms.
+- **Graceful Entry Plan**: Wait for candle close to confirm bias.
+- **Inside Candles**: Multiple inside candles show compression before breakout.
+- **Aggressive Entry**: For higher conviction setups, especially near demand zones.
+- **Risk Planning**:
+  - `B1`, `B2`, `B3` levels define entry risk zones.
+  - Adjust lot sizes & stop-loss based on zone risk.
+
+---
+
+## 📈 Timeframe Strategies
+- **Higher vs Lower Timeframe**:
+  - Plan with higher timeframe → Execute on lower timeframe.
+- **Single Timeframe Testing**: Useful for simplicity & clarity.
+- **Multi-Timeframe Confirmation**: Align entry with both top-down & step-down analysis.
+
+---
+
+## 🧱 Block & Pullback Creation
+- **Pullback Formation**: Occurs after demand or supply test.
+- **Block Creation**: Candle structure that defines supply/demand zone.
+- **Overlap Zones**: When multiple supply areas align with pending orders.
+- **Weight Control**: Supply area dominance over price movement.
+
+---
+
+## 💰 Supply & Demand Zones
+- **Demand Zone**: Test & react for buy entries.
+- **Supply Zone**:
+  - "Two gun, three gun" concept for layered resistance.
+  - Pending orders stacked in overlapping supply zones.
+- **Filling Area**: Price returning to fill untested levels.
+
+---
+
+## 🔄 Premium & Dilution Zones
+- Identify premium areas (sell zones) & discount areas (buy zones).
+- Avoid entries in dilution (choppy) zones.
+
+---
+
+## 📅 Practice & Market Scope
+- **Practice Timeframes**: 15 minutes and below for entry refinement.
+- **Larger Scope**: Daily, weekly, monthly charts for macro bias.
+- **Markets Used**:
+  - 📈 US 100
+  - 💱 Forex pairs 
+************************************END***************************************
+
+# GC 77: 📈 Price Action & Pullback Concepts
+
+## 🧱 Demand & Supply Blocks
+- **Powerful Demand Zones**: Identifying "real high" demand as the most powerful.
+- **Block Creation**: Use higher timeframe candlesticks to form pullback blocks.
+- **Supply Gaps**: Recognize supply gaps as potential entry/exit zones.
+- **Block Gradation**: Measure the strength of pullback blocks.
+
+## 🔄 Pullback Strategy
+- Pullbacks are **important before liquidity moves**.
+- Gradation of pullbacks helps in deciding trade strength.
+- Easy pullbacks are more favorable for entries.
+- Minimum capture strategy: take partial profits early.
+
+## ⏳ Timeframe Analysis
+- **Top-Down Analysis**: Start from higher timeframe, move to lower timeframe.
+- **Step-Down Analysis**: Break down trades into smaller timeframes for confirmation.
+- Lower timeframe confirmations before execution.
+- Higher timeframe planning + lower timeframe execution.
+
+## 🕯 Candlestick Patterns
+- Same-candle highs and sweeps can indicate liquidity manipulation.
+- Candle closing at key levels is important for confirmation.
+- Entry triggers often occur on candle close after pullback.
+- Multiple candle patterns:
+  - First candle: Initial move.
+  - Second candle: Confirmation.
+  - Third candle: Buying zone.
+
+## 💧 Liquidity & Manipulation
+- Liquidity sweeps around highs/lows are key entry areas.
+- Gap liquidity is considered **most powerful**.
+- Market manipulation often occurs at candle close near liquidity.
+
+## 📊 Trade Planning
+- Two main styles: Style 1 & Style 2.
+- Multiple analysis approaches: B1, B2 for step-down and top-down analysis.
+- Target-based planning — set targets before entry.
+- Adjust for volatile markets — use top-down candlestick analysis.
+
+## ⭐ Rating of Zones
+- **Most Powerful Demand**: Rating 5.
+- **Strong Demand/Supply**: Ratings 4 to 2.
+- **Weak Zones**: Rating 1.
+
+---
+✅ **Core Idea**:  
+Combine **top-down analysis**, **pullback block creation**, and **liquidity targeting** with proper candle closing confirmations to execute high-probability trades.
+
+
+************************************END***************************************
+
+# GC 78: 📈 Reversal Planning (Higher & Lower Timeframes)
+
+## 🎯 Overview
+- Second video of the **16th series**
+- Covers **Reversal Series** concepts
+- Focus on **Higher Timeframe (HTF)** and **Lower Timeframe (LTF)** reversal planning
+- Builds on previous intro (A1 → A2 → A3 sequence)
+
+---
+
+## 🛠 Structure & Key Concepts
+### 🔹 A1 – A2 – A3 Blocks
+- **A1**: Initial move
+- **A2**: Supply test / reaction
+- **A3**: Pullback or direct shift
+- Can be **Buying Plan** or **Selling Plan** depending on trend
+
+---
+
+## 📊 Trend Scenarios
+### 📈 Bullish Trend
+- A1 → A2 → A3 pullback entry
+- Direct shift possible after supply test in HTF
+
+### 📉 Bearish Trend
+- HTF low → downside push
+- LTF planning aligns with HTF direction
+
+---
+
+## 📍 Higher Timeframe (HTF) Planning
+- **Supply Sweep** → Shift → Gap Entry
+- Block creation using A1 → A2 → A3
+- Gap fill levels: 10%, 20%, 30%, 40%, 50%, 70%, 80%, 100% to A2
+
+---
+
+## ⏳ Lower Timeframe (LTF) Planning
+- Follows HTF bias
+- Gap block entry
+- Candle-by-candle entry
+- Pullback entries
+- Scalp & intraday opportunities
+
+---
+
+## 🛡 Risk Management
+- **Safest Stop Loss**: Suitable for intraday & scalping (low risk)
+- **Risky Stop Loss**: Aggressive / high risk, but higher RR
+- **Reward Ratios**: 1:12, 1:21 possible in ideal setups
+
+---
+
+## 📌 Entry Types
+- Gap Entry
+- Pullback Entry
+- Candle Entry
+- Gap + Candle Combination Entry
+- Body Cut entries for momentum trades
+
+---
+
+## 💡 Additional Notes
+- Gap into planning with single candle entries
+- Quality trade management is key
+- Avoid unnecessary trades
+- Focus on buying/selling zones, blocks, and breaks
+- Next video will continue the concept
+
+---
+
+✅ **Summary:**  
+The video details how to use A1 → A2 → A3 structure to plan high-probability reversals across higher and lower timeframes, with a strong emphasis on gap entries, risk management, and precise trade execution.
+
+****************************************END*****************************************
+
+# GC 79: 🏆  **Style 1 reversal plan** + pullback buying strategy
+
+## 📌 Context
+- **Third video** in the 16th Game Changer series.
+- Focus: **Style 1 reversal plan** + pullback buying strategy.
+- Applicable for **higher time frame** & **day time frame** analysis.
+
+---
+
+## 🔍 Key Concepts
+
+### 1️⃣ Style 1 Reversal Plan
+- **Gap entry**, **pullback entry**, and **candle-by-candle entry** methods.
+- Works well for **liquidity hunts** by big players in higher & lower time frames.
+- Important to identify **general block creation** in Style 1 low.
+
+---
+
+### 📊 Liquidity & Player Behavior
+- **Big players hunt liquidity** in both day and higher time frames.
+- Look for **gaps** as a sign of potential entry zones.
+- **General block** often created in Style 1 lows—acts as a key decision area.
+
+---
+
+### 🎯 Entry Types
+- **Gap Entry**: Enter when price gaps and confirms in higher/lower time frames.
+- **Pullback Entry**: Wait for retracement to key demand/supply zones.
+- **Candle Entry**: Enter based on **candle transition** and liquidity tests.
+
+---
+
+### 🛠 Confirmation & Strategy
+- **Shift in structure** (Style 2) rare but powerful—requires confirmation.
+- **Advanced confirmation** is important for safer trades.
+- Counter setups possible but require strong candle confirmation.
+
+---
+
+## 📈 Execution Plan
+- Identify **Style 1 low** → Look for block creation.
+- Choose **entry method** (Gap / Pullback / Candle).
+- Confirm with **structure shift** or **liquidity test**.
+- Manage with **option models** for entry & exit precision.
+
+---
+
+## 💡 Pro Tips
+- Most powerful **demand zones** can trigger strong reversal moves.
+- Avoid impulsive entries—wait for candle close confirmation.
+- **R level tests** after pullback give high-probability entries.
+
+
+
+
+
+************************************END***************************************
+
+# GC 80:📒 Candle-wise Planning & Liquidity Execution
+
+## 🕯️ Candle-Wise Planning
+- Focus directly on **candle-by-candle trade planning**.
+- **No need for complex setups** — use simple gap & liquidity concepts.
+- Entry based on:
+  - **Gap + First 15-min Candle** in reversal direction.
+  - **Candle Breaks** with confirmation.
+  - **Previous Candle Rejection** for reversals.
+
+---
+
+## 💧 Liquidity & Gaps
+- Identify **general liquidity zones** (buying & selling areas).
+- Look for **gaps in 15-min time frame** — strong reversal signal.
+- **Sweeps** of liquidity often followed by pullback → target.
+
+---
+
+## 🎯 Entry Strategies
+1. **Gap Entry** → Reverse in opposite direction after gap forms.
+2. **Candle Entry** → Aggressive entry after candle close in your direction.
+3. **Pullback Entry** → Wait for retracement to block/demand/supply zone.
+4. **Direct Candle Price Action** → Enter without waiting for pullback if candle is strong.
+
+---
+
+## 📈 Aggressive vs Safe Entries
+- **Aggressive**: Direct candle close entry without pullback.
+- **Safe**: Pullback to demand/supply zone, then enter.
+- Always confirm with **closing candle in your direction**.
+
+---
+
+## 🗂 Pattern References
+- **A1 → A2 → A3**: Buy/Sell cycle stages.
+- **B1 → B2 → B3**: Target mapping stages.
+- A1/A2/A3 used for **planning entries**.
+- B1/B2/B3 used for **planning exits/targets**.
+
+---
+
+## 🛠 Execution Notes
+- Identify **gap + liquidity sweep** → enter on confirmation.
+- Candle close above/below previous candle gives **direction clarity**.
+- Pullback after sweep often gives **best R/R entry**.
+- **Reject-type candles** = strong sign for reversal.
+
+---
+
+## ⚡ Quick Rules Recap
+- Main **gap** is key.
+- Close in your direction before entry.
+- Liquidity zones guide **target placement**.
+- Adapt between **gap / pullback / direct candle entry** based on price action.
+
+---
+
+## ✅ Summary
+Trading plan focuses on:
+- Simple **gap + candle close** logic.
+- Liquidity sweeps as the core trigger.
+- Flexible entry method: Gap / Pullback / Direct.
+- Use **A1/A2/A3 → B1/B2/B3** for structure & targets.
+ 
+
+************************************END***************************************
+
+
+# Gc 81: 📚 Trading Notes – Summary
+
+## 🔍 Higher Timeframe Analysis
+- Always start with **Higher Timeframe (HTF)** view.
+- Focus on **closing price** on HTF before planning entries.
+- Identify **Supply** or **Demand zones** from HTF structure.
+- **Simple Block Creation**: Master block → Just block → Liquidity check.
+- Pullback entries work best when confirmed in HTF.
+- Example HTFs: 1H, 15M, or Daily depending on trade plan.
+
+---
+
+## 🏗 Structure & Patterns
+- **B1 / B2 / B3** → Short clarity setups.
+- **A1 / A2 / A3** → Higher timeframe pullback sequences.
+- Look for **reversal patterns** after pullback for entries.
+- Candle closing confirmation is critical.
+- Gap entries:
+  - Gap fill → Pullback → High-probability move.
+- Avoid chasing price; wait for structure to form.
+
+---
+
+## 💡 Demand & Supply
+- Demand zones = Buying areas (High probability when liquidity sweep happens).
+- Supply zones = Selling areas.
+- Look for **liquidity grabs** before entry:
+  - Big players sweeping bottom/top.
+- Demand/Demand/Demand emphasis → Strong buyer interest.
+
+---
+
+## 🕒 Lower Timeframe Execution
+- Lower timeframe (e.g., **5M**) for precise entries.
+- Look for **candle touch** and reaction.
+- Match lower timeframe confirmation with HTF bias.
+- Aim for **≥ 50% confluence** with HTF for better probability.
+- Single candle gap entries can be effective when combined with liquidity sweep.
+
+---
+
+## 📌 Rules & Plans
+1. Always define **demand/supply** bias first.
+2. Confirm with **HTF close**.
+3. Only plan **high-probability trades**.
+4. Prefer **demand candle entries** after liquidity sweep.
+5. Gap planning should be **safe side** oriented.
+6. Shift plan if conditions change.
+
+---
+
+## 🎯 High Probability Triggers
+- **Gap fill → Demand entry**.
+- **Liquidity sweep → Demand entry**.
+- **Strong bullish candle** in demand zone.
+- **Reversal pattern** in confluence with HTF bias.
+
+---
+
+## ⚙ Trading Styles
+- **Style 1**: Simple execution.
+- **Style 2**: Advanced structure workout.
+- Market timing:
+  - 1H / 15M mix depending on volatility.
+  - 6H → Daily → 5M entries for some setups.
+
+---
+
+## 🏁 Final Notes
+- Be flexible — market changes require **plan adjustments**.
+- Gap entries can be **pink zone safe-side sells** or **demand buys**.
+- Simplify your approach:
+  - Block creation → Demand/Supply marking → Execution.
+
+
+
+************************************END***************************************
 
 
 # GC 99 Swing Trading Strategy Guide: Star Rating System
@@ -1322,5 +1865,9 @@ This guide covers advanced day trading strategies focusing on:
 6. **Use multiple time frame analysis** for better entries
 7. **Avoid low-volume and manipulated markets**
 8. **Keep detailed trading records** for continuous improvement
+
+************************************************************END******************************************************
+
+
 
 ************************************************************END******************************************************
