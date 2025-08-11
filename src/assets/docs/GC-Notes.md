@@ -958,7 +958,7 @@ Remember: **Quality over quantity** - wait for the perfect hunting setups at maj
 
 *************************************END***************************************************
 
-# GC 74: Entry Model
+# GC 74: Entry Model (EVD Entry Model)
  
 **🎯 Topic:** EVD Entry Model
 
@@ -1041,7 +1041,7 @@ Remember: **Quality over quantity** - wait for the perfect hunting setups at maj
 ---
 ************************************END******************************************
 
-# GC 75: Entry Model
+# GC 75: Entry Model (intermodal and precise entry technique)
 
 ## 🕵️ Overview 
 - Focus on **intermodal candle patterns** and **precise entry techniques**.
@@ -1106,6 +1106,7 @@ Remember: **Quality over quantity** - wait for the perfect hunting setups at maj
 ************************************END***************************************
 
 # GC 76: 📊 Entry Models & Candle Patterns
+
 - **Models Reference**: Using "e n t" models, already on Model 5.
 - **Key Candle Types**:
   - 🟨 *First Two Candles*: Identify highest bullish & lowest bearish candle.
@@ -1423,7 +1424,8 @@ Trading plan focuses on:
 ************************************END***************************************
 
 
-# Gc 81: 📚 Trading Notes – Summary
+# GC 81: 📚 Trading Notes – Summary
+
 
 ## 🔍 Higher Timeframe Analysis
 - Always start with **Higher Timeframe (HTF)** view.
