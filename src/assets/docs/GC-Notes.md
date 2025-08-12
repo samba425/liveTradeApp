@@ -313,7 +313,7 @@ Master pullbacks by combining **candle structure**, **equal high/low breaches**,
 
 ***************************************END***************************************
 
-# Gc 41: 🧲 Magnets – (Bullish/Bearish Pullbacks & Internal Liquidity)
+# GC 41: 🧲 Magnets – (Bullish/Bearish Pullbacks & Internal Liquidity)
 
 ## 📊 Bullish vs Bearish Pullbacks
 - **Bullish Pullback**:
@@ -1207,7 +1207,7 @@ Master pullbacks by combining **candle structure**, **equal high/low breaches**,
 
 
 ***************************************END***************************************
-# GC-54: Most Important Close → Most Powerful Demand
+# GC 54: Most Important Close → Most Powerful Demand
 
 ## 1. Core Concept
 - **Most Important Close → Most Powerful Demand**
@@ -1994,7 +1994,7 @@ If you'd like me to organize this more or add more detail, just say! 😊
 
 
 ***************************************END*******************************************
-# Gc 64: 📈 Detailed Structure & Pullback Explanation
+# GC 64: 📈 Detailed Structure & Pullback Explanation
 
 ---
 
@@ -4151,7 +4151,7 @@ If you'd like, I can help create a checklist or study guide based on these point
 
 
 ***************************************END*******************************************
-# Gc 89: 📊  Multi-Level Analysis Framework
+# GC 89: 📊  Multi-Level Analysis Framework
 ---
 
 ## 🔍 Multi-Level Analysis Framework
