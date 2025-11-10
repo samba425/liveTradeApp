@@ -1950,6 +1950,17 @@ Pattern completion → Think MANIPULATION
 - Keep practicing high-probability candle setups
 - Track rare high-reward cases
 
+** imp points **
+
+GC-60: Pullback (PB) Style Trading
+1) PB Style-1 is simple and effective — easy to use for trading.
+2) PB Style-2 is a bit harder but useful for improving skill and precision.
+3) In a bullish trend, if a candle’s high is swept, it gives a 50% fill; if low is swept, it gives a 100% fill.
+4) We analyze starting from monthly timeframe down to 1H timeframe (multi-timeframe confirmation).
+5) When trend is bullish, if price sweeps above, we sell only up to 50%; if it sweeps below, we hold till candle high.
+6) Compare monthly, weekly, and daily timeframes to avoid manipulation traps.
+7) Only trade when you’re mentally ready to accept stop loss.
+Always calculate your position and stop loss before entering — trade only within your risk limit.
 
 ***************************************END*******************************************
 # GC 61: High-probability entry
@@ -2020,6 +2031,20 @@ Pattern completion → Think MANIPULATION
 4. Focus on date-timeframe liquidity zones
 5. Use block break direction as confirmation
 
+**imp points**
+GC-61: Concentrative Entry and Trade Planning
+
+1) In the market, there are two types of traders — most successful traders and aggressive traders.
+2) Concentrative entry means a calm, planned entry — finding the best entry point where stop loss can be placed tightly, making you a better trader.
+3) Learn money management and risk-reward properly.
+4) When a bearish candle’s low gets swept, we look for buy entries.
+5) When a bullish candle’s high gets swept, we look for sell entries — but if a bullish candle sweeps another bullish candle, it’s a trap.
+6) Don’t just rely on past levels — always analyze the current market structure before deciding.
+7) In a bullish trend, focus only on bearish candles. When a bearish candle’s low is swept, it’s a clean sweep and gives a potential entry.
+8) When placing entries, aim for at least a 1:4 risk–reward ratio.
+9) Always reduce risk and increase reward — a smaller stop loss naturally increases your profit.
+10) When stop loss is reduced and position is managed properly, profit automatically grows.
+11) In a bullish trend, if a bullish candle’s high is swept, confirm the setup on a lower timeframe before entering.
 
 
 ***************************************END*******************************************
@@ -2104,7 +2129,18 @@ Pattern completion → Think MANIPULATION
 - Remaining % → psychology & execution discipline
 - Perfect close entries are critical
 
----
+** imp points **
+GC-62: Pullback and Demand Dynamics
+1) When a pullback sweep happens in a bullish trend, we look for buying opportunities.
+2) On a lower timeframe (LTF), the market may seem opposite to the higher timeframe (HTF), but the HTF direction always dominates.
+3) After a pullback test, a magnet zone is created — if price sweeps the pullback (PB) and closes above it, it confirms buying side strength.
+4) At the pullback area, new buyers enter and previous buyers re-enter — while others may sell after SL hit, BP (buy point) traders start buying there.
+5) On the higher timeframe, demand zones are often formed at pullback areas.
+6) If a pullback closes below its structure, price usually moves down to the next demand zone (still within bullish context).
+7) When there are more buyers, demand is created; when sellers dominate, supply forms.
+8) The market moves up or down as demand and supply zones form and shift.
+9) Algorithms are the ones managing and balancing demand and supply in the market.
+
 
 ***************************************END*******************************************
 # GC 63: 📊  Easy Slow Strategy
@@ -2169,8 +2205,20 @@ Pattern completion → Think MANIPULATION
 
 ---
 
-If you'd like me to organize this more or add more detail, just say! 😊
+***imp points***
+GC-63: Buying Area & MDS Concepts
 
+1) Buying areas are of two types, and one of them is formed by MDS (Market Direction Shift).
+2) MDS occurs when a single candle breaks a previous candle’s high and breaches its own low (or vice versa).
+3) When price moves up and then returns down again, two MDS formations can happen during that swing.
+4) In a swing, we call these formations structural PBs; usually, two MDS appear within one swing.
+5) When the market moves strongly in one direction, if a candle takes out the previous high/low and another candle reacts, it forms a technical PB.
+6) If one candle’s low is closed by another candle’s wick and that second candle closes higher, it indicates a structural PB.
+7) In a swing, only structural PB MDS are considered valid.
+8) Candlestick patterns can show structural or technical PB MDS depending on market behavior.
+9) MDS appears when the market turns or reverses from a zone.
+10) When two or a single MDS form at the same area, it becomes a strong buying zone.
+11) When multiple MDS overlap at one zone, it represents the most powerful area in the market.
 
 
 ***************************************END*******************************************
