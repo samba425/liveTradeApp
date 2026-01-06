@@ -1,31 +1,83 @@
-<body  >
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <a class="navbar-brand m-1">TradeApp</a>
-    <div class="container-fluid"> 
-      <div class="collapse navbar-collapse"  id="navbarSupportedContent">
-        <ul class="navbar-nav">
+<body>
+  <!-- Modern Sticky Navigation with Gradient -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <div class="container-fluid">
+      <!-- Brand with Icon -->
+      <a class="navbar-brand" routerLink="/" style="font-weight: 800; font-size: 1.5rem; letter-spacing: 1px;">
+        <i class="fas fa-chart-line" style="color: #ffd700;"></i> 
+        <span style="background: linear-gradient(45deg, #fff, #ffd700); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TradeApp</span>
+      </a>
+
+      <!-- Market Status Indicator -->
+      <div class="d-none d-lg-flex align-items-center mr-3" style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 20px;">
+        <span id="marketStatus" style="font-size: 0.9rem; font-weight: 600;">
+          <span id="statusDot" style="height: 10px; width: 10px; background-color: #bbb; border-radius: 50%; display: inline-block; margin-right: 5px;"></span>
+          <span id="statusText">Loading...</span>
+        </span>
+      </div>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <span class="nav-link active " aria-current="page" routerLink="/BankNifty">Bank Nifty</span>
+            <span class="nav-link" routerLink="/BankNifty" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-home"></i> Home
+            </span>
           </li>
           <li class="nav-item">
-            <span class="nav-link " routerLink="/volume-shocker">Volume Shocker</span>
+            <span class="nav-link" routerLink="/volume-shocker" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-bolt"></i> Volume
+            </span>
           </li>
           <li class="nav-item">
-            <span class="nav-link " routerLink="/openhighlow">Open High Low</span>
+            <span class="nav-link" routerLink="/openhighlow" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-equals"></i> O=H/L
+            </span>
           </li>
           <li class="nav-item">
-            <span class="nav-link " routerLink="/sma">Simple MA's</span>
+            <span class="nav-link" routerLink="/sma" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-wave-square"></i> SMA
+            </span>
           </li>
           <li class="nav-item">
-            <span class="nav-link " routerLink="/bb">BB</span>
+            <span class="nav-link" routerLink="/bb" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-chart-area"></i> BB
+            </span>
           </li>
-          <!-- <li class="nav-item">
-            <span class="nav-link " routerLink="/learn">Fundamental</span>
-          </li> -->
-        </ul>  
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/sectors" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-chart-pie"></i> Sectors
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/calculator" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-calculator"></i> Calc
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/watchlist" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-star"></i> Watchlist
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/alerts" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-bell"></i> Alerts
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/news" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-newspaper"></i> News
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" routerLink="/learn" routerLinkActive="active-route" style="cursor: pointer; font-weight: 600;">
+              <i class="fas fa-graduation-cap"></i> Learn
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   </nav> 
@@ -37,48 +89,88 @@
 		// NIFTYJR
 		// SENSEX
 		// CNXMETAL -->
-    <div class="btn m-1">
-      <div *ngIf='isbankNifty != "/BankNifty"'  role="group" aria-label="Basic mixed styles example">
-        <button type="button" (click)=refreshdata()  class="btn  m-1 btn-secondary">All Data</button>
-        <button type="button" (click)="refreshdata('NIFTY')"  class="btn m-1  btn-danger">Nifty50</button>
-        <button type="button" (click)="refreshdata('CNX200')" class="btn m-1  btn-warning">Nifty200</button>
-        <button type="button"   (click)="refreshdata('CNX500')" class="btn m-1  btn-success">Nifty500</button>
-        <button type="button"   (click)="refreshdata('CNXIT')" class="btn m-1  btn-dark">IT</button>
-        <button type="button"   (click)="refreshdata('NIFTYJR')" class="btn m-1  btn-primary">Next Nifty</button>
-        <button type="button"   (click)="refreshdata('CNXAUTO')" class="btn m-1  btn-info">AUTO</button>
-        <button type="button"   (click)="refreshdata('CNXMETAL')" class="btn m-1   btn-warning">Metal</button>
-        <div class="btn-group">
-          <button type="button" class="btn m-1 btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Sector Wise
+  <!-- Index Filter Buttons (Modern Card Style) -->
+  <div *ngIf='isbankNifty == "/sma" || isbankNifty == "/bb" || isbankNifty == "/volume-shocker" || isbankNifty == "/breakout"' class="container-fluid mt-3" style="position: relative; z-index: 100;">
+    <div class="card" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border: none;">
+      <div class="card-body">
+        <h5 class="mb-3"><i class="fas fa-filter"></i> Quick Filters</h5>
+        <div class="btn-group flex-wrap" role="group" style="position: relative;">
+          <button type="button" (click)="refreshdata()" class="btn btn-secondary m-1">
+            <i class="fas fa-globe"></i> All Data
           </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" *ngFor="let sector of sectorList" (click)="sectorSelect(sector)">{{sector}}</a>
+          <button type="button" (click)="refreshdata('NIFTY')" class="btn btn-danger m-1">
+            <i class="fas fa-chart-line"></i> Nifty 50
+          </button>
+          <button type="button" (click)="refreshdata('CNX200')" class="btn btn-warning m-1">
+            <i class="fas fa-layer-group"></i> Nifty 200
+          </button>
+          <button type="button" (click)="refreshdata('CNX500')" class="btn btn-success m-1">
+            <i class="fas fa-database"></i> Nifty 500
+          </button>
+          <button type="button" (click)="refreshdata('CNXIT')" class="btn btn-dark m-1">
+            <i class="fas fa-laptop-code"></i> IT
+          </button>
+          <button type="button" (click)="refreshdata('NIFTYJR')" class="btn btn-primary m-1">
+            <i class="fas fa-arrow-up"></i> Next Nifty
+          </button>
+          <button type="button" (click)="refreshdata('CNXAUTO')" class="btn btn-info m-1">
+            <i class="fas fa-car"></i> Auto
+          </button>
+          <button type="button" (click)="refreshdata('CNXMETAL')" class="btn btn-warning m-1">
+            <i class="fas fa-industry"></i> Metal
+          </button>
+          
+          <div class="btn-group m-1 dropdown" style="position: relative;">
+            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-sitemap"></i> Sector Wise
+            </button>
+            <ul class="dropdown-menu" style="max-height: 400px; overflow-y: auto; z-index: 1060; position: absolute;">
+              <li *ngFor="let sector of sectorList">
+                <a class="dropdown-item" (click)="sectorSelect(sector)" style="cursor: pointer;">
+                  <i class="fas fa-angle-right"></i> {{sector}}
+                </a>
+              </li>
+            </ul>
           </div>
+          
+          <button type="button" class="btn btn-outline-primary m-1" disabled>
+            <i class="fas fa-tag"></i> {{currentValue}}
+          </button>
         </div>
-        <div class="btn-group">
-          <button type="button"  class="btn m-1 ">{{currentValue}}</button> 
       </div>
-  </div>
     </div>
-
-  <!-- End Example Code -->
+  </div>
 </body>
 
 <div class="container-fluid">
-<router-outlet></router-outlet>
-</div> 
-  <hr>
-<div class="row m-2">
-  <div class="col-sm-6">
-      <div class="card-body">
-        <h4>Designed By Samba siva</h4>
-    </div>
-  </div>
-  <div class="col-sm-6">
-      <div class="card-body">
-        <button class='btn btn-link'><a href="https://livetradeapp1.onrender.com/getData?index=BANKNIFTY" target="_blank" rel="noopener noreferrer">Base Link</a></button>
-    </div>
-  </div>
+  <router-outlet></router-outlet>
 </div>
+
+<!-- Modern Footer -->
+<footer class="mt-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h4 style="font-weight: 700;">
+          <i class="fas fa-chart-line" style="color: #ffd700;"></i> TradeApp
+        </h4>
+        <p class="mb-0">Professional Trading & Analysis Platform</p>
+        <small style="opacity: 0.8;">Designed By Samba Siva © 2026</small>
+      </div>
+      <div class="col-md-6 text-md-right">
+        <div class="mb-2">
+          <a href="https://livetradeapp1.onrender.com/getData?index=BANKNIFTY" target="_blank" rel="noopener noreferrer" 
+             class="btn btn-light btn-sm mr-2" style="border-radius: 20px;">
+            <i class="fas fa-link"></i> API Base Link
+          </a>
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">
+          <i class="fas fa-exclamation-circle"></i> 
+          <strong>Disclaimer:</strong> This is for educational purposes only. Not financial advice.
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
 
 

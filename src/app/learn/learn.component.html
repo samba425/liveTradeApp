@@ -1,11 +1,15 @@
-<!-- Trading Knowledge Base Accordion -->
-<div class="knowledge-base-container">
-  <div class="knowledge-base-header">
-    <h2>📈 Trading & Investment Knowledge Base</h2>
-    <button class="btn btn-sm btn-primary" (click)="toggleAllKnowledgeBase()">
-      {{ allKnowledgeExpanded ? 'Collapse All Sections' : 'Expand All Sections' }}
-    </button>
-  </div>
+<!-- Main Container -->
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <!-- Trading Knowledge Base Accordion -->
+      <div class="knowledge-base-container">
+        <div class="knowledge-base-header">
+          <h2>📈 Trading & Investment Knowledge Base</h2>
+          <button class="btn btn-sm btn-primary" (click)="toggleAllKnowledgeBase()">
+            {{ allKnowledgeExpanded ? 'Collapse All Sections' : 'Expand All Sections' }}
+          </button>
+        </div>
 
   <!-- Section 1: Global Markets -->
   <div class="knowledge-section">
@@ -634,4 +638,8 @@
     src="assets/docs/GC-Notes.md"
     (ready)="onMarkdownReady()"
   ></markdown>
+</div>
+
+    </div>
+  </div>
 </div>

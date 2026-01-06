@@ -10,6 +10,9 @@ import { Subscription, interval } from 'rxjs';
 })
 export class BankniftyComponent implements OnInit, OnDestroy {
 
+  // View toggle for different indexes
+  currentView: 'banknifty' | 'sectors' = 'banknifty';
+
   ngOnInit() {
   }
 
@@ -17,10 +20,10 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   topBanks = ['ICICIBANK', 'KOTAKBANK', 'SBIN', 'AXISBANK']
   nifty50Top = ["HDFCBANK","RELIANCE","ICICIBANK","INFY","ITC","TCS","LT","BHARTIARTL","AXISBANK","SBIN"]
   public defaultColDef: ColDef = {
-    editable: true,
+    editable: false,
     filter: true,
-    flex: 5,
-    minWidth: 150,
+    resizable: true,
+    sortable: true
   };
   mySubscription: Subscription;
   bankSubscription: Subscription;
@@ -32,33 +35,90 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   rowData = [];
   rowTopData = [];
   pagination = true;
-  paginationPageSize = 2500;
-  paginationPageSizeSelector = [200, 500, 1000];
+  paginationPageSize = 20;
+  isLoading = false;
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", resizable:true ,sortable: true },
-    { field: "close", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "vwap", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
+    { 
+      headerName: "📊 Stock",
+      field: "name", 
+      resizable:true ,
+      sortable: true,
+      width: 180,
+      pinned: 'left',
+      cellStyle: { fontWeight: 'bold', color: '#667eea', cursor: 'pointer', fontSize: '14px' },
+      cellRenderer: (params) => {
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="https://www.tradingview.com/chart/?symbol=NSE:${params.value}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: bold; font-size: 14px;">${params.value}</a>
+            <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${params.value}'); event.stopPropagation();" style="cursor: pointer; color: #9ca3af; font-size: 11px; margin-left: 6px; opacity: 0.7;" title="Copy ${params.value}"></i>
+          </div>
+        `;
+      }
+    },
+    { 
+      headerName: "💰 Close",
+      field: "close", 
+      resizable:true ,
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + Math.floor(p.value).toLocaleString(),
+      cellStyle: { fontWeight: '600' }
+    },
+    { 
+      headerName: "📊 VWAP",
+      field: "vwap", 
+      resizable:true ,
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
+    },
     {
-      field: "vwapDiff", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), cellStyle: function (params) {
+      headerName: "📊 VWAP Diff",
+      field: "vwapDiff", 
+      resizable:true ,
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(), 
+      cellStyle: function (params) {
         if (params.value > 0) {
-          return { backgroundColor: 'green' };
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
         } else {
-          return { backgroundColor: 'red' };
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
         }
       }
     },
     {
-      field: "change_from_open", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
+      headerName: "📊 Change %",
+      field: "change_from_open", 
+      resizable:true ,
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+      cellStyle: function (params) {
         if (params.value > 0) {
-          return { backgroundColor: 'green' };
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
         } else {
-          return { backgroundColor: 'red' };
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
         }
       }
     },
-    { field: "preChange", resizable:true ,sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    { field: "change_from_open_abs", resizable:true ,sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
+    { 
+      headerName: "📈 Pre Change %",
+      field: "preChange", 
+      resizable:true ,
+      sortable: true, 
+      width: 130,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%'
+    },
+    { 
+      headerName: "💹 Change Abs",
+      field: "change_from_open_abs", 
+      resizable:true ,
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + Math.floor(p.value).toLocaleString()
+    },
   ];
   openHigh = [];
   openLow = [];
@@ -80,9 +140,20 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
 
   fetchIndex() {
+    this.isLoading = true;
     this.commonservice.fetchIndexsData();
     this.commonservice.fetchBankNiftyData();
     this.commonservice.fetchNiftyTopData()
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1000);
+  }
+
+  refreshData() {
+    this.fetchIndex();
+    this.fetchBankData();
+    this.fetchnseTopData();
+    this.fetchIndexData();
   }
 
   banks = []

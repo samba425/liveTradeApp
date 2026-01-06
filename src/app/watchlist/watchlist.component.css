@@ -1,0 +1,54 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+.input-group {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-group .btn {
+  margin-left: 5px;
+}
+
+.alert {
+  border-radius: 4px;
+}
+
+::ng-deep .ag-theme-alpine {
+  font-size: 14px;
+}
+
+::ng-deep .ag-header-cell-text {
+  font-weight: 600;
+}
+
+::ng-deep .ag-cell {
+  padding: 8px;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.card-body h6 {
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-body h3 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.btn-sm {
+  padding: 2px 8px;
+  font-size: 12px;
+}

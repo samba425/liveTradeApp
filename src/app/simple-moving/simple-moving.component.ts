@@ -14,91 +14,100 @@ export class SimpleMovingComponent implements OnInit {
   }
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
-    editable: true,
+    editable: false,
     filter: true,
-    flex: 1,
-    minWidth: 100
+    resizable: true,
+    sortable: true
   };
   inputValue: any = []
   rowData = [];
   rowDataHigh = [];
   rowDataLow = [];
   pagination = true;
-  paginationPageSize = 2500;
+  paginationPageSize = 20;
+  isLoading = false;
   filterData = []
-  paginationPageSizeSelector = [200, 500, 1000];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true, resizable: true },
-    {
-      headerName: "C.Price", field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter", resizable: true,
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
+    { 
+      headerName: "📊 Stock",
+      field: "name", 
+      sortable: true, 
+      resizable: true,
+      width: 180,
+      pinned: 'left',
+      cellStyle: { fontWeight: 'bold', color: '#667eea', cursor: 'pointer', fontSize: '14px' },
+      cellRenderer: (params) => {
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="https://www.tradingview.com/chart/?symbol=NSE:${params.value}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: bold; font-size: 14px;">${params.value}</a>
+            <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${params.value}'); event.stopPropagation();" style="cursor: pointer; color: #9ca3af; font-size: 11px; margin-left: 6px; opacity: 0.7;" title="Copy ${params.value}"></i>
+          </div>
+        `;
       }
     },
     {
-      headerName: "open %", field: "change_from_open", resizable: true, sortable: true, filter: "agNumberColumnFilter",
+      headerName: "💰 Close", 
+      field: "close", 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", 
+      resizable: true,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       },
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
-        if (params.value > 0) {
-          return { backgroundColor: 'green' };
-        } else {
-          return { backgroundColor: 'red' };
-        }
-      }
-    },
-    // { field: "preChange", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%' },
-    // { field: "change_from_open_abs", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() },
-    {
-      headerName: "20-50%", field: "sma2050Diff", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
+      cellStyle: { fontWeight: '600' }
     },
     {
-      headerName: "20 SMA", field: "sma20", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
+      headerName: "📊 Change %", 
+      field: "change_from_open", 
+      resizable: true, 
+      sortable: true, 
+      width: 120,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "50 SMA", field: "sma50", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "200 SMA", field: "godFather", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "200SMAClose%", field: "godFatherDiffPer", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', filter: "agNumberColumnFilter",
+      },
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
       cellStyle: function (params) {
         if (params.value > 0) {
-          return { backgroundColor: 'green' };
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
         } else {
-          return { backgroundColor: 'red' };
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
         }
-      }, filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
       }
     },
     {
-      field: "volume", resizable: true, sortable: true,
+      headerName: "📊 SMA Diff %", 
+      field: "sma2050Diff", 
+      resizable: true, 
+      sortable: true, 
+      width: 130,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      cellStyle: params => {
+        if (params.value > 5) {
+          return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: '600' };
+        } else if (params.value < 2) {
+          return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: '600' };
+        }
+        return {};
+      }
+    },
+    {
+      headerName: "📈 SMA 20", 
+      field: "sma20", 
+      resizable: true, 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -106,35 +115,127 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "RSI", field: "RSI", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "📈 SMA 50", 
+      field: "sma50", 
+      resizable: true, 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
     {
-      headerName: "MACD", field: "MACD", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "📈 SMA 200", 
+      field: "godFather", 
+      resizable: true, 
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
     {
-      headerName: "MACDBlue", field: "MACDMacd", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "📊 200 SMA Diff%", 
+      field: "godFatherDiffPer", 
+      resizable: true, 
+      sortable: true, 
+      width: 140,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+      filter: "agNumberColumnFilter",
+      cellStyle: function (params) {
+        if (params.value > 0) {
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        } else {
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        }
+      }, 
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
-    // {
-    //   headerName: "S-MACD", field: "MACDSignal", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-    //   filterParams: {
-    //     numAlwaysVisibleConditions: 2,
-    //     defaultJoinOperator: "OR"
-    //   }
-    // },
     {
-      headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
+      headerName: "📦 Volume",
+      field: "volume", 
+      resizable: true, 
+      sortable: true,
+      width: 120,
+      valueFormatter: p => {
+        const val = p.value;
+        if (val >= 10000000) return (val / 10000000).toFixed(2) + 'Cr';
+        if (val >= 100000) return (val / 100000).toFixed(2) + 'L';
+        if (val >= 1000) return (val / 1000).toFixed(2) + 'K';
+        return val.toLocaleString();
+      },
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "💹 RSI", 
+      field: "RSI", 
+      resizable: true, 
+      sortable: true, 
+      width: 100,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
+      cellStyle: params => {
+        if (params.value > 70) {
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        } else if (params.value < 30) {
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        } else if (params.value >= 50 && params.value <= 70) {
+          return { backgroundColor: '#dbeafe', color: '#1e40af' };
+        }
+        return {};
+      },
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "📊 MACD", 
+      field: "MACD", 
+      resizable: true, 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "🔵 MACD Signal", 
+      field: "MACDMacd", 
+      resizable: true, 
+      sortable: true, 
+      width: 130,
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "📈 52W High", 
+      field: "HIGH52", 
+      resizable: true, 
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
@@ -148,21 +249,21 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "scannerLink", resizable: true, field: 'name', sortable: true,minWidth: 150,
-      cellRenderer: function (params) {
-        let keyData = params.data.name;
-        let newLink =
-          `<a style="color:white;" href= https://www.screener.in/company/${keyData}
-      target="_blank">sceener</a>  |  <a style="color:white;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
-      target="_blank">chart</a>`;
-        return newLink;
-      }
-    },
-    {
       headerName: "industry", field: "industry", resizable: true, sortable: true, filter: "agNumberColumnFilter",minWidth: 150,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "scannerLink", resizable: true, field: 'name', sortable: true, minWidth: 150,
+      cellRenderer: function (params) {
+        let keyData = params.data.name;
+        let newLink =
+          `<a style="color:#007bff;" href= https://www.screener.in/company/${keyData}
+      target="_blank">screener</a>  |  <a style="color:#007bff;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+      target="_blank">chart</a>`;
+        return newLink;
       }
     },
     {
@@ -198,10 +299,19 @@ export class SimpleMovingComponent implements OnInit {
 
 
   fetchLiveData() {
+    this.isLoading = true;
     this.commonservice.getData.subscribe(data => {
       this.inputValue = data
       this.getStocks()
+      this.isLoading = false;
+    }, error => {
+      console.error('Error fetching data:', error);
+      this.isLoading = false;
     });
+  }
+
+  refreshData() {
+    this.fetchLiveData();
   }
 
 

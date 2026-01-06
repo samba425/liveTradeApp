@@ -148,6 +148,608 @@ app.get('/getData', async (req, res) => {
 		res.send({})
 	}
 })
+
+// Get first 5-minute candle data (9:15-9:20 AM)
+// NOTE: TradingView's |5 gives current 5-min candle, not historical first candle
+// This endpoint should only be called during 9:15-9:20 AM for accurate results
+app.get('/getFirst5MinCandle', async (req, res) => {
+	console.log('Fetching first 5-min candle data:', req.query);
+	
+	// Check if current time is within first 5 minutes of trading (9:15-9:20 AM IST)
+	const now = new Date();
+	const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+	const istTime = new Date(now.getTime() + istOffset);
+	const hours = istTime.getUTCHours();
+	const minutes = istTime.getUTCMinutes();
+	const currentMinutes = hours * 60 + minutes;
+	
+	// 9:15 AM = 555 minutes, 9:20 AM = 560 minutes
+	const isFirstFiveMinutes = currentMinutes >= 555 && currentMinutes <= 560;
+	
+	if (!isFirstFiveMinutes) {
+		// Return warning if not in first 5 minutes
+		console.warn('WARNING: Not in first 5 minutes of trading. Data may not reflect first candle.');
+	}
+	
+	try {
+		let query = []
+		if (req.query && req.query['index']) {
+			query = [
+				{
+					"type": "index",
+					"values": [
+						`NSE:${req.query['index']}`
+					]
+				}
+			]
+		}
+		
+		var reqObj = {
+			'method': 'POST',
+			'json': true,
+			'url': 'https://scanner.tradingview.com/india/scan',
+			'body': {
+				"filter": [
+					{
+						"left": "is_primary",
+						"operation": "equal",
+						"right": true
+					},
+					{
+						"left": "active_symbol",
+						"operation": "equal",
+						"right": true
+					}
+				],
+				"options": {
+					"lang": "en"
+				},
+				"markets": [
+					"india"
+				],
+				"symbols": {
+					"query": {
+						"types": []
+					},
+					"tickers": [],
+					"groups": query
+				},
+				"columns": [
+					"name",
+					"open",         // Day's open (9:15 AM open)
+					"high",         // Day's high so far
+					"low",          // Day's low so far
+					"close",        // Current close
+					"volume",       // Total volume
+					"change",
+					"change_from_open",
+					"SMA20",
+					"SMA50",
+					"RSI",
+					"VWAP",
+					"price_52_week_high",
+					"MACD.macd",
+					"MACD.signal",
+					"industry.tr"
+				],
+				"sort": {
+					"sortBy": "volume",
+					"sortOrder": "desc"
+				},
+				"range": [0, 5000]
+			}
+		};
+		
+		let result = await request(reqObj);
+		
+		// Add metadata about timing
+		if (result && result.data) {
+			result.metadata = {
+				fetchTime: istTime.toISOString(),
+				isFirstFiveMinutes: isFirstFiveMinutes,
+				note: isFirstFiveMinutes ? 
+					'Data captured during first 5 minutes (9:15-9:20 AM)' : 
+					'WARNING: Data not from first 5 minutes. Open/High/Low may be from entire day so far.'
+			};
+		}
+		
+		res.send(result);
+	} catch(err) {
+		console.error('fetch first 5-min candle error -->', err)
+		res.send({})
+	}
+})
+
+// News API endpoints
+app.get('/news/market', async (req, res) => {
+	console.log('Fetching market news');
+	try {
+		// Sample news data - in production, integrate with NewsAPI.org or other news API
+		const sampleNews = {
+			status: 'ok',
+			totalResults: 4,
+			articles: [
+				{
+					source: { name: 'Economic Times' },
+					title: 'Nifty 50 reaches new high amid strong market sentiment',
+					description: 'The benchmark Nifty 50 index touched a new record high today as investors showed strong confidence in the Indian market.',
+					url: 'https://economictimes.com',
+					urlToImage: null,
+					publishedAt: new Date().toISOString(),
+					content: 'Full article content here...'
+				},
+				{
+					source: { name: 'Business Standard' },
+					title: 'IT stocks rally on positive Q4 earnings outlook',
+					description: 'Information Technology stocks saw significant gains as major companies reported better-than-expected earnings.',
+					url: 'https://business-standard.com',
+					urlToImage: null,
+					publishedAt: new Date(Date.now() - 3600000).toISOString(),
+					content: 'Full article content here...'
+				},
+				{
+					source: { name: 'MoneyControl' },
+					title: 'Banking sector shows resilience despite global headwinds',
+					description: 'Indian banking stocks continue to perform well despite challenges in the global financial markets.',
+					url: 'https://moneycontrol.com',
+					urlToImage: null,
+					publishedAt: new Date(Date.now() - 7200000).toISOString(),
+					content: 'Full article content here...'
+				},
+				{
+					source: { name: 'LiveMint' },
+					title: 'FII inflows boost market sentiment',
+					description: 'Foreign Institutional Investors continue to pour money into Indian equities, boosting overall market sentiment.',
+					url: 'https://livemint.com',
+					urlToImage: null,
+					publishedAt: new Date(Date.now() - 10800000).toISOString(),
+					content: 'Full article content here...'
+				}
+			]
+		};
+		
+		res.json(sampleNews);
+	} catch(err) {
+		console.error('News fetch error -->', err);
+		res.status(500).json({ status: 'error', message: 'Failed to fetch news' });
+	}
+});
+
+app.get('/news/stock', async (req, res) => {
+	const symbol = req.query.symbol;
+	console.log('Fetching news for stock:', symbol);
+	try {
+		// Sample stock-specific news
+		const sampleNews = {
+			status: 'ok',
+			totalResults: 2,
+			articles: [
+				{
+					source: { name: 'Economic Times' },
+					title: `${symbol} reports strong quarterly results`,
+					description: `${symbol} has announced better-than-expected quarterly earnings with significant growth in revenue.`,
+					url: 'https://economictimes.com',
+					urlToImage: null,
+					publishedAt: new Date().toISOString(),
+					content: 'Full article content here...'
+				},
+				{
+					source: { name: 'MoneyControl' },
+					title: `Analysts upgrade ${symbol} target price`,
+					description: `Major brokerage firms have upgraded their target price for ${symbol} citing strong fundamentals.`,
+					url: 'https://moneycontrol.com',
+					urlToImage: null,
+					publishedAt: new Date(Date.now() - 3600000).toISOString(),
+					content: 'Full article content here...'
+				}
+			]
+		};
+		
+		res.json(sampleNews);
+	} catch(err) {
+		console.error('Stock news fetch error -->', err);
+		res.status(500).json({ status: 'error', message: 'Failed to fetch stock news' });
+	}
+});
+
+// NSE India API Integration
+app.get('/nse/option-chain/:symbol', async (req, res) => {
+	const symbol = req.params.symbol; // NIFTY or BANKNIFTY
+	console.log('Fetching option chain for:', symbol);
+	try {
+		const options = {
+			method: 'GET',
+			url: `https://www.nseindia.com/api/option-chain-indices?symbol=${symbol}`,
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*',
+				'Accept-Language': 'en-US,en;q=0.5',
+				'Accept-Encoding': 'gzip, deflate, br'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('NSE Option Chain error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch option chain', message: err.message });
+	}
+});
+
+app.get('/nse/quote/:symbol', async (req, res) => {
+	const symbol = req.params.symbol;
+	console.log('Fetching NSE quote for:', symbol);
+	try {
+		const options = {
+			method: 'GET',
+			url: `https://www.nseindia.com/api/quote-equity?symbol=${symbol}`,
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*',
+				'Accept-Language': 'en-US,en;q=0.5'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('NSE Quote error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch quote', message: err.message });
+	}
+});
+
+app.get('/nse/market-status', async (req, res) => {
+	console.log('Fetching market status');
+	try {
+		const options = {
+			method: 'GET',
+			url: 'https://www.nseindia.com/api/marketStatus',
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Market status error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch market status', message: err.message });
+	}
+});
+
+app.get('/nse/gainers', async (req, res) => {
+	console.log('Fetching top gainers');
+	try {
+		const options = {
+			method: 'GET',
+			url: 'https://www.nseindia.com/api/live-analysis-variations?index=gainers',
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Gainers error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch gainers', message: err.message });
+	}
+});
+
+app.get('/nse/losers', async (req, res) => {
+	console.log('Fetching top losers');
+	try {
+		const options = {
+			method: 'GET',
+			url: 'https://www.nseindia.com/api/live-analysis-variations?index=losers',
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Losers error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch losers', message: err.message });
+	}
+});
+
+// NSE Sector Data API - Optimized for Sector Tracker
+app.get('/nse/sectors', async (req, res) => {
+	console.log('Fetching all sector data');
+	try {
+		const sectorIndices = {
+			'IT': 'NIFTY%20IT',
+			'BANKING': 'NIFTY%20BANK',
+			'AUTO': 'NIFTY%20AUTO',
+			'PHARMA': 'NIFTY%20PHARMA',
+			'FMCG': 'NIFTY%20FMCG',
+			'METAL': 'NIFTY%20METAL',
+			'REALTY': 'NIFTY%20REALTY',
+			'ENERGY': 'NIFTY%20ENERGY',
+			'INFRA': 'NIFTY%20INFRASTRUCTURE',
+			'FINANCIAL': 'NIFTY%20FINANCIAL%20SERVICES'
+		};
+
+		const sectorPromises = Object.entries(sectorIndices).map(async ([sectorKey, indexName]) => {
+			try {
+				const options = {
+					method: 'GET',
+					url: `https://www.nseindia.com/api/equity-stockIndices?index=${indexName}`,
+					headers: {
+						'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+						'Accept': '*/*'
+					}
+				};
+				
+				const response = await request(options);
+				const data = JSON.parse(response);
+				
+				// Calculate sector metrics
+				const stocks = data.data || [];
+				const advancers = stocks.filter(s => s.pChange > 0).length;
+				const decliners = stocks.filter(s => s.pChange < 0).length;
+				const avgChange = stocks.length > 0 
+					? stocks.reduce((sum, s) => sum + (s.pChange || 0), 0) / stocks.length 
+					: 0;
+				const strength = stocks.length > 0 ? (advancers / stocks.length) * 100 : 50;
+				const topStock = stocks.reduce((max, s) => 
+					(s.pChange || 0) > (max.pChange || 0) ? s : max
+				, stocks[0] || {});
+
+				return {
+					name: sectorKey,
+					displayName: indexName.replace(/%20/g, ' '),
+					avgChange,
+					advancers,
+					decliners,
+					strength,
+					totalVolume: stocks.reduce((sum, s) => sum + (s.totalTradedVolume || 0), 0),
+					topStock: topStock ? {
+						name: topStock.symbol,
+						change: topStock.pChange || 0,
+						price: topStock.lastPrice || 0
+					} : null,
+					stocks: stocks.slice(0, 10) // Top 10 stocks per sector
+				};
+			} catch (err) {
+				console.error(`Error fetching ${sectorKey}:`, err.message);
+				return {
+					name: sectorKey,
+					displayName: sectorKey,
+					avgChange: 0,
+					advancers: 0,
+					decliners: 0,
+					strength: 50,
+					totalVolume: 0,
+					topStock: null,
+					stocks: []
+				};
+			}
+		});
+
+		const sectors = await Promise.all(sectorPromises);
+		res.json({
+			status: 'success',
+			timestamp: new Date().toISOString(),
+			data: sectors.sort((a, b) => b.avgChange - a.avgChange)
+		});
+	} catch(err) {
+		console.error('Sectors API error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch sector data', message: err.message });
+	}
+});
+
+// Individual Sector Data
+app.get('/nse/sector/:sector', async (req, res) => {
+	const sector = req.params.sector.toUpperCase();
+	console.log('Fetching sector:', sector);
+	
+	const sectorMap = {
+		'IT': 'NIFTY%20IT',
+		'BANKING': 'NIFTY%20BANK',
+		'AUTO': 'NIFTY%20AUTO',
+		'PHARMA': 'NIFTY%20PHARMA',
+		'FMCG': 'NIFTY%20FMCG',
+		'METAL': 'NIFTY%20METAL',
+		'REALTY': 'NIFTY%20REALTY',
+		'ENERGY': 'NIFTY%20ENERGY',
+		'INFRA': 'NIFTY%20INFRASTRUCTURE',
+		'FINANCIAL': 'NIFTY%20FINANCIAL%20SERVICES'
+	};
+	
+	const indexName = sectorMap[sector];
+	if (!indexName) {
+		return res.status(400).json({ error: 'Invalid sector name' });
+	}
+	
+	try {
+		const options = {
+			method: 'GET',
+			url: `https://www.nseindia.com/api/equity-stockIndices?index=${indexName}`,
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				'Accept': '*/*'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Sector API error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch sector data', message: err.message });
+	}
+});
+
+// Yahoo Finance API Integration
+app.get('/yahoo/quote/:symbol', async (req, res) => {
+	const symbol = req.params.symbol + '.NS'; // Add .NS for NSE stocks
+	console.log('Fetching Yahoo quote for:', symbol);
+	try {
+		const options = {
+			method: 'GET',
+			url: `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
+			headers: {
+				'User-Agent': 'Mozilla/5.0'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Yahoo quote error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch Yahoo quote', message: err.message });
+	}
+});
+
+app.get('/yahoo/historical/:symbol', async (req, res) => {
+	const symbol = req.params.symbol + '.NS';
+	const period1 = req.query.period1 || Math.floor(Date.now() / 1000) - (365 * 24 * 60 * 60); // 1 year ago
+	const period2 = req.query.period2 || Math.floor(Date.now() / 1000);
+	const interval = req.query.interval || '1d'; // 1d, 1wk, 1mo
+	
+	console.log('Fetching historical data for:', symbol);
+	try {
+		const options = {
+			method: 'GET',
+			url: `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}`,
+			headers: {
+				'User-Agent': 'Mozilla/5.0'
+			}
+		};
+		
+		const response = await request(options);
+		res.json(JSON.parse(response));
+	} catch(err) {
+		console.error('Yahoo historical error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch historical data', message: err.message });
+	}
+});
+
+// Enhanced stock scanner endpoint
+app.get('/scanner/breakouts', async (req, res) => {
+	console.log('Fetching breakout stocks');
+	try {
+		const reqObj = {
+			method: 'POST',
+			json: true,
+			url: 'https://scanner.tradingview.com/india/scan',
+			body: {
+				filter: [
+					{
+						left: "change",
+						operation: "greater",
+						right: 3 // Stocks up more than 3%
+					},
+					{
+						left: "volume",
+						operation: "greater",
+						right: 100000 // Minimum volume
+					},
+					{
+						left: "is_primary",
+						operation: "equal",
+						right: true
+					}
+				],
+				options: { lang: "en" },
+				symbols: { query: { types: [] }, tickers: [] },
+				columns: ["name", "close", "change", "change_abs", "high", "low", "volume", "Recommend.All"],
+				sort: { sortBy: "change", sortOrder: "desc" },
+				range: [0, 50]
+			}
+		};
+		
+		const response = await request(reqObj);
+		res.json(response);
+	} catch(err) {
+		console.error('Breakouts scanner error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch breakouts', message: err.message });
+	}
+});
+
+app.get('/scanner/volume-spike', async (req, res) => {
+	console.log('Fetching volume spike stocks');
+	try {
+		const reqObj = {
+			method: 'POST',
+			json: true,
+			url: 'https://scanner.tradingview.com/india/scan',
+			body: {
+				filter: [
+					{
+						left: "volume",
+						operation: "greater",
+						right: 500000 // High volume
+					},
+					{
+						left: "is_primary",
+						operation: "equal",
+						right: true
+					}
+				],
+				options: { lang: "en" },
+				symbols: { query: { types: [] }, tickers: [] },
+				columns: ["name", "close", "volume", "change", "relative_volume_10d_calc"],
+				sort: { sortBy: "relative_volume_10d_calc", sortOrder: "desc" },
+				range: [0, 50]
+			}
+		};
+		
+		const response = await request(reqObj);
+		res.json(response);
+	} catch(err) {
+		console.error('Volume spike scanner error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch volume spikes', message: err.message });
+	}
+});
+
+// API Documentation endpoint
+app.get('/api/docs', (req, res) => {
+	const apiDocs = {
+		message: 'Trading App API Documentation',
+		version: '2.0',
+		endpoints: {
+			tradingView: {
+				'/getData': 'Get stock data from TradingView (existing)',
+				'/getData?index=BANKNIFTY': 'Get Bank Nifty stocks',
+				'/getData?nseTop=true': 'Get top NSE stocks'
+			},
+			nse: {
+				'/nse/option-chain/:symbol': 'Get option chain (NIFTY/BANKNIFTY)',
+				'/nse/quote/:symbol': 'Get stock quote from NSE',
+				'/nse/market-status': 'Get market status',
+				'/nse/gainers': 'Get top gainers',
+				'/nse/losers': 'Get top losers'
+			},
+			yahoo: {
+				'/yahoo/quote/:symbol': 'Get stock quote from Yahoo Finance',
+				'/yahoo/historical/:symbol': 'Get historical data (params: period1, period2, interval)'
+			},
+			scanner: {
+				'/scanner/breakouts': 'Get stocks breaking out (>3% move)',
+				'/scanner/volume-spike': 'Get stocks with volume spikes'
+			},
+			news: {
+				'/news/market': 'Get market news',
+				'/news/stock?symbol=RELIANCE': 'Get stock-specific news'
+			}
+		},
+		examples: {
+			optionChain: 'http://localhost:5001/nse/option-chain/NIFTY',
+			quote: 'http://localhost:5001/nse/quote/RELIANCE',
+			historical: 'http://localhost:5001/yahoo/historical/TCS?interval=1d',
+			breakouts: 'http://localhost:5001/scanner/breakouts'
+		}
+	};
+	
+	res.json(apiDocs);
+});
+
 app.all('/*', async (req, res) => {
 	console.log('url:', req.url.substring(1))
 	if (req.url) {

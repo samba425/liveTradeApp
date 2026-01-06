@@ -1,0 +1,45 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.list-group-item {
+  border-left: 4px solid #17a2b8;
+}
+
+.list-group-item h6 {
+  color: #333;
+  font-weight: bold;
+}
+
+::ng-deep .ag-theme-alpine {
+  font-size: 13px;
+}
+
+::ng-deep .ag-header-cell-text {
+  font-weight: 600;
+}
+
+.btn-sm {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.mr-1 {
+  margin-right: 4px;
+}

@@ -1,4 +1,40 @@
-<div class="jumbotron jumbotron-fluid " *ngIf='rowData && rowData.length;else spinner'>
+<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
+  
+  <!-- Header Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <div class="card-body">
+          <h2 class="mb-2"><i class="fas fa-chart-area"></i> Bollinger Bands (BB) Analysis</h2>
+          <p class="mb-0" style="opacity: 0.9;">Track price action near Bollinger Bands</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh Button -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <button class="btn btn-primary btn-lg" (click)="refreshData()" [disabled]="isLoading"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; font-weight: 600;">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> 
+        {{ isLoading ? 'Loading...' : 'Refresh Data' }}
+      </button>
+      <span *ngIf="isLoading" class="ml-3 text-muted">
+        <i class="fas fa-spinner fa-spin"></i> Fetching latest data...
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading Bollinger Bands data...</p>
+  </div>
+
+<div *ngIf='rowData && rowData.length && !isLoading;else spinner'>
   <div class="row m-2">
     <div class="col-sm-5">
       <ul class="list-group m-1">
@@ -18,9 +54,18 @@
   </div>
 
   <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height:400px;width: auto" [rowData]="rowData"
-      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
-      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
+    <ag-grid-angular 
+      class="ag-theme-balham" 
+      style="height:600px;width: 100%" 
+      [rowData]="rowData"
+      [suppressExcelExport]="true" 
+      [rowSelection]="rowSelection" 
+      [gridOptions]="gridOptions" 
+      [pagination]="pagination"
+      [defaultColDef]="defaultColDef" 
+      [paginationPageSize]="paginationPageSize"
+      [domLayout]="'normal'" 
+      [columnDefs]="colDefs">
     </ag-grid-angular>
   </div>
   
@@ -44,9 +89,18 @@
     </div>
   </div>
   <div class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height: 300px;width: auto" [rowData]="filteredrowData"
-      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptionsfiltered" [pagination]="true"
-      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
+    <ag-grid-angular 
+      class="ag-theme-balham" 
+      style="height: 600px;width: 100%" 
+      [rowData]="filteredrowData"
+      [suppressExcelExport]="true" 
+      [rowSelection]="rowSelection" 
+      [gridOptions]="gridOptionsfiltered" 
+      [pagination]="pagination"
+      [defaultColDef]="defaultColDef" 
+      [paginationPageSize]="paginationPageSize"
+      [domLayout]="'normal'" 
+      [columnDefs]="colDefs">
     </ag-grid-angular>
   </div>
 </div>

@@ -1,0 +1,60 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+h2 {
+  font-weight: bold;
+  color: #333;
+}
+
+h3, h6 {
+  margin-bottom: 0.5rem;
+}
+
+.text-success {
+  color: #28a745 !important;
+  font-weight: bold;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+table {
+  margin-bottom: 0;
+}
+
+table td {
+  padding: 0.75rem;
+}
+
+table td:first-child {
+  width: 40%;
+}
+
+table td:nth-child(2) {
+  width: 35%;
+}
+
+table td:nth-child(3) {
+  width: 25%;
+}
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+#chartContainer {
+  min-height: 400px;
+}

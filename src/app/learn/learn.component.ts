@@ -481,3 +481,18 @@ initToggles() {
 
  
 }
+
+// VG ( Volume Gap )
+// ( {57960} ( 1 day ago close > 1 day ago open and( ( 1 day ago close - 1 day ago open ) / 1 day ago open ) * 100 > 2 and daily open > 1 day ago high and daily close > daily open and( ( daily close - daily open ) / daily open ) * 100 > 2 and daily open > 1 day ago close and daily volume > daily sma( daily volume , 20 ) and 1 day ago open < 1 day ago close and( 1 day ago close - 1 day ago open ) / 1 day ago open * 100 >= 1 and daily open < daily close and( daily close - daily open ) / daily open * 100 >= 1 and daily low > 1 day ago high and daily volume > 0 ) )
+
+// style 1 Quertly
+// "( {cash} ( ( {57960} ( 1 quarter ago close > 1 quarter ago open and quarterly low < 1 quarter ago low and quarterly close > 1 quarter ago low and daily close > 1 quarter ago low and 1 day ago low < 1 quarter ago low and quarterly rsi( 14 ) > 50 and quarterly open > 1 quarter ago low ) ) ) ) "
+
+// style 1 monthy
+// "( {cash} ( ( {57960} ( 1 month ago close > 1 month ago open and monthly low < 1 month ago low and monthly close > 1 month ago low and daily close > 1 quarter ago low and [-1] 1 hour low < 1 month ago low and monthly rsi( 14 ) > 50 and monthly open > 1 month ago low ) ) ) ) "
+
+// style 1 weekly
+// "( {cash} ( ( {57960} ( 1 week ago close > 1 week ago open and weekly low < 1 week ago low and weekly close > 1 week ago low and [0] 1 hour close > 1 week ago low and [-1] 1 hour low < 1 week ago low and weekly rsi( 14 ) > 50 and weekly open > 1 week ago low ) ) ) ) "
+
+// style 1 daily 
+// "( {cash} ( ( {57960} ( 1 day ago close > 1 day ago open and daily low < 1 day ago low and weekly close > 1 week ago low and [0] 15 minute close > 1 day ago low and [-1] 15 minute low < 1 day ago low and daily rsi( 14 ) > 50 and daily open > 1 day ago low ) ) ) ) "

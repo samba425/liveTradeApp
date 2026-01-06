@@ -16,66 +16,138 @@ export class VolumeshockersComponent implements OnInit {
   query;
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
-    editable: true,
+    editable: false,
     filter: true,
-    flex: 5,
-    minWidth: 100,
+    resizable: true,
+    sortable: true,
   };
   inputValue: any = []
   rowData = [];
   rowStockData = [];
   pagination = true;
-  paginationPageSize = 2500;
-  paginationPageSizeSelector = [200, 500, 1000];
+  paginationPageSize = 20;
+  isLoading = false;
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", resizable: true, sortable: true },
+    { 
+      headerName: "📊 Symbol",
+      field: "name", 
+      resizable: true, 
+      sortable: true,
+      width: 180,
+      pinned: 'left',
+      cellStyle: { fontWeight: 'bold', color: '#667eea', cursor: 'pointer', fontSize: '14px' },
+      cellRenderer: (params) => {
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="https://www.tradingview.com/chart/?symbol=NSE:${params.value}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: bold; font-size: 14px;">${params.value}</a>
+            <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${params.value}'); event.stopPropagation();" style="cursor: pointer; color: #9ca3af; font-size: 11px; margin-left: 6px; opacity: 0.7;" title="Copy ${params.value}"></i>
+          </div>
+        `;
+      }
+    },
     {
-      field: "close", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString(),
+      headerName: "💰 Close",
+      field: "close", 
+      resizable: true, 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
-    { field: "open", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "high", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    { field: "low", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    {
-      field: "change_from_open", resizable: true, sortable: true, filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      },
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
-        if (params.value > 0) {
-          return { backgroundColor: 'green' };
-        } else {
-          return { backgroundColor: 'red' };
-        }
-      }
+    { 
+      headerName: "📊 Open",
+      field: "open", 
+      resizable: true, 
+      sortable: true,
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
+    },
+    { 
+      headerName: "📈 High",
+      field: "high", 
+      resizable: true, 
+      sortable: true,
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
+    },
+    { 
+      headerName: "📉 Low",
+      field: "low", 
+      resizable: true, 
+      sortable: true,
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
     },
     {
-      field: "preChange", resizable: true, sortable: true, filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      },
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', cellStyle: function (params) {
-        if (params.value > 0) {
-          return { backgroundColor: 'green' };
-        } else {
-          return { backgroundColor: 'red' };
-        }
-      }
-    },
-    { field: "change_from_open_abs", resizable: true, sortable: true, valueFormatter: p => Math.floor(p.value).toLocaleString() },
-    {
-      field: "volume", resizable: true, sortable: true,
+      headerName: "📊 Change %",
+      field: "change_from_open", 
+      resizable: true, 
+      sortable: true,
+      width: 120,
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
+      },
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+      cellStyle: function (params) {
+        if (params.value > 0) {
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        } else {
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        }
+      }
+    },
+    {
+      headerName: "📈 Pre Change %",
+      field: "preChange", 
+      resizable: true, 
+      sortable: true,
+      width: 120,
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+      cellStyle: function (params) {
+        if (params.value > 0) {
+          return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        } else {
+          return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        }
+      }
+    },
+    { 
+      headerName: "💹 Change Abs",
+      field: "change_from_open_abs", 
+      resizable: true, 
+      sortable: true,
+      width: 130,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
+    },
+    {
+      headerName: "📦 Volume",
+      field: "volume", 
+      resizable: true, 
+      sortable: true,
+      width: 120,
+      filter: "agNumberColumnFilter",
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      valueFormatter: p => {
+        const val = p.value;
+        if (val >= 10000000) return (val / 10000000).toFixed(2) + 'Cr';
+        if (val >= 100000) return (val / 100000).toFixed(2) + 'L';
+        if (val >= 1000) return (val / 1000).toFixed(2) + 'K';
+        return val.toLocaleString();
       }
     }
   ];
@@ -288,13 +360,21 @@ export class VolumeshockersComponent implements OnInit {
   // "34 market_cap_basic" // > 2B to 2000B
 
   fetchLiveData() {
+    this.isLoading = true;
     this.commonservice.getData.subscribe(data => {
       this.inputValue = data
       setTimeout(() => {
         this.volume()
+        this.isLoading = false;
       }, 1000)
-
+    }, error => {
+      console.error('Error fetching data:', error);
+      this.isLoading = false;
     });
+  }
+
+  refreshData() {
+    this.fetchLiveData();
   }
 
   onSearchInputChange() {

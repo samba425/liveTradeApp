@@ -131,3 +131,10 @@ plot(selectionCondition ? 1 : 0, title="Stock Selection", style=plot.style_colum
 ```
 
 This script is a simplified example and should be adjusted to use actual data and more comprehensive logic. By combining multiple metrics, you can make a more informed decision about which stocks to consider for investment.
+
+git config user.name "samba425"
+git config user.email "asiva325@gmail.com"
+
+
+git config user.name "NewUserName"
+git config user.email "newuser@example.com"

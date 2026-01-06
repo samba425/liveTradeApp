@@ -1,58 +1,177 @@
-<div class="jumbotron jumbotron-fluid " >
-  <div class="row m-2">
-    <div class="col-sm-3">
-      <ul class="list-group">
-        <li class="list-group-item list-group-item-success">
-          <h4>SMA 20 & 50 & 200</h4>
-        </li>
-      </ul>
-      <input class="form-control form-control-lg mt-1" type="text" [(ngModel)]="searchQuery"
-        (input)="onSearchInputChange()" placeholder="Search...">
-    </div> 
-    <div class="col-sm-4">
-      <textarea class="form-control form-control-lg  textStyle" type="text"  rows="1" [(ngModel)]="query"
-         placeholder="Query Search..."></textarea>
-         <p class="font-italic">search with res, keys:low,close,sma20,sma50,
-          godFather,volume,RSI,MACD,HIGH52,VWAP,sector,MACDSignal,EMA5|5,EMA10|5,EMA14|1H,EMA21|1H,EMA50|1H,exchange</p>
-    </div> 
-    
-    <div  class="col-sm-4" role="group" >
-      <button type="button" (click)=querySearch()  class="btn  m-1 btn-success">Query</button>
-      <button type="button" (click)="nearSMA()"  class="btn m-1  btn-primary">SMA filter</button>
-      <button type="button" (click)="near2050SMA()"  class="btn m-1 btn-info">SMA 20/50</button>
-      <button type="button" (click)="onBtnExport()" class="btn m-1 btn-dark">CSV</button>
-      <button type="button" (click)="reset()" class="btn m-1 btn-danger">Reset</button>
+<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
+  
+  <!-- Header Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <div class="card-body">
+          <h2 class="mb-2"><i class="fas fa-wave-square"></i> Simple Moving Averages (SMA) Analysis</h2>
+          <p class="mb-0" style="opacity: 0.9;">Track SMA 20, 50 & 200 crossovers and trends</p>
+        </div>
       </div>
-  </div>
-
-  <div *ngIf='rowData && rowData.length;else spinner' class="example-wrapper">
-    <ag-grid-angular class="ag-theme-dark" style="height: 800px;width: auto" [rowData]="rowData"
-      [suppressExcelExport]="true" [rowSelection]="rowSelection" [gridOptions]="gridOptions" [pagination]="true"
-      [defaultColDef]="defaultColDef" [paginationPageSize]="paginationPageSize" [columnDefs]="colDefs">
-    </ag-grid-angular>
-  </div>
-</div>
-
-<ng-template #spinner>   
-  <div class="d-flex justify-content-center">
-    <div class="spinner-grow text-success" role="status">
-     
     </div>
   </div>
-</ng-template>
 
-<div class="row m-2">
-  <div class="col-sm-6">
-      <div class="card-body">
-        <h4>NOTE:</h4> GOD FATHER diff %
-        <h4>If + means Above 200 SMA</h4>
-        <h4>If - means Below 200 SMA</h4>
+  <!-- Refresh Button -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <button class="btn btn-primary btn-lg" (click)="refreshData()" [disabled]="isLoading"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; font-weight: 600;">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> 
+        {{ isLoading ? 'Loading...' : 'Refresh Data' }}
+      </button>
+      <span *ngIf="isLoading" class="ml-3 text-muted">
+        <i class="fas fa-spinner fa-spin"></i> Fetching latest data...
+      </span>
     </div>
   </div>
-  <!-- <div class="col-sm-6">
-      <div class="card-body">
-        <h4>NOTE:</h4> Daily after 2.30 % (20SMA %)
-        <h4>Highest -% take entry for 3-5% target</h4>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading SMA data...</p>
+  </div>
+
+  <!-- Control Panel -->
+  <div class="row mb-4" *ngIf="!isLoading">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-sliders-h"></i> Filters & Query Builder</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Search Input -->
+            <div class="col-md-4 mb-3">
+              <label style="font-weight: 600;"><i class="fas fa-search"></i> Search Stocks</label>
+              <input 
+                class="form-control" 
+                type="text" 
+                [(ngModel)]="searchQuery"
+                (input)="onSearchInputChange()" 
+                placeholder="🔍 Search by stock name..."
+                style="border-radius: 10px;">
+            </div>
+
+            <!-- Query Builder -->
+            <div class="col-md-5 mb-3">
+              <label style="font-weight: 600;"><i class="fas fa-code"></i> Advanced Query</label>
+              <textarea 
+                class="form-control" 
+                type="text" 
+                rows="2" 
+                [(ngModel)]="query"
+                placeholder="Query Search..."
+                style="font-family: monospace; border-radius: 10px;"></textarea>
+              <small class="text-muted">
+                <i class="fas fa-info-circle"></i> Keys: low, close, sma20, sma50, godFather, volume, RSI, MACD, HIGH52, VWAP, sector
+              </small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-3 mb-3">
+              <label style="font-weight: 600;"><i class="fas fa-cog"></i> Actions</label>
+              <div class="btn-group-vertical w-100">
+                <button type="button" (click)="querySearch()" class="btn btn-success mb-1">
+                  <i class="fas fa-play"></i> Execute Query
+                </button>
+                <button type="button" (click)="nearSMA()" class="btn btn-primary mb-1">
+                  <i class="fas fa-filter"></i> SMA Filter
+                </button>
+                <button type="button" (click)="near2050SMA()" class="btn btn-info mb-1">
+                  <i class="fas fa-wave-square"></i> SMA 20/50
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="row mt-2">
+            <div class="col-12">
+              <div class="btn-group" role="group">
+                <button type="button" (click)="onBtnExport()" class="btn btn-dark">
+                  <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button type="button" (click)="reset()" class="btn btn-danger">
+                  <i class="fas fa-redo"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-  </div> -->
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="!rowData || rowData.length === 0" class="text-center py-5">
+    <div class="card">
+      <div class="card-body">
+        <div class="spinner-grow text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <p class="mt-3 text-muted">Loading SMA data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Grid -->
+  <div *ngIf="rowData && rowData.length > 0" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table"></i> SMA Analysis Results</h5>
+            <span class="badge badge-light">{{rowData.length}} stocks</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ag-grid-angular 
+            class="ag-theme-balham" 
+            style="height: 600px;width: 100%" 
+            [rowData]="rowData"
+            [suppressExcelExport]="true" 
+            [rowSelection]="rowSelection" 
+            [gridOptions]="gridOptions" 
+            [pagination]="pagination"
+            [defaultColDef]="defaultColDef" 
+            [paginationPageSize]="paginationPageSize"
+            [domLayout]="'normal'" 
+            [columnDefs]="colDefs">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Information Cards -->
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card" style="border-left: 5px solid #10b981;">
+        <div class="card-body">
+          <h6><i class="fas fa-info-circle"></i> GOD FATHER Indicator</h6>
+          <p class="mb-0"><strong>Positive (+):</strong> Stock is above 200 SMA</p>
+          <p class="mb-0"><strong>Negative (-):</strong> Stock is below 200 SMA</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="border-left: 5px solid #3b82f6;">
+        <div class="card-body">
+          <h6><i class="fas fa-chart-line"></i> SMA 20/50 Crossover</h6>
+          <p class="mb-0"><strong>Golden Cross:</strong> SMA 20 crosses above SMA 50 (Bullish)</p>
+          <p class="mb-0"><strong>Death Cross:</strong> SMA 20 crosses below SMA 50 (Bearish)</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="border-left: 5px solid #f59e0b;">
+        <div class="card-body">
+          <h6><i class="fas fa-lightbulb"></i> Trading Tip</h6>
+          <p class="mb-0">Look for stocks near SMA 20 with positive GOD FATHER for potential entries</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

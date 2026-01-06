@@ -1,0 +1,225 @@
+<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
+  
+  <div class="row">
+    <div class="col-12">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div>
+          <h2 class="mb-1" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">
+            <i class="fas fa-chart-pie"></i> Sector Rotation Tracker
+          </h2>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Real-time sector performance & money flow analysis</p>
+        </div>
+        <div class="text-right">
+          <button class="btn btn-primary" (click)="refreshData()" [disabled]="isLoading" style="box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);">
+            <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> 
+            {{ isLoading ? 'Refreshing...' : 'Refresh Data' }}
+          </button>
+          <br>
+          <small class="text-muted" *ngIf="lastUpdated" style="font-size: 0.75rem;">
+            <i class="fas fa-clock"></i> Updated: {{ lastUpdated | date:'HH:mm:ss' }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading && sectors.length === 0" class="text-center py-5" style="background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted" style="font-size: 1.1rem; font-weight: 600;">Loading sector data from NSE...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage" class="alert alert-danger" style="border-radius: 12px; border-left: 5px solid #dc3545;">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Error:</strong> {{ errorMessage }}
+      </div>
+
+      <!-- Quick Stats -->
+      <div *ngIf="!isLoading && sectors.length > 0" class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+            <div class="card-body text-center">
+              <i class="fas fa-chart-line fa-2x mb-2"></i>
+              <h3 class="mb-0">{{ sectors.length }}</h3>
+              <small>Total Sectors</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none;">
+            <div class="card-body text-center">
+              <i class="fas fa-arrow-up fa-2x mb-2"></i>
+              <h3 class="mb-0">{{ sectorsUp }}</h3>
+              <small>Sectors Up</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none;">
+            <div class="card-body text-center">
+              <i class="fas fa-arrow-down fa-2x mb-2"></i>
+              <h3 class="mb-0">{{ sectorsDown }}</h3>
+              <small>Sectors Down</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none;">
+            <div class="card-body text-center">
+              <i class="fas fa-fire fa-2x mb-2"></i>
+              <h3 class="mb-0">{{ strongestSectorName }}</h3>
+              <small>Strongest Sector</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heat Map View -->
+      <div *ngIf="!isLoading && sectors.length > 0" class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header text-white">
+              <h5 class="mb-0"><i class="fas fa-fire"></i> Sector Heat Map - Live Performance</h5>
+            </div>
+            <div class="card-body" style="background: #f8f9fa;">
+              <div class="row">
+                <div *ngFor="let sector of sectors" class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                  <div class="heat-map-cell p-4 text-center" 
+                       [style.background-color]="getSectorColor(sector.avgChange)"
+                       style="color: white;">
+                    <h6 class="mb-2">{{ sector.displayName }}</h6>
+                    <h4 class="mb-2">{{ sector.avgChange >= 0 ? '+' : '' }}{{ sector.avgChange.toFixed(2) }}%</h4>
+                    <small style="font-weight: 700;">{{ getStrengthLabel(sector.strength) }}</small>
+                    <div class="mt-2" style="font-size: 0.7rem; opacity: 0.9;">
+                      <i class="fas fa-arrow-up"></i> {{ sector.advancers }} 
+                      <i class="fas fa-arrow-down ml-2"></i> {{ sector.decliners }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Sector Table -->
+      <div *ngIf="!isLoading && sectors.length > 0" class="row">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+              <h5 class="mb-0"><i class="fas fa-table"></i> Detailed Sector Analysis</h5>
+            </div>
+            <div class="card-body p-0">
+              <ag-grid-angular
+                style="width: 100%;"
+                class="ag-theme-balham"
+                [rowData]="sectors"
+                [columnDefs]="columnDefs"
+                [gridOptions]="gridOptions">
+              </ag-grid-angular>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top 3 Sectors -->
+      <div *ngIf="!isLoading && sectors.length > 0" class="row mt-4">
+        <div class="col-md-4" *ngFor="let sector of getTop3Sectors(); let i = index">
+          <div class="card" [ngClass]="getBorderClass(i)">
+            <div class="card-header text-white" [ngClass]="getHeaderBgClass(i)">
+              <h6 class="mb-0">
+                <i class="fas" [ngClass]="getIconClass(i)"></i>
+                #{{ i + 1 }} {{ sector.displayName }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Avg Change</small>
+                  <h5 [ngClass]="getChangeClass(sector.avgChange)">
+                    {{ sector.avgChange >= 0 ? '+' : '' }}{{ sector.avgChange.toFixed(2) }}%
+                  </h5>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Strength</small>
+                  <h5 [ngClass]="getStrengthClass(sector.strength)">
+                    {{ sector.strength.toFixed(1) }}
+                  </h5>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Advancers</small>
+                  <h6 class="text-success">{{ sector.advancers }}</h6>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Decliners</small>
+                  <h6 class="text-danger">{{ sector.decliners }}</h6>
+                </div>
+              </div>
+              <div *ngIf="sector.topStock">
+                <small class="text-muted">Top Performer</small>
+                <p class="mb-0 font-weight-bold" [ngClass]="getChangeClass(sector.topStock.change)">
+                  {{ sector.topStock.name }} ({{ sector.topStock.change >= 0 ? '+' : '' }}{{ sector.topStock.change.toFixed(2) }}%)
+                </p>
+              </div>
+              <hr>
+              <div>
+                <small class="text-muted">Stocks in Sector</small>
+                <div class="mt-2">
+                  <span *ngFor="let stock of sector.stocks.slice(0, 4)" class="badge mr-1 mb-1" [ngClass]="getBadgeClass(stock.change)">
+                    {{ stock.name }}
+                  </span>
+                  <span *ngIf="sector.stocks.length > 4" class="badge badge-light">
+                    +{{ sector.stocks.length - 4 }} more
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trading Insights -->
+      <div *ngIf="!isLoading && sectors.length > 0" class="row mt-4">
+        <div class="col-12">
+          <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Trading Insights</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6><i class="fas fa-arrow-up text-success"></i> Strongest Sectors (Money Inflow)</h6>
+                  <ul>
+                    <li *ngFor="let sector of getTop3Sectors()">
+                      <strong>{{ sector.displayName }}</strong>: {{ sector.avgChange.toFixed(2) }}% 
+                      <span class="text-success">({{ sector.advancers }} advancing)</span>
+                    </li>
+                  </ul>
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> Consider buying stocks from these sectors
+                  </small>
+                </div>
+                <div class="col-md-6">
+                  <h6><i class="fas fa-arrow-down text-danger"></i> Weakest Sectors (Money Outflow)</h6>
+                  <ul>
+                    <li *ngFor="let sector of getWeakest3Sectors()">
+                      <strong>{{ sector.displayName }}</strong>: {{ sector.avgChange.toFixed(2) }}% 
+                      <span class="text-danger">({{ sector.decliners }} declining)</span>
+                    </li>
+                  </ul>
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> Avoid or short stocks from these sectors
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

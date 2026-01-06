@@ -1,42 +1,306 @@
-<div class="jumbotron jumbotron-fluid " *ngIf='inputValue && inputValue.length'>
-<ul class="list-group mt-3">
-  <li class="list-group-item list-group-item-danger"><h3>Open=High</h3></li>
-  </ul>
+<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
   
-<hr>
-<ag-grid-angular
-class="ag-theme-dark"
-style="height: 500px;width: auto"
-  [rowData]="rowDataHigh"
-  [rowSelection]="rowSelection"
-  [pagination]="true" 
-  [defaultColDef]="defaultColDef"
-  [paginationPageSize]="paginationPageSize"
-  [columnDefs]="colDefsOpenHigh">
-</ag-grid-angular>
-<hr>
-<ul class="list-group mt-3">
-  <li class="list-group-item list-group-item-success"><h3>Open=Low</h3></li>
-  </ul>
-<hr>
-<ag-grid-angular
-class="ag-theme-dark"
-style="height: 500px;width: auto"
-  [rowData]="rowDataLow"
-  [rowSelection]="rowSelection"
-  [defaultColDef]="defaultColDef"
-  [pagination]="true" 
-  [paginationPageSize]="paginationPageSize"
-  [columnDefs]="colDefsOpenHigh">
-</ag-grid-angular>
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <div class="card-body">
+          <h2 class="mb-2"><i class="fas fa-chart-candlestick"></i> Open-High-Low Pattern Analysis</h2>
+          <p class="mb-0" style="opacity: 0.9;">Identify potential reversal patterns based on first 5-minute candle (9:15-9:20 AM) - All NSE Stocks</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Time Warning -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-warning" role="alert">
+        <strong><i class="fas fa-clock"></i> Important Timing Note:</strong>
+        This scanner works best when used <strong>during or immediately after 9:15-9:20 AM IST</strong>. 
+        At that time, the day's open/high/low values represent the first 5-minute candle. 
+        If used later in the day, you'll see stocks where the day's open equals the day's high/low (not specifically the first 5 minutes).
+      </div>
+    </div>
+  </div>
+
+  <!-- Strategy Information Cards -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card" style="border-left: 5px solid #ef4444;">
+        <div class="card-body">
+          <h5 class="text-danger"><i class="fas fa-arrow-down"></i> Open = High Strategy (Bearish)</h5>
+          <p class="mb-2"><strong>Pattern:</strong> First 5-minute candle (9:15-9:20 AM) opens at its high</p>
+          <p class="mb-0"><strong>Risk:Reward:</strong> 1:1.5 (Best: 1:1)</p>
+          <div class="mt-3">
+            <span class="badge badge-danger">Bearish Pattern</span>
+            <span class="badge badge-warning ml-2">Mean Reversion</span>
+            <span class="badge badge-info ml-2">First 5-Min Candle</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card" style="border-left: 5px solid #10b981;">
+        <div class="card-body">
+          <h5 class="text-success"><i class="fas fa-arrow-up"></i> Open = Low Strategy (Bullish)</h5>
+          <p class="mb-2"><strong>Pattern:</strong> First 5-minute candle (9:15-9:20 AM) opens at its low</p>
+          <p class="mb-0"><strong>Risk:Reward:</strong> 1:2 or higher</p>
+          <div class="mt-3">
+            <span class="badge badge-success">Bullish Pattern</span>
+            <span class="badge badge-info ml-2">Momentum Play</span>
+            <span class="badge badge-primary ml-2">First 5-Min Candle</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Stats and Refresh -->
+  <div class="row mb-3" *ngIf="inputValue && inputValue.length">
+    <div class="col-md-4">
+      <div class="card text-center" style="border-top: 4px solid #ef4444;">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Open = High</h6>
+          <h2 class="text-danger mb-1">{{ rowDataHigh.length }}</h2>
+          <small class="text-muted">Bearish Setups</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center" style="border-top: 4px solid #10b981;">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Open = Low</h6>
+          <h2 class="text-success mb-1">{{ rowDataLow.length }}</h2>
+          <small class="text-muted">Bullish Setups</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center" style="border-top: 4px solid #667eea;">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Total Analyzed</h6>
+          <h2 class="text-primary mb-1">{{ inputValue.length }}</h2>
+          <small class="text-muted">NSE Stocks</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh Button -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <button class="btn btn-primary btn-lg" (click)="fetchFirst5MinData()" [disabled]="isLoading"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; font-weight: 600;">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> 
+        {{ isLoading ? 'Loading...' : 'Refresh Data' }}
+      </button>
+      <span *ngIf="isLoading" class="ml-3 text-muted">
+        <i class="fas fa-spinner fa-spin"></i> Fetching latest data from NSE...
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading first 5-minute candle data for all NSE stocks...</p>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="row mb-4" *ngIf="!isLoading && inputValue && inputValue.length">
+    <div class="col-12">
+      <div class="card" style="border-left: 5px solid #3b82f6;">
+        <div class="card-header" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+          <h6 class="mb-0"><i class="fas fa-filter"></i> Filter Options</h6>
+        </div>
+        <div class="card-body">
+          <div class="row align-items-end">
+            <div class="col-md-3">
+              <div class="form-group mb-0">
+                <label class="d-flex align-items-center">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="filterWholeNumberOpen" 
+                    (change)="applyFilters()"
+                    class="mr-2"
+                    style="width: 18px; height: 18px;">
+                  <strong>Open ends with .00</strong>
+                </label>
+                <small class="text-muted d-block mt-1">Only show stocks with whole number opens (100.00, 250.00, etc.)</small>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="form-group mb-0">
+                <label><strong>Price From (₹)</strong></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [(ngModel)]="filterPriceFrom" 
+                  placeholder="Min price"
+                  min="0"
+                  step="10">
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="form-group mb-0">
+                <label><strong>Price To (₹)</strong></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [(ngModel)]="filterPriceTo" 
+                  placeholder="Max price"
+                  min="0"
+                  step="10">
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="btn-group" role="group">
+                <button 
+                  type="button" 
+                  class="btn btn-primary"
+                  (click)="applyFilters()">
+                  <i class="fas fa-check"></i> Apply Filters
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-secondary"
+                  (click)="resetFilters()">
+                  <i class="fas fa-undo"></i> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-3" *ngIf="filterWholeNumberOpen || filterPriceFrom > 0 || filterPriceTo < 5000">
+            <div class="col-12">
+              <div class="alert alert-info mb-0 py-2">
+                <strong>Active Filters:</strong>
+                <span *ngIf="filterWholeNumberOpen" class="badge badge-primary ml-2">Whole Number Opens Only</span>
+                <span *ngIf="filterPriceFrom > 0" class="badge badge-success ml-2">Min: ₹{{ filterPriceFrom }}</span>
+                <span *ngIf="filterPriceTo < 5000" class="badge badge-warning ml-2">Max: ₹{{ filterPriceTo }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open = High Section (Bearish) -->
+  <div class="row mb-4" *ngIf="inputValue && inputValue.length && !isLoading">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="fas fa-arrow-down"></i> Open = High (Bearish Pattern)
+              <span class="badge badge-warning ml-2">{{ rowDataHigh.length }} stocks</span>
+            </h5>
+            <small style="opacity: 0.9;">
+              <i class="fas fa-filter"></i> Price &lt; ₹3000 | Volume &gt; 3L
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          
+          <ag-grid-angular
+            class="ag-theme-balham"
+            style="height: 600px; width: 100%;"
+            [rowData]="rowDataHigh"
+            [rowSelection]="rowSelection"
+            [pagination]="pagination" 
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="paginationPageSize"
+            [columnDefs]="colDefsOpenHigh"
+            [domLayout]="'normal'">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open = Low Section (Bullish) -->
+  <div class="row mb-4" *ngIf="inputValue && inputValue.length && !isLoading">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="fas fa-arrow-up"></i> Open = Low (Bullish Pattern)
+              <span class="badge badge-warning ml-2">{{ rowDataLow.length }} stocks</span>
+            </h5>
+            <small style="opacity: 0.9;">
+              <i class="fas fa-filter"></i> Price ₹30-3000 | Volume &gt; 3L
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          
+          <ag-grid-angular
+            class="ag-theme-balham"
+            style="height: 600px; width: 100%;"
+            [rowData]="rowDataLow"
+            [rowSelection]="rowSelection"
+            [defaultColDef]="defaultColDef"
+            [pagination]="pagination" 
+            [paginationPageSize]="paginationPageSize"
+            [columnDefs]="colDefsOpenHigh"
+            [domLayout]="'normal'">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div class="row" *ngIf="!inputValue || inputValue.length === 0">
+    <div class="col-12">
+      <div class="card text-center py-5">
+        <div class="card-body">
+          <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+          <h4>No Data Available</h4>
+          <p class="text-muted">Select an index filter from the top menu to load stock data</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Explanation -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-dark text-white">
+          <h6 class="mb-0"><i class="fas fa-question-circle"></i> Understanding the Metrics</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <h6><i class="fas fa-percent"></i> Change from Open</h6>
+              <p class="small text-muted">Current price movement from opening price</p>
+            </div>
+            <div class="col-md-3">
+              <h6><i class="fas fa-chart-line"></i> SMA 20-50 Diff %</h6>
+              <p class="small text-muted">Difference between 20-day and 50-day moving averages</p>
+            </div>
+            <div class="col-md-3">
+              <h6><i class="fas fa-tachometer-alt"></i> RSI</h6>
+              <p class="small text-muted">Relative Strength Index (Overbought &gt; 70, Oversold &lt; 30)</p>
+            </div>
+            <div class="col-md-3">
+              <h6><i class="fas fa-mountain"></i> 52W High</h6>
+              <p class="small text-muted">52-week high price level</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
-<!-- close: res['d'][4],
-open: res['d'][1],
-high: res['d'][2],
-low: res['d'][3],
-SMADiff:res['d'][13]-res['d'][12],
-godFatherDiff:res['d'][14]-res['d'][4],
-// change:res['d'][7],
-SMADiffChang: Math.abs( -->
- 
-note: when open = high .after 15min if vwap goes up and close above VWAP and again come down close is entry : target days 2nd low 1:1.5 best 1:1

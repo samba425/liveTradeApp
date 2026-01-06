@@ -1,0 +1,270 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="fas fa-calculator"></i> Position Size & Risk Calculator</h2>
+      <p class="text-muted">Calculate proper position sizing based on your risk management rules</p>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <!-- Calculator Form -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-edit"></i> Enter Trade Details</h5>
+        </div>
+        <div class="card-body">
+          <!-- Account Size -->
+          <div class="form-group">
+            <label><i class="fas fa-wallet"></i> Account Size (₹)</label>
+            <input type="number" class="form-control" [(ngModel)]="accountSize" placeholder="100000">
+            <small class="text-muted">Your total trading capital</small>
+          </div>
+
+          <!-- Risk Percentage -->
+          <div class="form-group">
+            <label><i class="fas fa-percent"></i> Risk Per Trade (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="riskPercentage" placeholder="2" min="0.1" max="10" step="0.1">
+            <small class="text-muted">Recommended: 1-2% per trade</small>
+          </div>
+
+          <hr>
+
+          <!-- Entry Price -->
+          <div class="form-group">
+            <label><i class="fas fa-sign-in-alt"></i> Entry Price (₹) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="entryPrice" placeholder="1500" step="0.05">
+            <small class="text-muted">Price at which you plan to enter</small>
+          </div>
+
+          <!-- Stop Loss -->
+          <div class="form-group">
+            <label><i class="fas fa-hand-paper"></i> Stop Loss (₹) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="stopLoss" placeholder="1450" step="0.05">
+            <small class="text-muted">Price at which you'll exit if wrong</small>
+          </div>
+
+          <!-- Target Price -->
+          <div class="form-group">
+            <label><i class="fas fa-bullseye"></i> Target Price (₹)</label>
+            <input type="number" class="form-control" [(ngModel)]="target" placeholder="1600" step="0.05">
+            <small class="text-muted">Optional: For Risk:Reward calculation</small>
+          </div>
+
+          <!-- Leverage -->
+          <div class="form-group">
+            <label><i class="fas fa-layer-group"></i> Leverage Multiplier</label>
+            <select class="form-control" [(ngModel)]="leverageMultiplier">
+              <option [value]="1">1x (Cash/Delivery)</option>
+              <option [value]="3">3x (Intraday MIS)</option>
+              <option [value]="5">5x (F&O Margin)</option>
+              <option [value]="10">10x (High Leverage)</option>
+            </select>
+            <small class="text-muted">Select based on product type</small>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-primary" (click)="calculatePosition()">
+              <i class="fas fa-calculator"></i> Calculate
+            </button>
+            <button class="btn btn-secondary" (click)="reset()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculation Results -->
+    <div class="col-md-6">
+      <div class="card" *ngIf="result">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-chart-line"></i> Position Sizing Results</h5>
+        </div>
+        <div class="card-body">
+          <!-- Quantity -->
+          <div class="result-item">
+            <h6><i class="fas fa-shopping-cart"></i> Quantity to Buy</h6>
+            <h3 class="text-primary">{{ result.quantity }} shares</h3>
+            <small class="text-muted">Based on your risk parameters</small>
+          </div>
+
+          <hr>
+
+          <!-- Position Value -->
+          <div class="result-item">
+            <h6><i class="fas fa-rupee-sign"></i> Total Position Size</h6>
+            <h4>₹{{ result.positionSize.toLocaleString('en-IN', {maximumFractionDigits: 2}) }}</h4>
+            <small class="text-muted">{{ result.quantity }} shares × ₹{{ entryPrice }}</small>
+          </div>
+
+          <hr>
+
+          <!-- Margin Required -->
+          <div class="result-item">
+            <h6><i class="fas fa-money-bill-wave"></i> Margin Required</h6>
+            <h4 class="text-info">₹{{ result.marginRequired.toLocaleString('en-IN', {maximumFractionDigits: 2}) }}</h4>
+            <small class="text-muted">With {{ leverageMultiplier }}x leverage</small>
+          </div>
+
+          <hr>
+
+          <!-- Risk Amount -->
+          <div class="result-item">
+            <h6><i class="fas fa-exclamation-triangle"></i> Risk Amount</h6>
+            <h4 [ngClass]="getRiskColor(result.portfolioRisk)">
+              ₹{{ result.riskAmount.toLocaleString('en-IN', {maximumFractionDigits: 2}) }}
+            </h4>
+            <small class="text-muted">{{ result.portfolioRisk.toFixed(2) }}% of account</small>
+          </div>
+
+          <!-- Potential Profit -->
+          <div class="result-item" *ngIf="target">
+            <hr>
+            <h6><i class="fas fa-trophy"></i> Potential Profit</h6>
+            <h4 class="text-success">₹{{ result.potentialProfit.toLocaleString('en-IN', {maximumFractionDigits: 2}) }}</h4>
+            <small class="text-muted">If target is reached</small>
+          </div>
+
+          <!-- Risk:Reward Ratio -->
+          <div class="result-item" *ngIf="target">
+            <hr>
+            <h6><i class="fas fa-balance-scale"></i> Risk:Reward Ratio</h6>
+            <h3 [ngClass]="getRRColor(result.riskRewardRatio)">
+              1:{{ result.riskRewardRatio.toFixed(2) }}
+            </h3>
+            <small class="text-muted">
+              <span *ngIf="result.riskRewardRatio >= 3" class="text-success">✓ Excellent trade setup</span>
+              <span *ngIf="result.riskRewardRatio >= 2 && result.riskRewardRatio < 3" class="text-primary">✓ Good trade setup</span>
+              <span *ngIf="result.riskRewardRatio >= 1 && result.riskRewardRatio < 2" class="text-warning">⚠ Average trade setup</span>
+              <span *ngIf="result.riskRewardRatio < 1" class="text-danger">✗ Poor Risk:Reward - Avoid</span>
+            </small>
+          </div>
+
+          <hr>
+
+          <!-- Save Button -->
+          <button class="btn btn-success btn-block" (click)="savePosition()">
+            <i class="fas fa-save"></i> Save This Position
+          </button>
+        </div>
+      </div>
+
+      <!-- Help Card -->
+      <div class="card mt-3" *ngIf="!result">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0"><i class="fas fa-info-circle"></i> How to Use</h6>
+        </div>
+        <div class="card-body">
+          <ol class="mb-0">
+            <li>Enter your total account size</li>
+            <li>Set risk percentage (1-2% recommended)</li>
+            <li>Enter entry price for the stock</li>
+            <li>Set your stop loss level</li>
+            <li>Optionally add target for R:R calculation</li>
+            <li>Click Calculate</li>
+          </ol>
+          <hr>
+          <p class="mb-0"><strong>Example:</strong></p>
+          <ul class="mb-0">
+            <li>Account: ₹1,00,000</li>
+            <li>Risk: 2% = ₹2,000</li>
+            <li>Entry: ₹1,500</li>
+            <li>Stop Loss: ₹1,450 (₹50 risk per share)</li>
+            <li>Buy Quantity: ₹2,000 / ₹50 = 40 shares</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Positions -->
+  <div class="row mt-4" *ngIf="savedPositions.length > 0">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-history"></i> Saved Positions</h5>
+          <button class="btn btn-sm btn-danger" (click)="clearAllPositions()">
+            <i class="fas fa-trash"></i> Clear All
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Entry</th>
+                  <th>Stop Loss</th>
+                  <th>Target</th>
+                  <th>Quantity</th>
+                  <th>Risk</th>
+                  <th>Profit</th>
+                  <th>R:R</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pos of savedPositions; let i = index">
+                  <td>{{ pos.date | date:'dd MMM, HH:mm' }}</td>
+                  <td>₹{{ pos.entryPrice }}</td>
+                  <td class="text-danger">₹{{ pos.stopLoss }}</td>
+                  <td class="text-success">₹{{ pos.target || '-' }}</td>
+                  <td><strong>{{ pos.quantity }}</strong></td>
+                  <td class="text-danger">₹{{ pos.riskAmount.toFixed(0) }}</td>
+                  <td class="text-success">₹{{ pos.potentialProfit.toFixed(0) }}</td>
+                  <td [ngClass]="getRRColor(pos.riskRewardRatio)">
+                    <strong>1:{{ pos.riskRewardRatio.toFixed(2) }}</strong>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-danger" (click)="deletePosition(i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk Management Tips -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card border-warning">
+        <div class="card-header bg-warning">
+          <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Risk Management Rules</h6>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li><strong>Never risk more than 1-2%</strong> of your capital per trade</li>
+            <li><strong>Always use stop loss</strong> - no exceptions</li>
+            <li><strong>Aim for minimum 1:2 Risk:Reward</strong> ratio</li>
+            <li><strong>Don't trade without a plan</strong> - calculate before entering</li>
+            <li><strong>Keep position sizes small</strong> to avoid large drawdowns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-success">
+        <div class="card-header bg-success text-white">
+          <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Pro Tips</h6>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li>Risk 1% on uncertain trades, 2% on high-confidence setups</li>
+            <li>Use tighter stop loss for intraday, wider for swing trades</li>
+            <li>Account for brokerage and taxes in your calculations</li>
+            <li>Reduce position size during volatile market conditions</li>
+            <li>Track all trades to improve your risk management</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

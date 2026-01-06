@@ -1,15 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonserviceService } from './commonservice.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { interval, Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'tradeApp';
   isbankNifty;
   currentValue = "NIFTY"
+  private marketStatusSubscription: Subscription;
+  
   sectorList = [
     "Energy Minerals",
     "Non-Energy Minerals",
@@ -32,6 +36,7 @@ export class AppComponent {
     "Technology Services",
     "Transportation",
     "Utilities"]
+    
   constructor(private commonService: CommonserviceService,private router: Router,private activatedRoute:ActivatedRoute) {
     this.refreshdata()
     
@@ -42,10 +47,53 @@ export class AppComponent {
       }
     });
   }
+  
+  ngOnInit() {
+    this.updateMarketStatus();
+    // Update market status every minute
+    this.marketStatusSubscription = interval(60000).subscribe(() => {
+      this.updateMarketStatus();
+    });
+  }
+  
+  ngOnDestroy() {
+    if (this.marketStatusSubscription) {
+      this.marketStatusSubscription.unsubscribe();
+    }
+  }
+  
+  updateMarketStatus() {
+    const now = new Date();
+    const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours * 60 + minutes;
+    
+    // Market hours: Monday-Friday, 9:15 AM - 3:30 PM IST
+    const marketOpen = 9 * 60 + 15; // 9:15 AM
+    const marketClose = 15 * 60 + 30; // 3:30 PM
+    
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    
+    if (statusDot && statusText) {
+      if (day >= 1 && day <= 5 && currentTime >= marketOpen && currentTime <= marketClose) {
+        statusDot.style.backgroundColor = '#10b981';
+        statusDot.classList.add('market-open');
+        statusText.textContent = 'Market Open';
+      } else {
+        statusDot.style.backgroundColor = '#ef4444';
+        statusDot.classList.remove('market-open');
+        statusText.textContent = 'Market Closed';
+      }
+    }
+  }
+  
   sectorSelect(sector) {
     this.currentValue = sector;
     this.commonService.fetchLiveData(undefined,sector);
   }
+  
   refreshdata(index?) {
     this.currentValue = index ? index : "ALL";
     this.commonService.fetchLiveData(index);

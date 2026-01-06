@@ -1,0 +1,211 @@
+<div class="container-fluid mt-4">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-2">Loading stock data...</p>
+  </div>
+
+  <!-- Stock Detail -->
+  <div *ngIf="!isLoading && stock">
+    <!-- Stock Header -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="mb-2">{{ stock.name }}</h2>
+            <p class="text-muted mb-0" *ngIf="stock.sector">{{ stock.sector }}</p>
+          </div>
+          <div class="col-md-6 text-right">
+            <button 
+              class="btn"
+              [class.btn-warning]="isInWatchlist"
+              [class.btn-outline-warning]="!isInWatchlist"
+              (click)="toggleWatchlist()"
+            >
+              <i class="fas fa-star"></i>
+              {{ isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Overview -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary text-white">
+          <div class="card-body text-center">
+            <h6>Current Price</h6>
+            <h2>₹{{ stock.close.toFixed(2) }}</h2>
+            <p class="mb-0" [class.text-success]="stock.change >= 0" [class.text-danger]="stock.change < 0">
+              {{ stock.change >= 0 ? '+' : '' }}₹{{ stock.change.toFixed(2) }}
+              ({{ stock.changePercent.toFixed(2) }}%)
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Open</h6>
+            <h3>₹{{ stock.open.toFixed(2) }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h6 class="text-muted">High / Low</h6>
+            <h3>
+              <span class="text-success">₹{{ stock.high.toFixed(2) }}</span>
+              /
+              <span class="text-danger">₹{{ stock.low.toFixed(2) }}</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Volume</h6>
+            <h3>{{ formatVolume(stock.volume) }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-line"></i> Intraday Chart
+        </h5>
+      </div>
+      <div class="card-body">
+        <div #chartContainer style="position: relative;"></div>
+      </div>
+    </div>
+
+    <!-- Technical Indicators & Fundamentals -->
+    <div class="row">
+      <!-- Technical Indicators -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-bar"></i> Technical Indicators
+            </h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm table-bordered">
+              <tbody>
+                <tr *ngIf="stock.sma20">
+                  <td><strong>SMA 20</strong></td>
+                  <td class="text-right">₹{{ stock.sma20.toFixed(2) }}</td>
+                  <td class="text-center" [class.text-success]="stock.close > stock.sma20" [class.text-danger]="stock.close < stock.sma20">
+                    {{ stock.close > stock.sma20 ? 'Above' : 'Below' }}
+                  </td>
+                </tr>
+                <tr *ngIf="stock.sma50">
+                  <td><strong>SMA 50</strong></td>
+                  <td class="text-right">₹{{ stock.sma50.toFixed(2) }}</td>
+                  <td class="text-center" [class.text-success]="stock.close > stock.sma50" [class.text-danger]="stock.close < stock.sma50">
+                    {{ stock.close > stock.sma50 ? 'Above' : 'Below' }}
+                  </td>
+                </tr>
+                <tr *ngIf="stock.sma200">
+                  <td><strong>SMA 200</strong></td>
+                  <td class="text-right">₹{{ stock.sma200.toFixed(2) }}</td>
+                  <td class="text-center" [class.text-success]="stock.close > stock.sma200" [class.text-danger]="stock.close < stock.sma200">
+                    {{ stock.close > stock.sma200 ? 'Above' : 'Below' }}
+                  </td>
+                </tr>
+                <tr *ngIf="stock.rsi">
+                  <td><strong>RSI</strong></td>
+                  <td class="text-right">{{ stock.rsi.toFixed(2) }}</td>
+                  <td class="text-center">
+                    <span *ngIf="stock.rsi > 70" class="badge badge-danger">Overbought</span>
+                    <span *ngIf="stock.rsi < 30" class="badge badge-success">Oversold</span>
+                    <span *ngIf="stock.rsi >= 30 && stock.rsi <= 70" class="badge badge-secondary">Neutral</span>
+                  </td>
+                </tr>
+                <tr *ngIf="stock.vwap">
+                  <td><strong>VWAP</strong></td>
+                  <td class="text-right">₹{{ stock.vwap.toFixed(2) }}</td>
+                  <td class="text-center" [class.text-success]="stock.close > stock.vwap" [class.text-danger]="stock.close < stock.vwap">
+                    {{ stock.close > stock.vwap ? 'Above' : 'Below' }}
+                  </td>
+                </tr>
+                <tr *ngIf="stock.macd">
+                  <td><strong>MACD</strong></td>
+                  <td class="text-right">{{ stock.macd.toFixed(2) }}</td>
+                  <td class="text-center" [class.text-success]="stock.macd > 0" [class.text-danger]="stock.macd < 0">
+                    {{ stock.macd > 0 ? 'Bullish' : 'Bearish' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fundamentals -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+              <i class="fas fa-file-invoice-dollar"></i> Fundamental Data
+            </h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm table-bordered">
+              <tbody>
+                <tr *ngIf="stock.marketCap">
+                  <td><strong>Market Cap</strong></td>
+                  <td class="text-right">{{ formatMarketCap(stock.marketCap) }}</td>
+                </tr>
+                <tr *ngIf="stock.pe">
+                  <td><strong>P/E Ratio</strong></td>
+                  <td class="text-right">{{ stock.pe.toFixed(2) }}</td>
+                </tr>
+                <tr *ngIf="stock.pb">
+                  <td><strong>P/B Ratio</strong></td>
+                  <td class="text-right">{{ stock.pb.toFixed(2) }}</td>
+                </tr>
+                <tr *ngIf="stock.eps">
+                  <td><strong>EPS</strong></td>
+                  <td class="text-right">₹{{ stock.eps.toFixed(2) }}</td>
+                </tr>
+                <tr *ngIf="stock.dividendYield">
+                  <td><strong>Dividend Yield</strong></td>
+                  <td class="text-right">{{ stock.dividendYield.toFixed(2) }}%</td>
+                </tr>
+                <tr *ngIf="stock.roe">
+                  <td><strong>ROE</strong></td>
+                  <td class="text-right">{{ stock.roe.toFixed(2) }}%</td>
+                </tr>
+                <tr *ngIf="stock.fiftyTwoWeekHigh">
+                  <td><strong>52W High</strong></td>
+                  <td class="text-right">₹{{ stock.fiftyTwoWeekHigh.toFixed(2) }}</td>
+                </tr>
+                <tr *ngIf="stock.fiftyTwoWeekLow">
+                  <td><strong>52W Low</strong></td>
+                  <td class="text-right">₹{{ stock.fiftyTwoWeekLow.toFixed(2) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!isLoading && !stock" class="text-center my-5">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h5>Stock not found</h5>
+    <p class="text-muted">Unable to find data for symbol: {{ symbol }}</p>
+  </div>
+</div>

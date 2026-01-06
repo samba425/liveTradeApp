@@ -15,10 +15,10 @@ export class BBComponent implements OnInit {
   }
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
-    editable: true,
+    editable: false,
     filter: true,
-    flex: 1,
-    minWidth: 100
+    resizable: true,
+    sortable: true
   };
   inputValue: any = []
   rowData = [];
@@ -28,52 +28,108 @@ export class BBComponent implements OnInit {
   rowDataHigh = [];
   rowDataLow = [];
   pagination = true;
-  paginationPageSize = 2500;
-  paginationPageSizeSelector = [200, 500, 1000];
+  paginationPageSize = 20;
+  isLoading = false;
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "name", sortable: true, resizable: true },
+    { 
+      headerName: "📊 Stock",
+      field: "name", 
+      sortable: true, 
+      resizable: true,
+      width: 180,
+      pinned: 'left',
+      cellStyle: { fontWeight: 'bold', color: '#667eea', cursor: 'pointer', fontSize: '14px' },
+      cellRenderer: (params) => {
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="https://www.tradingview.com/chart/?symbol=NSE:${params.value}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: bold; font-size: 14px;">${params.value}</a>
+            <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${params.value}'); event.stopPropagation();" style="cursor: pointer; color: #9ca3af; font-size: 11px; margin-left: 6px; opacity: 0.7;" title="Copy ${params.value}"></i>
+          </div>
+        `;
+      }
+    },
     {
-      field: "close", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter", resizable: true,
+      headerName: "💰 Close",
+      field: "close", 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", 
+      resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      cellStyle: { fontWeight: '600' }
+    },
+    {
+      headerName: "📈 High",
+      field: "high", 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", 
+      resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      cellStyle: { color: '#10b981', fontWeight: '600' }
+    },
+    {
+      headerName: "📉 Low",
+      field: "low", 
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", 
+      resizable: true,
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      },
+      cellStyle: { color: '#ef4444', fontWeight: '600' }
+    },
+    {
+      headerName: "📊 BB Signal",
+      field: "bb", 
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+      filter: "agNumberColumnFilter", 
+      resizable: true,
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
     {
-      field: "high", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter", resizable: true,
+      headerName: "📈 52W High", 
+      field: "HIGH52", 
+      resizable: true, 
+      sortable: true, 
+      width: 120,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(), 
+      filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
         defaultJoinOperator: "OR"
       }
     },
     {
-      field: "low", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter", resizable: true,
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      field: "bb", sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter", resizable: true,
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "52 High", field: "HIGH52", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      field: "volume", resizable: true, sortable: true,
+      headerName: "📦 Volume",
+      field: "volume", 
+      resizable: true, 
+      sortable: true,
+      width: 120,
+      valueFormatter: p => {
+        const val = p.value;
+        if (val >= 10000000) return (val / 10000000).toFixed(2) + 'Cr';
+        if (val >= 100000) return (val / 100000).toFixed(2) + 'L';
+        if (val >= 1000) return (val / 1000).toFixed(2) + 'K';
+        return val.toLocaleString();
+      },
       filter: "agNumberColumnFilter",
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -85,8 +141,8 @@ export class BBComponent implements OnInit {
       cellRenderer: function (params) {
         let keyData = params.data.name;
         let newLink =
-          `<a style="color:white;" href= https://www.screener.in/company/${keyData}
-    target="_blank">sceener</a>  |  <a style="color:white;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
+          `<a style="color:#007bff;" href= https://www.screener.in/company/${keyData}
+    target="_blank">screener</a>  |  <a style="color:#007bff;" href= https://in.tradingview.com/chart/6QuU1TVy/?symbol=NSE%3A${keyData}
     target="_blank">chart</a>`;
         return newLink;
       }
@@ -122,10 +178,19 @@ export class BBComponent implements OnInit {
 
 
   fetchLiveData() {
+    this.isLoading = true;
     this.commonservice.getData.subscribe(data => {
       this.inputValue = data
       this.getHighLow()
+      this.isLoading = false;
+    }, error => {
+      console.error('Error fetching data:', error);
+      this.isLoading = false;
     });
+  }
+
+  refreshData() {
+    this.fetchLiveData();
   }
 
   getHighLow() {

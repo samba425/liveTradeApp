@@ -1,1 +1,16 @@
- 
+.btn-group .btn-light.active {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-color: white !important;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-group .btn-light {
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.btn-group .btn-light:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white;
+}

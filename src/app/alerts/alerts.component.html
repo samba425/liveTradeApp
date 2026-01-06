@@ -1,0 +1,150 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0">
+            <i class="fas fa-bell"></i> Price Alerts
+            <span class="badge badge-light ml-2">{{ alerts.length }} total</span>
+            <span class="badge badge-success ml-2">{{ getActiveAlertsCount() }} active</span>
+            <span class="badge badge-info ml-2">{{ getTriggeredAlertsCount() }} triggered</span>
+          </h4>
+        </div>
+        
+        <div class="card-body">
+          <!-- Alert Messages -->
+          <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ successMessage }}
+            <button type="button" class="close" (click)="successMessage = ''">
+              <span>&times;</span>
+            </button>
+          </div>
+          
+          <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ errorMessage }}
+            <button type="button" class="close" (click)="errorMessage = ''">
+              <span>&times;</span>
+            </button>
+          </div>
+
+          <!-- Create Alert Form -->
+          <div class="card mb-4 bg-light">
+            <div class="card-body">
+              <h5 class="card-title">Create New Alert</h5>
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label>Stock Symbol</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="e.g., RELIANCE, TCS"
+                      [(ngModel)]="newSymbol"
+                      (keyup.enter)="createAlert()"
+                    />
+                  </div>
+                </div>
+                
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label>Target Price (₹)</label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      placeholder="0.00"
+                      [(ngModel)]="newTargetPrice"
+                      (keyup.enter)="createAlert()"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label>Condition</label>
+                    <select class="form-control" [(ngModel)]="newCondition">
+                      <option value="above">Price goes above</option>
+                      <option value="below">Price goes below</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary btn-block" (click)="createAlert()">
+                      <i class="fas fa-plus"></i> Create Alert
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="alert alert-info mb-0">
+                <small>
+                  <i class="fas fa-info-circle"></i> 
+                  Alerts are checked every 30 seconds. You'll receive a browser notification when an alert is triggered.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Notifications -->
+          <div *ngIf="notifications.length > 0" class="card mb-4">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-history"></i> Recent Notifications
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="list-group" style="max-height: 200px; overflow-y: auto;">
+                <div *ngFor="let notification of notifications.slice(0, 10)" 
+                     class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">{{ notification.alert.symbol }}</h6>
+                    <small>{{ notification.timestamp | date:'short' }}</small>
+                  </div>
+                  <p class="mb-1">{{ notification.message }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mb-3">
+            <div class="btn-group">
+              <button class="btn btn-outline-danger" (click)="clearTriggeredAlerts()">
+                <i class="fas fa-broom"></i> Clear Triggered Alerts
+              </button>
+              <button class="btn btn-outline-danger" (click)="clearAllAlerts()">
+                <i class="fas fa-trash"></i> Clear All Alerts
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="alerts.length === 0" class="text-center my-5">
+            <i class="fas fa-bell fa-3x text-muted mb-3"></i>
+            <h5>No alerts configured</h5>
+            <p class="text-muted">Create your first price alert above</p>
+          </div>
+
+          <!-- Alerts Grid -->
+          <div *ngIf="alerts.length > 0">
+            <ag-grid-angular
+              style="width: 100%; height: 500px;"
+              class="ag-theme-alpine"
+              [rowData]="alerts"
+              [columnDefs]="columnDefs"
+              [gridOptions]="gridOptions"
+              [pagination]="true"
+              [paginationPageSize]="20"
+              [enableCellTextSelection]="true"
+            >
+            </ag-grid-angular>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

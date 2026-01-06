@@ -12,6 +12,13 @@ import { FormsModule } from '@angular/forms';
 import { BBComponent } from './bb/bb.component';
 import { LearnComponent } from './learn/learn.component';
 import { MarkdownModule } from 'ngx-markdown';
+import { WatchlistComponent } from './watchlist/watchlist.component';
+import { AlertsComponent } from './alerts/alerts.component';
+import { StockDetailComponent } from './stock-detail/stock-detail.component';
+import { NewsComponent } from './news/news.component';
+import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
+import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -20,7 +27,13 @@ import { MarkdownModule } from 'ngx-markdown';
     SimpleMovingComponent,
     BankniftyComponent,
     BBComponent,
-    LearnComponent
+    LearnComponent,
+    WatchlistComponent,
+    AlertsComponent,
+    StockDetailComponent,
+    NewsComponent,
+    SectorTrackerComponent,
+    PositionCalculatorComponent
   ],
   imports: [AppRoutingModule, FormsModule,
     AgGridModule.withComponents([]), BrowserModule, HttpClientModule, MarkdownModule.forRoot()

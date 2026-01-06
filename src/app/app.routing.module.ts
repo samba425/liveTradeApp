@@ -6,6 +6,13 @@ import { SimpleMovingComponent } from './simple-moving/simple-moving.component';
 import { BankniftyComponent } from './banknifty/banknifty.component';
 import { BBComponent } from './bb/bb.component';
 import { LearnComponent } from './learn/learn.component';
+import { WatchlistComponent } from './watchlist/watchlist.component';
+import { AlertsComponent } from './alerts/alerts.component';
+import { StockDetailComponent } from './stock-detail/stock-detail.component';
+import { NewsComponent } from './news/news.component';
+import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
+import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
+
 @NgModule({
   declarations: [ 
     
@@ -19,6 +26,12 @@ import { LearnComponent } from './learn/learn.component';
       { path: 'BankNifty', component: BankniftyComponent },
       { path: 'bb', component: BBComponent },
       { path: 'learn', component: LearnComponent },
+      { path: 'watchlist', component: WatchlistComponent },
+      { path: 'alerts', component: AlertsComponent },
+      { path: 'news', component: NewsComponent },
+      { path: 'stock/:symbol', component: StockDetailComponent },
+      { path: 'sectors', component: SectorTrackerComponent },
+      { path: 'calculator', component: PositionCalculatorComponent },
       { path: '**', redirectTo: '/BankNifty', pathMatch: 'full' },
     ])
   ],
