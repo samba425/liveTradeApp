@@ -261,15 +261,14 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
   }
 
   updateSectorData(newData: SectorData[]) {
+    // Update data and sort
+    this.sectors = newData.sort((a, b) => b.avgChange - a.avgChange);
+    
     if (this.gridApi) {
-      // Update existing data without re-rendering entire grid
-      this.sectors = newData.sort((a, b) => b.avgChange - a.avgChange);
-      this.gridApi.setRowData(this.sectors);
-      // Flash updated cells to show changes (without parameters as they're not supported in this version)
+      // Use AG-Grid v33 API to update row data
+      this.gridApi.setGridOption('rowData', this.sectors);
+      // Flash updated cells to show changes
       this.gridApi.flashCells();
-    } else {
-      // Initial load
-      this.sectors = newData.sort((a, b) => b.avgChange - a.avgChange);
     }
   }
 

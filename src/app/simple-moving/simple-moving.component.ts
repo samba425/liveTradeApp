@@ -289,6 +289,14 @@ export class SimpleMovingComponent implements OnInit {
   gridOptions: GridOptions;
   searchQuery: string = '';
   query: string = '';
+  
+  // Price range filter properties
+  minPrice: number = 0;
+  maxPrice: number = 200000;
+  minPriceFilter: number = 0;
+  maxPriceFilter: number = 200000;
+  filteredByPriceCount: number = 0;
+  activeSlider: 'min' | 'max' = 'max';
 
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
@@ -364,15 +372,64 @@ export class SimpleMovingComponent implements OnInit {
     this.rowData = []
     setTimeout(() => {
       this.rowData = this.allData
+      this.calculatePriceRange();
+      this.filteredByPriceCount = this.rowData.length;
     }, 100)
 
+  }
+
+  calculatePriceRange() {
+    if (this.allData.length > 0) {
+      const prices = this.allData.map(stock => stock.close);
+      this.minPrice = Math.floor(Math.min(...prices));
+      this.maxPrice = Math.min(200000, Math.ceil(Math.max(...prices))); // Cap at 2 lakh
+      this.minPriceFilter = this.minPrice;
+      this.maxPriceFilter = this.maxPrice;
+    }
+  }
+
+  onPriceFilterChange() {
+    // Ensure min is always less than max
+    if (this.minPriceFilter > this.maxPriceFilter) {
+      const temp = this.minPriceFilter;
+      this.minPriceFilter = this.maxPriceFilter;
+      this.maxPriceFilter = temp;
+    }
+
+    // Filter data based on price range
+    const filtered = this.allData.filter(stock => 
+      stock.close >= this.minPriceFilter && stock.close <= this.maxPriceFilter
+    );
+    
+    this.filteredByPriceCount = filtered.length;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = filtered;
+    }, 10);
+  }
+
+  bringToFront(slider: 'min' | 'max') {
+    this.activeSlider = slider;
+    // Update z-index dynamically
+    const minSlider = document.querySelector('.min-slider') as HTMLElement;
+    const maxSlider = document.querySelector('.max-slider') as HTMLElement;
+    
+    if (slider === 'min') {
+      if (minSlider) minSlider.style.zIndex = '5';
+      if (maxSlider) maxSlider.style.zIndex = '3';
+    } else {
+      if (minSlider) minSlider.style.zIndex = '3';
+      if (maxSlider) maxSlider.style.zIndex = '5';
+    }
   }
   
   reset() {
     this.rowData = []
+    this.calculatePriceRange(); // Reset price sliders
     
     setTimeout(() => {
       this.rowData = this.allData
+      this.filteredByPriceCount = this.rowData.length;
     }, 100)
   }
   // 0: "name",

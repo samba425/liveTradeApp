@@ -2,26 +2,23 @@
   
   <!-- Index/Sector View Toggle -->
   <div class="row mb-3">
-    <div class="col-12">
-      <div class="btn-group btn-group-lg" role="group" style="box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div class="col-12 d-flex justify-content-center">
+      <div class="toggle-switch-container">
         <button 
           type="button" 
-          class="btn" 
-          [class.btn-info]="currentView === 'banknifty'"
-          [class.btn-outline-info]="currentView !== 'banknifty'"
-          (click)="currentView = 'banknifty'"
-          style="font-weight: 600;">
+          class="toggle-btn" 
+          [class.active]="currentView === 'banknifty'"
+          (click)="currentView = 'banknifty'">
           <i class="fas fa-chart-line"></i> Index View
         </button>
         <button 
           type="button" 
-          class="btn" 
-          [class.btn-info]="currentView === 'sectors'"
-          [class.btn-outline-info]="currentView !== 'sectors'"
-          (click)="currentView = 'sectors'"
-          style="font-weight: 600;">
+          class="toggle-btn" 
+          [class.active]="currentView === 'sectors'"
+          (click)="currentView = 'sectors'">
           <i class="fas fa-layer-group"></i> Sector View
         </button>
+        <div class="toggle-slider" [class.sector-active]="currentView === 'sectors'"></div>
       </div>
     </div>
   </div>
