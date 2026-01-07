@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 declare const LightweightCharts: any;
 
 @Component({
+  standalone: false,
   selector: 'app-stock-detail',
   templateUrl: './stock-detail.component.html',
   styleUrls: ['./stock-detail.component.css']

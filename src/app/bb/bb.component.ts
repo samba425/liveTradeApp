@@ -1,15 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ColDef, GridOptions } from 'ag-grid-community';
+import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 
 @Component({
+  standalone: false,
   selector: 'app-bb',
   templateUrl: './bb.component.html',
   styleUrls: ['./bb.component.css']
 })
 export class BBComponent implements OnInit {
 
+  private gridApi!: GridApi;
+  private gridApiFiltered!: GridApi;
 
   ngOnInit() {
   }
@@ -331,26 +334,34 @@ export class BBComponent implements OnInit {
 
   }
 
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+  }
+
+  onGridReadyFiltered(params: any) {
+    this.gridApiFiltered = params.api;
+  }
+
   onSearchInputChange() {
-    if (this.gridOptions.api) {
-      this.gridOptions.api.setQuickFilter(this.searchQuery);
+    if (this.gridApi) {
+      this.gridApi.setGridOption('quickFilterText', this.searchQuery);
     }
   }
 
   onBtnExport() {
     var d = new Date();
-    this.gridOptions.api.exportDataAsCsv({ "fileName": `SMA(${d.toLocaleDateString()}).csv` });
+    this.gridApi.exportDataAsCsv({ fileName: `SMA(${d.toLocaleDateString()}).csv` });
   }
 
   onSearchInputChangeFiltered() {
-    if (this.gridOptionsfiltered.api) {
-      this.gridOptionsfiltered.api.setQuickFilter(this.searchQuery1);
+    if (this.gridApiFiltered) {
+      this.gridApiFiltered.setGridOption('quickFilterText', this.searchQuery1);
     }
   }
 
   onBtnExportFiltered() {
     var d = new Date();
-    this.gridOptionsfiltered.api.exportDataAsCsv({ "fileName": `SMA(${d.toLocaleDateString()}).csv` });
+    this.gridApiFiltered.exportDataAsCsv({ fileName: `SMA(${d.toLocaleDateString()}).csv` });
   }
   
    isDoji(open, high, low, close) {

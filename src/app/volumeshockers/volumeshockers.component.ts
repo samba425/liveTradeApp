@@ -1,15 +1,19 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ColDef, GridOptions } from 'ag-grid-community';
+import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 import { options } from './optionsStocks';
 @Component({
+  standalone: false,
   selector: 'app-volumeshockers',
   templateUrl: './volumeshockers.component.html',
   styleUrls: ['./volumeshockers.component.css']
 })
 export class VolumeshockersComponent implements OnInit {
+
+  private gridApi!: GridApi;
+  private gridStockApi!: GridApi;
 
   ngOnInit() {
   }
@@ -377,15 +381,23 @@ export class VolumeshockersComponent implements OnInit {
     this.fetchLiveData();
   }
 
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+  }
+
+  onGridStockReady(params: any) {
+    this.gridStockApi = params.api;
+  }
+
   onSearchInputChange() {
-    if (this.gridOptions.api) {
-      this.gridOptions.api.setQuickFilter(this.searchQuery);
+    if (this.gridApi) {
+      this.gridApi.setGridOption('quickFilterText', this.searchQuery);
     }
   }
 
   onSearchStockInputChange() {
-    if (this.gridStockOptions.api) {
-      this.gridStockOptions.api.setQuickFilter(this.searchStockQuery);
+    if (this.gridStockApi) {
+      this.gridStockApi.setGridOption('quickFilterText', this.searchStockQuery);
     }
   }
 
@@ -478,7 +490,7 @@ export class VolumeshockersComponent implements OnInit {
     }
   onBtnExport() {
     var d = new Date();
-    this.gridOptions.api.exportDataAsCsv({ "fileName": `volumeShockers(${d.toLocaleDateString()}).csv` });
+    this.gridApi.exportDataAsCsv({ fileName: `volumeShockers(${d.toLocaleDateString()}).csv` });
   }
   Options() {
     this.rowStockData = this.optionsSTock;

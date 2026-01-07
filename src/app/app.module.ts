@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { OpenHighCloseComponent } from './open-high-close/open-high-close.component';
 import { AgGridModule } from 'ag-grid-angular';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AppRoutingModule } from './app.routing.module';
 import { VolumeshockersComponent } from './volumeshockers/volumeshockers.component';
 import { BankniftyComponent } from './banknifty/banknifty.component';
@@ -18,6 +19,11 @@ import { StockDetailComponent } from './stock-detail/stock-detail.component';
 import { NewsComponent } from './news/news.component';
 import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
 import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 @NgModule({
   declarations: [
@@ -35,10 +41,17 @@ import { PositionCalculatorComponent } from './position-calculator/position-calc
     SectorTrackerComponent,
     PositionCalculatorComponent
   ],
-  imports: [AppRoutingModule, FormsModule,
-    AgGridModule.withComponents([]), BrowserModule, HttpClientModule, MarkdownModule.forRoot()
+  imports: [
+    BrowserModule,
+    AppRoutingModule, 
+    FormsModule,
+    AgGridModule,
+    MarkdownModule.forRoot()
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi()),
+    provideAnimations()
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

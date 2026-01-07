@@ -55,7 +55,7 @@
 
   <div class="example-wrapper">
     <ag-grid-angular 
-      class="ag-theme-balham" 
+      class="ag-theme-quartz" 
       style="height:600px;width: 100%" 
       [rowData]="rowData"
       [suppressExcelExport]="true" 
@@ -65,7 +65,8 @@
       [defaultColDef]="defaultColDef" 
       [paginationPageSize]="paginationPageSize"
       [domLayout]="'normal'" 
-      [columnDefs]="colDefs">
+      [columnDefs]="colDefs"
+      (gridReady)="onGridReady($event)">
     </ag-grid-angular>
   </div>
   
@@ -90,7 +91,7 @@
   </div>
   <div class="example-wrapper">
     <ag-grid-angular 
-      class="ag-theme-balham" 
+      class="ag-theme-quartz" 
       style="height: 600px;width: 100%" 
       [rowData]="filteredrowData"
       [suppressExcelExport]="true" 
@@ -100,7 +101,8 @@
       [defaultColDef]="defaultColDef" 
       [paginationPageSize]="paginationPageSize"
       [domLayout]="'normal'" 
-      [columnDefs]="colDefs">
+      [columnDefs]="colDefs"
+      (gridReady)="onGridReadyFiltered($event)">
     </ag-grid-angular>
   </div>
 </div>

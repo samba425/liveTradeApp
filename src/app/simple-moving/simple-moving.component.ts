@@ -1,14 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ColDef, GridOptions } from 'ag-grid-community';
+import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 
 @Component({
+  standalone: false,
   selector: 'app-simple-moving',
   templateUrl: './simple-moving.component.html',
   styleUrls: ['./simple-moving.component.css']
 })
 export class SimpleMovingComponent implements OnInit {
+
+  private gridApi!: GridApi;
 
   ngOnInit() {
   }
@@ -433,10 +436,13 @@ export class SimpleMovingComponent implements OnInit {
     }, 100)
   }
 
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+  }
 
   onSearchInputChange() {
-    if (this.gridOptions.api) {
-      this.gridOptions.api.setQuickFilter(this.searchQuery);
+    if (this.gridApi) {
+      this.gridApi.setGridOption('quickFilterText', this.searchQuery);
     }
   }
 
@@ -465,7 +471,7 @@ export class SimpleMovingComponent implements OnInit {
 
   onBtnExport() {
     var d = new Date();
-    this.gridOptions.api.exportDataAsCsv({ "fileName": `SMA(${d.toLocaleDateString()}).csv` });
+    this.gridApi.exportDataAsCsv({ fileName: `SMA(${d.toLocaleDateString()}).csv` });
   }
 }
 

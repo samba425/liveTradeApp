@@ -4,6 +4,7 @@ import { Stock } from '../shared/models/stock.model';
 import { Subscription } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-watchlist',
   templateUrl: './watchlist.component.html',
   styleUrls: ['./watchlist.component.css']

@@ -118,7 +118,7 @@
           <!-- Data Grid -->
           <div *ngIf="rowStockData.length > 0">
             <ag-grid-angular 
-              class="ag-theme-balham" 
+              class="ag-theme-quartz" 
               style="height: 500px;width: 100%" 
               [rowData]="rowStockData"
               [suppressExcelExport]="true" 
@@ -128,7 +128,8 @@
               [defaultColDef]="defaultColDef" 
               [paginationPageSize]="paginationPageSize"
               [domLayout]="'normal'"
-              [columnDefs]="colStocksDefs">
+              [columnDefs]="colStocksDefs"
+              (gridReady)="onGridStockReady($event)">
             </ag-grid-angular>
           </div>
         </div>
@@ -183,7 +184,7 @@
           <!-- Data Grid -->
           <div *ngIf="rowData.length > 0">
             <ag-grid-angular 
-              class="ag-theme-balham" 
+              class="ag-theme-quartz" 
               style="height: 500px;width: 100%" 
               [rowData]="rowData"
               [suppressExcelExport]="true" 
@@ -193,7 +194,8 @@
               [defaultColDef]="defaultColDef" 
               [paginationPageSize]="paginationPageSize"
               [domLayout]="'normal'"
-              [columnDefs]="colDefs">
+              [columnDefs]="colDefs"
+              (gridReady)="onGridReady($event)">
             </ag-grid-angular>
           </div>
         </div>

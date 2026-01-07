@@ -127,7 +127,7 @@
         </div>
         <div class="card-body">
           <ag-grid-angular 
-            class="ag-theme-balham" 
+            class="ag-theme-quartz" 
             style="height: 600px;width: 100%" 
             [rowData]="rowData"
             [suppressExcelExport]="true" 
@@ -137,7 +137,8 @@
             [defaultColDef]="defaultColDef" 
             [paginationPageSize]="paginationPageSize"
             [domLayout]="'normal'" 
-            [columnDefs]="colDefs">
+            [columnDefs]="colDefs"
+            (gridReady)="onGridReady($event)">
           </ag-grid-angular>
         </div>
       </div>

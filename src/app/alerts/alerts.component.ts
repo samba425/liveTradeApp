@@ -4,6 +4,7 @@ import { PriceAlert, AlertNotification } from '../shared/models/alert.model';
 import { Subscription } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-alerts',
   templateUrl: './alerts.component.html',
   styleUrls: ['./alerts.component.css']

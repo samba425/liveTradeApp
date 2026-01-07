@@ -4,6 +4,7 @@ import { CommonserviceService } from '../commonservice.service';
 import { Subscription, interval } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-banknifty',
   templateUrl: './banknifty.component.html',
   styleUrls: ['./banknifty.component.css']

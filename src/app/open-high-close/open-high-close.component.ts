@@ -4,6 +4,7 @@ import { ColDef, GridApi } from 'ag-grid-community'; // Column Definition Type I
 import { CommonserviceService } from '../commonservice.service';
 
 @Component({
+  standalone: false,
   selector: 'app-open-high-close',
 
   templateUrl: './open-high-close.component.html',
@@ -402,14 +403,14 @@ export class OpenHighCloseComponent implements OnInit {
     setTimeout(() => {
       // Update data using Grid API to prevent re-render
       if (this.gridApiHigh) {
-        this.gridApiHigh.setRowData(this.openHigh);
+        this.gridApiHigh.setGridOption('rowData', this.openHigh);
         this.gridApiHigh.flashCells();
       } else {
         this.rowDataHigh = this.openHigh;
       }
       
       if (this.gridApiLow) {
-        this.gridApiLow.setRowData(this.openLow);
+        this.gridApiLow.setGridOption('rowData', this.openLow);
         this.gridApiLow.flashCells();
       } else {
         this.rowDataLow = this.openLow;

@@ -1,6 +1,7 @@
 import { AfterViewInit,Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-learn',
   templateUrl: './learn.component.html',
   styleUrls: ['./learn.component.css']

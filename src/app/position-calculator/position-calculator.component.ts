@@ -11,6 +11,7 @@ interface PositionCalculation {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-position-calculator',
   templateUrl: './position-calculator.component.html',
   styleUrls: ['./position-calculator.component.css']

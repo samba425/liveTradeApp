@@ -4,6 +4,7 @@ import { NewsArticle } from '../shared/models/news.model';
 import { Subscription } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.css']

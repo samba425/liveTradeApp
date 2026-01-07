@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, interval } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 interface SectorData {
   name: string;
@@ -16,6 +16,7 @@ interface SectorData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-sector-tracker',
   templateUrl: './sector-tracker.component.html',
   styleUrls: ['./sector-tracker.component.css']
