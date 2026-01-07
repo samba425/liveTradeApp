@@ -44,7 +44,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
       field: "name", 
       resizable:true ,
       sortable: true,
-      width: 180,
+      width: 150,
       pinned: 'left',
       cellStyle: { fontWeight: 'bold', color: '#667eea', cursor: 'pointer', fontSize: '14px' },
       cellRenderer: (params) => {
@@ -65,14 +65,6 @@ export class BankniftyComponent implements OnInit, OnDestroy {
       valueFormatter: p => '₹' + Math.floor(p.value).toLocaleString(),
       cellStyle: { fontWeight: '600' }
     },
-    { 
-      headerName: "📊 VWAP",
-      field: "vwap", 
-      resizable:true ,
-      sortable: true, 
-      width: 110,
-      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
-    },
     {
       headerName: "📊 VWAP Diff",
       field: "vwapDiff", 
@@ -87,6 +79,14 @@ export class BankniftyComponent implements OnInit, OnDestroy {
           return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
         }
       }
+    },
+    { 
+      headerName: "📊 VWAP",
+      field: "vwap", 
+      resizable:true ,
+      sortable: true, 
+      width: 110,
+      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString()
     },
     {
       headerName: "📊 Change %",
@@ -162,6 +162,28 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   banksTrend = 0;
   allbankTrands = 0
   niftyaboveVwap = 0
+  
+  // Getter methods for template
+  get positiveIndicesCount(): number {
+    return this.indexValues.filter(idx => idx.preChange > 0).length;
+  }
+  
+  get totalIndicesCount(): number {
+    return this.indexValues.length;
+  }
+  
+  get overallSentiment(): string {
+    if (this.allbankTrands >= 10 && this.niftyaboveVwap >= 7) return 'Strong';
+    if (this.allbankTrands <= 5 && this.niftyaboveVwap <= 4) return 'Weak';
+    return 'Neutral';
+  }
+  
+  get overallSentimentClass(): string {
+    if (this.allbankTrands >= 10 && this.niftyaboveVwap >= 7) return 'badge-success';
+    if (this.allbankTrands <= 5 && this.niftyaboveVwap <= 4) return 'badge-danger';
+    return 'badge-warning';
+  }
+  
   // latest Volume > latest Sma ( volume,20 ) * 5 
   fetchBank() {
     this.hdfcTrend = 0;

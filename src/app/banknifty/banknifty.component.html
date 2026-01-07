@@ -26,18 +26,33 @@
     </div>
   </div>
 
-  <!-- Header Section -->
+  <!-- Header Section with Market Status -->
   <div class="row mb-4">
     <div class="col-12">
       <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
         <div class="card-body">
-          <h2 class="mb-2">
-            <i [class]="currentView === 'banknifty' ? 'fas fa-chart-line' : 'fas fa-layer-group'"></i> 
-            {{ currentView === 'banknifty' ? 'Market Dashboard - Index Analysis' : 'Market Dashboard - Sector Analysis' }}
-          </h2>
-          <p class="mb-0" style="opacity: 0.9;">
-            {{ currentView === 'banknifty' ? 'Live tracking of Bank Nifty & top market indices' : 'Real-time sector performance & rotation tracking' }}
-          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="mb-2">
+                <i [class]="currentView === 'banknifty' ? 'fas fa-chart-line' : 'fas fa-layer-group'"></i> 
+                {{ currentView === 'banknifty' ? 'Market Dashboard - Index Analysis' : 'Market Dashboard - Sector Analysis' }}
+              </h2>
+              <p class="mb-0" style="opacity: 0.9;">
+                {{ currentView === 'banknifty' ? 'Live tracking of Bank Nifty & top market indices' : 'Real-time sector performance & rotation tracking' }}
+              </p>
+            </div>
+            <div class="text-right" *ngIf="currentView === 'banknifty'">
+              <div class="badge badge-pill px-3 py-2" 
+                   [ngClass]="hdfcTrend >= 1 && banksTrend >= 2 ? 'badge-success' : (hdfcTrend == 0 && banksTrend <= 1 ? 'badge-danger' : 'badge-warning')"
+                   style="font-size: 1rem;">
+                <i class="fas" [ngClass]="hdfcTrend >= 1 && banksTrend >= 2 ? 'fa-arrow-trend-up' : (hdfcTrend == 0 && banksTrend <= 1 ? 'fa-arrow-trend-down' : 'fa-minus')"></i>
+                {{ hdfcTrend >= 1 && banksTrend >= 2 ? 'Bullish' : (hdfcTrend == 0 && banksTrend <= 1 ? 'Bearish' : 'Mixed') }}
+              </div>
+              <div class="mt-2" style="font-size: 0.85rem; opacity: 0.85;">
+                <i class="fas fa-sync-alt"></i> Auto-refresh every 30s
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -46,141 +61,178 @@
   <!-- BANK NIFTY VIEW -->
   <div *ngIf="currentView === 'banknifty'">
   
-  <!-- Trend Indicators Cards -->
+  <!-- Trend Indicators Cards - Simplified -->
   <div class="row mb-4">
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card" style="border-left: 5px solid #10b981;">
+    <!-- Single Combined Trend Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card h-100" [ngStyle]="{'border-left': '5px solid ' + (hdfcTrend >= 1 && banksTrend >= 2 ? '#10b981' : (hdfcTrend == 0 && banksTrend <= 1 ? '#ef4444' : '#f59e0b'))}">
         <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fas fa-chart-line"></i> Full Bullish Trend</h6>
-          <h2 class="mb-0" [ngClass]="hdfcTrend && banksTrend >=2 ? 'text-success' : 'text-muted'">
-            {{ hdfcTrend && banksTrend >=2 ? '✓' : '—' }}
-          </h2>
-          <small *ngIf="hdfcTrend && banksTrend >=2" class="text-success">Strong Bullish Signal</small>
-          <small *ngIf="!(hdfcTrend && banksTrend >=2)" class="text-muted">Not Active</small>
+          <h6 class="text-muted mb-2"><i class="fas fa-chart-pie"></i> Market Trend</h6>
+          <h1 class="mb-2" [ngClass]="hdfcTrend >= 1 && banksTrend >= 2 ? 'text-success' : (hdfcTrend == 0 && banksTrend <= 1 ? 'text-danger' : 'text-warning')" style="font-size: 2.5rem; font-weight: 800;">
+            {{ hdfcTrend >= 1 && banksTrend >= 2 ? 'BULLISH' : (hdfcTrend == 0 && banksTrend <= 1 ? 'BEARISH' : 'MIXED') }}
+          </h1>
+          <div class="mb-2">
+            <span class="badge" [ngClass]="hdfcTrend >= 1 && banksTrend >= 2 ? 'badge-success' : (hdfcTrend == 0 && banksTrend <= 1 ? 'badge-danger' : 'badge-warning')">
+              Top 5: {{hdfcTrend + banksTrend}}/5 Above VWAP
+            </span>
+          </div>
+          <small class="text-muted">HDFC: {{hdfcTrend}}/1 | Others: {{banksTrend}}/4</small>
         </div>
       </div>
     </div>
     
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card" style="border-left: 5px solid #f59e0b;">
+    <!-- Market Breadth -->
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card h-100" style="border-left: 5px solid #6366f1;">
         <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fas fa-arrows-alt-h"></i> Sideways Trend</h6>
-          <h2 class="mb-0" [ngClass]="banksTrend >=2 && !hdfcTrend ? 'text-warning' : 'text-muted'">
-            {{ banksTrend >=2 && !hdfcTrend ? '⚠' : '—' }}
-          </h2>
-          <small *ngIf="banksTrend >=2 && !hdfcTrend" class="text-warning">Mixed Signals</small>
-          <small *ngIf="!(banksTrend >=2 && !hdfcTrend)" class="text-muted">Not Active</small>
+          <h6 class="text-muted mb-2"><i class="fas fa-balance-scale"></i> Market Breadth</h6>
+          <h1 class="mb-2 text-primary" style="font-size: 2.5rem; font-weight: 800;">
+            {{ (allbankTrands / 14 * 100).toFixed(0) }}%
+          </h1>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar" [ngClass]="allbankTrands >= 10 ? 'bg-success' : (allbankTrands >= 7 ? 'bg-warning' : 'bg-danger')"
+                 role="progressbar" [style.width.%]="(allbankTrands / 14 * 100)"></div>
+          </div>
+          <small class="text-muted">{{allbankTrands}} of 14 Banks Above VWAP</small>
         </div>
       </div>
     </div>
     
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card" style="border-left: 5px solid #ef4444;">
+    <!-- Nifty 50 Strength -->
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card h-100" style="border-left: 5px solid #f59e0b;">
         <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fas fa-chart-line fa-rotate-180"></i> Bearish Trend</h6>
-          <h2 class="mb-0" [ngClass]="banksTrend <=2 && !hdfcTrend ? 'text-danger' : 'text-muted'">
-            {{ banksTrend <=2 && !hdfcTrend ? '↓' : '—' }}
-          </h2>
-          <small *ngIf="banksTrend <=2 && !hdfcTrend" class="text-danger">Bearish with HDFC</small>
-          <small *ngIf="!(banksTrend <=2 && !hdfcTrend)" class="text-muted">Not Active</small>
+          <h6 class="text-muted mb-2"><i class="fas fa-trophy"></i> Nifty Top 10</h6>
+          <h1 class="mb-2" [ngClass]="niftyaboveVwap >= 7 ? 'text-success' : (niftyaboveVwap >= 5 ? 'text-warning' : 'text-danger')" style="font-size: 2.5rem; font-weight: 800;">
+            {{niftyaboveVwap}}/10
+          </h1>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar" [ngClass]="niftyaboveVwap >= 7 ? 'bg-success' : (niftyaboveVwap >= 5 ? 'bg-warning' : 'bg-danger')"
+                 role="progressbar" [style.width.%]="(niftyaboveVwap / 10 * 100)"></div>
+          </div>
+          <small class="text-muted">Stocks Above VWAP ({{(niftyaboveVwap / 10 * 100).toFixed(0)}}%)</small>
         </div>
       </div>
     </div>
     
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card" style="border-left: 5px solid #3b82f6;">
+    <!-- Quick Stats -->
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card h-100" style="border-left: 5px solid #8b5cf6;">
         <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fas fa-arrow-up"></i> Above VWAP</h6>
-          <h2 class="mb-0 text-primary">{{ allbankTrands }}</h2>
-          <small class="text-muted">All Banks Above VWAP</small>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Data Grid -->
-  <div class="row mb-4">
-    <div class="col-md-9">
-      <div class="card">
-        <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-          <h5 class="mb-0"><i class="fas fa-table"></i> Bank Nifty Constituents</h5>
-        </div>
-        <div class="card-body">
-          <ag-grid-angular 
-            class="ag-theme-balham" 
-            style="height:400px;width: 100%" 
-            [rowData]="rowData"
-            [rowSelection]="rowSelection" 
-            [pagination]="pagination" 
-            [defaultColDef]="defaultColDef"
-            [paginationPageSize]="paginationPageSize"
-            [domLayout]="'normal'" 
-            [columnDefs]="colDefs">
-          </ag-grid-angular>
-        </div>
-      </div>
-    </div>
-    <!-- Indices Summary Table -->
-    <div class="col-md-3">
-      <div class="card">
-        <div class="card-header bg-info text-white">
-          <h6 class="mb-0"><i class="fas fa-list"></i> Indices Summary</h6>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0">
-            <thead style="background: #f8f9fa;">
-              <tr>
-                <th style="font-size: 0.85rem;">Index</th>
-                <th style="font-size: 0.85rem;">Price</th>
-                <th style="font-size: 0.85rem;">Change%</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of indexValues">
-                <td style="font-weight: 600; font-size: 0.9rem;">{{item.name}}</td>
-                <td style="font-size: 0.9rem;">{{item.close | number : '1.2-2'}}</td>
-                <td style="font-size: 0.9rem;" [ngClass]="item.preChange > 0 ? 'text-success' : 'text-danger'">
-                  <strong>{{item.preChange | number : '1.2-2'}}%</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Top 5 Banks Strength Card -->
-      <div class="card mt-3">
-        <div class="card-body text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 0.25rem;">
-          <h6 class="mb-2"><i class="fas fa-medal"></i> Top 5 Banks Strength</h6>
-          <h2 class="mb-0" style="font-weight: 800;">{{ banksTrend + hdfcTrend }} / 5</h2>
-          <small style="opacity: 0.9;">Banks trading above VWAP</small>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Nifty Top 10 Section -->
-  <div class="row mt-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header text-white" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-trophy"></i> Nifty Top 10 Stocks</h5>
-            <span class="badge badge-light">{{niftyaboveVwap}} / 10 Above VWAP</span>
+          <h6 class="text-muted mb-2"><i class="fas fa-info-circle"></i> Quick Stats</h6>
+          <div class="mb-3">
+            <small class="text-muted d-block mb-1">Indices Positive</small>
+            <h3 class="mb-0" [ngClass]="positiveIndicesCount > 0 ? 'text-success' : 'text-muted'" style="font-weight: 700;">
+              {{ positiveIndicesCount }}/{{ totalIndicesCount }}
+            </h3>
+          </div>
+          <div>
+            <small class="text-muted d-block mb-1">Overall Sentiment</small>
+            <span class="badge badge-pill px-3 py-2" 
+                  [ngStyle]="{
+                    'background-color': overallSentiment === 'Strong' ? '#10b981' : (overallSentiment === 'Weak' ? '#ef4444' : '#f59e0b'),
+                    'color': 'white'
+                  }"
+                  style="font-size: 0.9rem; font-weight: 600;">
+              {{ overallSentiment }}
+            </span>
           </div>
         </div>
-        <div class="card-body">
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Data - All in One Row -->
+  <div class="row mb-4">
+    <!-- Bank Nifty Constituents -->
+    <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+      <div class="card h-100">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fas fa-table"></i> Bank Nifty</h6>
+            <span class="badge badge-light" style="font-size: 0.75rem;">{{allbankTrands}}/14 VWAP</span>
+          </div>
+        </div>
+        <div class="card-body p-0">
           <ag-grid-angular 
             class="ag-theme-balham" 
-            style="height:400px;width: 100%"
-            [rowData]="rowTopData"
+            style="height:450px;width: 100%" 
+            [rowData]="rowData"
             [rowSelection]="rowSelection" 
-            [pagination]="pagination" 
+            [pagination]="false" 
             [defaultColDef]="defaultColDef"
-            [paginationPageSize]="paginationPageSize"
             [domLayout]="'normal'" 
             [columnDefs]="colDefs">
           </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Nifty Top 10 Stocks -->
+    <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+      <div class="card h-100">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fas fa-trophy"></i> Nifty Top 10</h6>
+            <span class="badge badge-light" style="font-size: 0.75rem;">{{niftyaboveVwap}}/10 VWAP</span>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <ag-grid-angular 
+            class="ag-theme-balham" 
+            style="height:450px;width: 100%"
+            [rowData]="rowTopData"
+            [rowSelection]="rowSelection" 
+            [pagination]="false" 
+            [defaultColDef]="defaultColDef"
+            [domLayout]="'normal'" 
+            [columnDefs]="colDefs">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indices Summary & Bank Strength -->
+    <div class="col-lg-4 col-md-12">
+      <div class="row h-100">
+        <!-- Indices Summary -->
+        <div class="col-12 mb-3">
+          <div class="card">
+            <div class="card-header bg-info text-white">
+              <h6 class="mb-0"><i class="fas fa-list"></i> Indices Summary</h6>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover table-sm mb-0">
+                <thead style="background: #f8f9fa;">
+                  <tr>
+                    <th style="font-size: 0.8rem;">Index</th>
+                    <th style="font-size: 0.8rem;">Price</th>
+                    <th style="font-size: 0.8rem;">Change%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of indexValues">
+                    <td style="font-weight: 600; font-size: 0.85rem;">{{item.name}}</td>
+                    <td style="font-size: 0.85rem;">{{item.close | number : '1.2-2'}}</td>
+                    <td style="font-size: 0.85rem;" [ngClass]="item.preChange > 0 ? 'text-success' : 'text-danger'">
+                      <strong>{{item.preChange | number : '1.2-2'}}%</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top 5 Banks Strength Card -->
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 0.25rem; min-height: 200px;">
+              <h6 class="mb-3"><i class="fas fa-medal"></i> Top 5 Banks Strength</h6>
+              <h1 class="mb-2" style="font-weight: 800; font-size: 3rem;">{{ banksTrend + hdfcTrend }} / 5</h1>
+              <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Banks trading above VWAP</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
