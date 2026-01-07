@@ -19,11 +19,11 @@ import { PositionCalculatorComponent } from './position-calculator/position-calc
   ],
   imports: [
     RouterModule.forRoot([
-      { path: '',redirectTo: '/BankNifty', pathMatch: 'full'},
+      { path: '',redirectTo: '/home', pathMatch: 'full'},
       { path: 'volume-shocker', component: VolumeshockersComponent},
       { path: 'openhighlow', component: OpenHighCloseComponent },
       { path: 'sma', component: SimpleMovingComponent },
-      { path: 'BankNifty', component: BankniftyComponent },
+      { path: 'home', component: BankniftyComponent },
       { path: 'bb', component: BBComponent },
       { path: 'learn', component: LearnComponent },
       { path: 'watchlist', component: WatchlistComponent },
@@ -32,7 +32,7 @@ import { PositionCalculatorComponent } from './position-calculator/position-calc
       { path: 'stock/:symbol', component: StockDetailComponent },
       { path: 'sectors', component: SectorTrackerComponent },
       { path: 'calculator', component: PositionCalculatorComponent },
-      { path: '**', redirectTo: '/BankNifty', pathMatch: 'full' },
+      { path: '**', redirectTo: '/home', pathMatch: 'full' },
     ])
   ],
   exports: [

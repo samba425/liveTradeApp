@@ -219,7 +219,10 @@
             [defaultColDef]="defaultColDef"
             [paginationPageSize]="paginationPageSize"
             [columnDefs]="colDefsOpenHigh"
-            [domLayout]="'normal'">
+            [rowHeight]="rowHeight"
+            [headerHeight]="headerHeight"
+            [domLayout]="'normal'"
+            (gridReady)="onGridReadyHigh($event)">
           </ag-grid-angular>
         </div>
       </div>
@@ -252,7 +255,10 @@
             [pagination]="pagination" 
             [paginationPageSize]="paginationPageSize"
             [columnDefs]="colDefsOpenHigh"
-            [domLayout]="'normal'">
+            [rowHeight]="rowHeight"
+            [headerHeight]="headerHeight"
+            [domLayout]="'normal'"
+            (gridReady)="onGridReadyLow($event)">
           </ag-grid-angular>
         </div>
       </div>

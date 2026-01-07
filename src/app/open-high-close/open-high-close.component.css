@@ -14,3 +14,71 @@
   background: rgba(255, 255, 255, 0.2) !important;
   color: white;
 }
+
+/* AG-Grid Row Height Fix */
+::ng-deep .ag-theme-balham .ag-row {
+  height: 42px !important;
+  min-height: 42px !important;
+  line-height: 42px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+::ng-deep .ag-theme-balham .ag-header-row {
+  height: 45px !important;
+  min-height: 45px !important;
+}
+
+::ng-deep .ag-theme-balham .ag-cell {
+  line-height: 42px !important;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  border-right: 1px solid #e2e8f0;
+}
+
+::ng-deep .ag-theme-balham .ag-header-cell {
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Prevent row overlap */
+::ng-deep .ag-theme-balham .ag-center-cols-container {
+  min-height: 100%;
+}
+
+::ng-deep .ag-theme-balham .ag-row-odd {
+  background-color: #f9fafb;
+}
+
+::ng-deep .ag-theme-balham .ag-row-even {
+  background-color: #ffffff;
+}
+
+::ng-deep .ag-theme-balham .ag-row:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Fix grid container */
+::ng-deep .ag-theme-balham {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+::ng-deep .ag-theme-balham .ag-root-wrapper {
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+/* Ensure proper cell rendering */
+::ng-deep .ag-theme-balham .ag-cell-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Fix for text overflow */
+::ng-deep .ag-theme-balham .ag-cell-value {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

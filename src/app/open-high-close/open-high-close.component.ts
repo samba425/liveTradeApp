@@ -20,6 +20,15 @@ export class OpenHighCloseComponent implements OnInit {
     resizable: true,
     sortable: true,
   };
+  
+  // Row height configuration to prevent overlapping
+  public rowHeight = 42;
+  public headerHeight = 45;
+  
+  // Grid APIs to prevent full re-render on updates
+  private gridApiHigh: GridApi;
+  private gridApiLow: GridApi;
+  
   inputValue: any = []
   rowData = [];
   rowDataHigh = [];
@@ -391,11 +400,33 @@ export class OpenHighCloseComponent implements OnInit {
     console.log('Sample Open High item:', this.openHigh[0]);
     
     setTimeout(() => {
-      this.rowDataHigh = this.openHigh;
-      this.rowDataLow = this.openLow;
+      // Update data using Grid API to prevent re-render
+      if (this.gridApiHigh) {
+        this.gridApiHigh.setRowData(this.openHigh);
+        this.gridApiHigh.flashCells();
+      } else {
+        this.rowDataHigh = this.openHigh;
+      }
+      
+      if (this.gridApiLow) {
+        this.gridApiLow.setRowData(this.openLow);
+        this.gridApiLow.flashCells();
+      } else {
+        this.rowDataLow = this.openLow;
+      }
+      
       console.log('RowDataHigh Count:', this.rowDataHigh.length);
       console.log('RowDataLow Count:', this.rowDataLow.length);
     }, 100);
+  }
+
+  // Grid ready event handlers
+  onGridReadyHigh(params: any) {
+    this.gridApiHigh = params.api;
+  }
+
+  onGridReadyLow(params: any) {
+    this.gridApiLow = params.api;
   }
 
 }

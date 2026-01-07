@@ -25,6 +25,7 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
   isLoading = true;
   errorMessage = '';
   lastUpdated: Date;
+  gridApi: any;
   
   private refreshSubscription: Subscription;
   private readonly REFRESH_INTERVAL = 30000; // 30 seconds
@@ -206,7 +207,13 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       resizable: true
     },
     rowHeight: 45,
-    headerHeight: 50
+    headerHeight: 50,
+    onGridReady: (params) => {
+      this.gridApi = params.api;
+    },
+    // Prevent full re-render on data update
+    suppressAnimationFrame: false,
+    animateRows: true
   };
 
   constructor(private http: HttpClient) {}
@@ -226,14 +233,17 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
   }
 
   loadSectorData() {
-    this.isLoading = true;
+    // Don't show loading spinner on refresh, only on initial load
+    if (!this.lastUpdated) {
+      this.isLoading = true;
+    }
     this.errorMessage = '';
     
     // Use optimized NSE Sector API - returns pre-calculated sector data
     this.http.get(`${environment.baseUrl}nse/sectors`).toPromise()
       .then((response: any) => {
         if (response && response.status === 'success' && response.data) {
-          this.sectors = response.data;
+          this.updateSectorData(response.data);
           this.isLoading = false;
           this.lastUpdated = new Date();
         } else {
@@ -249,6 +259,19 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       });
   }
 
+  updateSectorData(newData: SectorData[]) {
+    if (this.gridApi) {
+      // Update existing data without re-rendering entire grid
+      this.sectors = newData.sort((a, b) => b.avgChange - a.avgChange);
+      this.gridApi.setRowData(this.sectors);
+      // Flash updated cells to show changes (without parameters as they're not supported in this version)
+      this.gridApi.flashCells();
+    } else {
+      // Initial load
+      this.sectors = newData.sort((a, b) => b.avgChange - a.avgChange);
+    }
+  }
+
   loadSectorDataFallback() {
     // Original method as fallback
     this.http.get(`${environment.baseUrl}getData`).toPromise()
@@ -261,7 +284,7 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
           return this.processSectorData(sectorKey, sector.name, sector.stocks, allStocks);
         });
         
-        this.sectors = sectorResults.sort((a, b) => b.avgChange - a.avgChange);
+        this.updateSectorData(sectorResults);
         this.isLoading = false;
         this.lastUpdated = new Date();
       })
