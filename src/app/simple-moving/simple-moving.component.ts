@@ -452,7 +452,9 @@ export class SimpleMovingComponent implements OnInit {
       try {
         this.query ? this.query : "res['close'] > 1"
         this.allData.forEach((res) => {
-          if (eval(`${this.query}`)) {
+          // Use Function constructor instead of eval for safer evaluation
+          const evaluator = new Function('res', `return ${this.query}`);
+          if (evaluator(res)) {
             this.filterData.push(res);
           }
         });

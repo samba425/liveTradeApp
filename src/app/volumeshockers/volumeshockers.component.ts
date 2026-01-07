@@ -471,8 +471,11 @@ export class VolumeshockersComponent implements OnInit {
         try {
           this.query ? this.query : "res['close'] > 1"
           this.allData.forEach((res) => {
-            if (eval(`${this.query}`)) {
-              console.log('-eval(`${this.query}`)',eval(`${this.query}`))
+            // Use Function constructor instead of eval for safer evaluation
+            const evaluator = new Function('res', `return ${this.query}`);
+            const result = evaluator(res);
+            if (result) {
+              console.log('-query result:', result);
               filterData.push(res);
             }
           });
