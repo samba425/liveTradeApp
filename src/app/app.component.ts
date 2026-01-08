@@ -14,6 +14,8 @@ export class AppComponent implements OnInit, OnDestroy {
   isbankNifty;
   currentValue = "NIFTY"
   private marketStatusSubscription: Subscription;
+  serverStatus: string = 'idle';
+  showServerWarning: boolean = false;
   
   sectorList = [
     "Energy Minerals",
@@ -39,7 +41,19 @@ export class AppComponent implements OnInit, OnDestroy {
     "Utilities"]
     
   constructor(private commonService: CommonserviceService,private router: Router,private activatedRoute:ActivatedRoute) {
-    this.refreshdata()
+    // Wake up the server first (important for Render.com cold starts)
+    this.commonService.wakeUpServer();
+    
+    // Subscribe to server status
+    this.commonService.getServerStatus.subscribe(status => {
+      this.serverStatus = status;
+      this.showServerWarning = (status === 'warming');
+    });
+    
+    // Delay data fetch slightly to allow server wake up
+    setTimeout(() => {
+      this.refreshdata();
+    }, 2000);
     
     
     router.events.subscribe((event) => {

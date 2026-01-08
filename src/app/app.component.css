@@ -33,6 +33,18 @@ span {
   animation: pulse 2s infinite;
 }
 
+/* Server Warming Animation */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.alert-info {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background-size: 2000px 100%;
+}
+
 /* Sticky Navbar Shadow on Scroll */
 .navbar.scrolled {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;

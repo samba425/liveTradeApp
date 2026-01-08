@@ -1,4 +1,11 @@
 <body>
+  <!-- Server Status Warning Banner -->
+  <div *ngIf="showServerWarning" class="alert alert-info alert-dismissible fade show" role="alert" 
+       style="margin: 0; border-radius: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; text-align: center;">
+    <strong>🔄 Server is warming up...</strong> Please wait a moment while we fetch the latest data. This may take up to 30 seconds.
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  
   <!-- Modern Sticky Navigation with Gradient -->
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
     <div class="container-fluid">

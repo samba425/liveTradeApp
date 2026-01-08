@@ -137,6 +137,12 @@ async function fetchTradingViewData(indexType) {
 	let result = await request(reqObj);
 	return result
 }
+
+// Health check endpoint for server wake-up
+app.get('/health', (req, res) => {
+	res.status(200).send('OK');
+});
+
 app.get('/getData', async (req, res) => {
 	// res.send('hello...')
 	console.log('req.query:', req.query, req.params)
