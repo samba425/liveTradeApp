@@ -168,7 +168,7 @@ export class SimpleMovingComponent implements OnInit {
       field: "pattern",
       resizable: true,
       sortable: true,
-      width: 160,
+      width: 180,
       filter: "agTextColumnFilter",
       hide: true,
       cellStyle: params => {
@@ -178,6 +178,10 @@ export class SimpleMovingComponent implements OnInit {
         if (pattern.includes('Bullish Hammer')) return { backgroundColor: '#dcfce7', color: '#15803d', fontWeight: 'bold' };
         if (pattern.includes('Bearish Hammer')) return { backgroundColor: '#fed7aa', color: '#9a3412', fontWeight: 'bold' };
         if (pattern.includes('Inverted')) return { backgroundColor: '#e0e7ff', color: '#3730a3', fontWeight: 'bold' };
+        if (pattern.includes('Shooting Star')) return { backgroundColor: '#fecaca', color: '#7f1d1d', fontWeight: 'bold' };
+        if (pattern.includes('Spinning Top')) return { backgroundColor: '#fef3c7', color: '#78350f', fontWeight: 'bold' };
+        if (pattern.includes('Strong Bullish Cross')) return { backgroundColor: '#bbf7d0', color: '#14532d', fontWeight: 'bold' };
+        if (pattern.includes('Bullish Marubozu')) return { backgroundColor: '#bfdbfe', color: '#1e3a8a', fontWeight: 'bold' };
         if (pattern.includes('Classic')) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: 'bold' };
         return { color: '#9ca3af' };
       }
@@ -591,14 +595,15 @@ export class SimpleMovingComponent implements OnInit {
     });
     console.log('Pattern breakdown:', patternCounts);
 
-    // Show pattern columns
-    this.showPatternColumns();
-
     // Show high-quality patterns by default
     this.showingPatterns = true;
     this.rowData = []
     setTimeout(() => {
       this.rowData = this.smaPatterns
+      // Show pattern columns after grid is ready
+      setTimeout(() => {
+        this.showPatternColumns();
+      }, 200);
     }, 100)
   }
 
@@ -728,6 +733,72 @@ export class SimpleMovingComponent implements OnInit {
     return { isInverted: false, type: '' };
   }
 
+  isShootingStar(open: number, close: number, high: number, low: number): { isShootingStar: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+
+    if (totalRange === 0 || bodySize === 0) return { isShootingStar: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const upperShadowRatio = upperShadow / bodySize;
+    const lowerShadowRatio = lowerShadow / bodySize;
+    const bodyPosition = ((Math.min(open, close) - low) / totalRange) * 100;
+
+    // Shooting Star: Small body at bottom (60%+ down), long upper shadow, bearish
+    if (bodyPercent >= 10 && bodyPercent <= 35 && upperShadowRatio >= 2 && lowerShadowRatio <= 0.5 && bodyPosition <= 40) {
+      return { isShootingStar: true, type: 'Shooting Star' };
+    }
+
+    return { isShootingStar: false, type: '' };
+  }
+
+  isSpinningTop(open: number, close: number, high: number, low: number): { isSpinning: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+
+    if (totalRange === 0) return { isSpinning: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const upperShadowPercent = (upperShadow / totalRange) * 100;
+    const lowerShadowPercent = (lowerShadow / totalRange) * 100;
+
+    // Spinning Top: Small body (5-20%), both shadows significant (20%+)
+    if (bodyPercent >= 5 && bodyPercent <= 20 && upperShadowPercent >= 20 && lowerShadowPercent >= 20) {
+      return { isSpinning: true, type: 'Spinning Top' };
+    }
+
+    return { isSpinning: false, type: '' };
+  }
+
+  isBullishEngulfing(open: number, close: number, high: number, low: number): { isEngulfing: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+
+    if (totalRange === 0) return { isEngulfing: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+    const upperShadowPercent = (upperShadow / totalRange) * 100;
+    const lowerShadowPercent = (lowerShadow / totalRange) * 100;
+
+    // Strong Bullish Candle: Large body (50%+), close > open, small shadows
+    if (close > open && bodyPercent >= 50 && upperShadowPercent <= 25 && lowerShadowPercent <= 25) {
+      // Extra strong if open near low (crossing from bottom)
+      const openPosition = ((open - low) / totalRange) * 100;
+      if (openPosition <= 30) {
+        return { isEngulfing: true, type: 'Strong Bullish Cross' };
+      }
+      return { isEngulfing: true, type: 'Bullish Marubozu' };
+    }
+
+    return { isEngulfing: false, type: '' };
+  }
+
   getPatternStrength(stock: any): { pattern: string, strength: number, isBullish: boolean, smaPosition: string } {
     const { open, close, high, low, godFather } = stock;
     
@@ -757,6 +828,30 @@ export class SimpleMovingComponent implements OnInit {
     if (invertedResult.isInverted) {
       pattern = invertedResult.type;
       baseStrength = 65;
+      isBullish = true;
+    }
+
+    // Check Shooting Star
+    const shootingStarResult = this.isShootingStar(open, close, high, low);
+    if (shootingStarResult.isShootingStar) {
+      pattern = shootingStarResult.type;
+      baseStrength = 60;
+      isBullish = false;
+    }
+
+    // Check Spinning Top
+    const spinningTopResult = this.isSpinningTop(open, close, high, low);
+    if (spinningTopResult.isSpinning) {
+      pattern = spinningTopResult.type;
+      baseStrength = 55;
+      isBullish = false; // Neutral/indecision
+    }
+
+    // Check Bullish Engulfing/Strong Cross
+    const engulfingResult = this.isBullishEngulfing(open, close, high, low);
+    if (engulfingResult.isEngulfing) {
+      pattern = engulfingResult.type;
+      baseStrength = engulfingResult.type === 'Strong Bullish Cross' ? 85 : 75;
       isBullish = true;
     }
 
@@ -800,6 +895,10 @@ export class SimpleMovingComponent implements OnInit {
     this.rowData = [];
     setTimeout(() => {
       this.rowData = this.filteredallData;
+      // Keep pattern columns visible
+      setTimeout(() => {
+        this.showPatternColumns();
+      }, 100);
     }, 100);
   }
 
@@ -808,6 +907,10 @@ export class SimpleMovingComponent implements OnInit {
     this.rowData = [];
     setTimeout(() => {
       this.rowData = this.smaPatterns;
+      // Keep pattern columns visible
+      setTimeout(() => {
+        this.showPatternColumns();
+      }, 100);
     }, 100);
   }
 
