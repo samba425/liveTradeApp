@@ -75,7 +75,18 @@
     <div class="col-sm-5">
       <ul class="list-group m-1">
         <li class="list-group-item list-group-item-success">
-          <h3>BB Filter List</h3>
+          <h3>
+            <span *ngIf="showingPatterns">🎯 Best Patterns (Doji/Hammer)</span>
+            <span *ngIf="!showingPatterns">📊 All BB Filter Results</span>
+            <span class="badge badge-success ml-2" *ngIf="showingPatterns">{{ dojjiHammer.length }} high-quality</span>
+            <span class="badge badge-primary ml-2" *ngIf="!showingPatterns">{{ filteredallData.length }} stocks</span>
+          </h3>
+          <small class="text-muted" *ngIf="showingPatterns">
+            Showing patterns with strength ≥50 • Total filtered: {{ filteredallData.length }} stocks
+          </small>
+          <small class="text-muted" *ngIf="!showingPatterns">
+            All stocks touching BB lower band • High-quality patterns: {{ dojjiHammer.length }}
+          </small>
         </li>
       </ul>
     </div>
@@ -86,7 +97,12 @@
 
     <div class="col-sm-2" role="group" >
       <button class="btn m-1  btn-warning" (click)="onBtnExportFiltered()">Download CSV</button>
-      <button class="btn  m-1 btn-success" (click)="onlyDojiHammer()">filter</button> 
+      <button class="btn m-1 btn-info" (click)="showAllFiltered()" *ngIf="showingPatterns && dojjiHammer.length > 0">
+        📊 Show All ({{ filteredallData.length }})
+      </button>
+      <button class="btn m-1 btn-success" (click)="onlyDojiHammer()" *ngIf="!showingPatterns && dojjiHammer.length > 0">
+        🎯 Best Patterns ({{ dojjiHammer.length }})
+      </button>
     </div>
   </div>
   <div class="example-wrapper">

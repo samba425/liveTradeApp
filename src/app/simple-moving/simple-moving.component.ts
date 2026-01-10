@@ -164,6 +164,81 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
+      headerName: "🕯️ Pattern",
+      field: "pattern",
+      resizable: true,
+      sortable: true,
+      width: 160,
+      filter: "agTextColumnFilter",
+      hide: true,
+      cellStyle: params => {
+        const pattern = params.value || 'No Pattern';
+        if (pattern.includes('Dragonfly')) return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        if (pattern.includes('Gravestone')) return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        if (pattern.includes('Bullish Hammer')) return { backgroundColor: '#dcfce7', color: '#15803d', fontWeight: 'bold' };
+        if (pattern.includes('Bearish Hammer')) return { backgroundColor: '#fed7aa', color: '#9a3412', fontWeight: 'bold' };
+        if (pattern.includes('Inverted')) return { backgroundColor: '#e0e7ff', color: '#3730a3', fontWeight: 'bold' };
+        if (pattern.includes('Classic')) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: 'bold' };
+        return { color: '#9ca3af' };
+      }
+    },
+    {
+      headerName: "💪 Strength",
+      field: "strength",
+      resizable: true,
+      sortable: true,
+      width: 120,
+      filter: "agNumberColumnFilter",
+      hide: true,
+      valueFormatter: p => {
+        if (!p.value) return '-';
+        const strength = p.value;
+        if (strength >= 85) return `${strength} 🔥`;
+        if (strength >= 75) return `${strength} ✅`;
+        if (strength >= 65) return `${strength} 👍`;
+        if (strength >= 55) return `${strength} 👌`;
+        return `${strength}`;
+      },
+      cellStyle: params => {
+        const strength = params.value || 0;
+        if (strength >= 85) return { backgroundColor: '#dcfce7', color: '#15803d', fontWeight: 'bold' };
+        if (strength >= 75) return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: 'bold' };
+        if (strength >= 65) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: 'bold' };
+        return {};
+      }
+    },
+    {
+      headerName: "📍 SMA Position",
+      field: "smaPosition",
+      resizable: true,
+      sortable: true,
+      width: 160,
+      filter: "agTextColumnFilter",
+      hide: true,
+      cellStyle: params => {
+        const position = params.value || '';
+        if (position.includes('Bouncing Above')) return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        if (position.includes('Testing Below')) return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        if (position.includes('On SMA200')) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: 'bold' };
+        return {};
+      }
+    },
+    {
+      headerName: "🎯 Signal",
+      field: "signal",
+      resizable: true,
+      sortable: true,
+      width: 110,
+      filter: "agTextColumnFilter",
+      hide: true,
+      cellStyle: params => {
+        const signal = params.value || '';
+        if (signal.includes('Bullish')) return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        if (signal.includes('Bearish')) return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        return {};
+      }
+    },
+    {
       headerName: "📦 Volume",
       field: "volume", 
       resizable: true, 
@@ -297,6 +372,11 @@ export class SimpleMovingComponent implements OnInit {
   maxPriceFilter: number = 200000;
   filteredByPriceCount: number = 0;
   activeSlider: 'min' | 'max' = 'max';
+  
+  // Pattern detection properties
+  filteredallData = [];
+  smaPatterns = [];
+  showingPatterns = true;
 
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
@@ -402,6 +482,10 @@ export class SimpleMovingComponent implements OnInit {
     );
     
     this.filteredByPriceCount = filtered.length;
+    
+    // Hide pattern columns for price filter
+    this.hidePatternColumns();
+    
     this.rowData = [];
     setTimeout(() => {
       this.rowData = filtered;
@@ -426,6 +510,9 @@ export class SimpleMovingComponent implements OnInit {
   reset() {
     this.rowData = []
     this.calculatePriceRange(); // Reset price sliders
+    
+    // Hide pattern columns on reset
+    this.hidePatternColumns();
     
     setTimeout(() => {
       this.rowData = this.allData
@@ -467,15 +554,51 @@ export class SimpleMovingComponent implements OnInit {
   
   nearSMA() {
     this.filterData = []
+    this.filteredallData = []
+    this.smaPatterns = []
+    
     this.allData.forEach((res) => {
       if (res['low'] <= res['godFather'] && res['close'] >= res['godFather'] && res['volume'] >= 200000) {
-        this.filterData.push(res);
+        // Add pattern analysis to each stock
+        const patternData = this.getPatternStrength(res);
+        const enhancedStock = {
+          ...res,
+          pattern: patternData.pattern,
+          strength: patternData.strength,
+          signal: patternData.isBullish ? '🟢 Bullish' : '🔴 Bearish',
+          smaPosition: patternData.smaPosition
+        };
+        
+        this.filteredallData.push(enhancedStock);
+        
+        // Only add high-quality patterns (strength >= 50)
+        if (patternData.strength >= 50) {
+          this.smaPatterns.push(enhancedStock);
+        }
       }
     });
 
+    // Log pattern breakdown
+    console.log('=== SMA200 Pattern Analysis ===');
+    console.log('Total stocks near SMA200:', this.filteredallData.length);
+    console.log('High-quality patterns (≥50 strength):', this.smaPatterns.length);
+    console.log('Weak patterns:', this.filteredallData.length - this.smaPatterns.length);
+    
+    const patternCounts = {};
+    this.filteredallData.forEach(stock => {
+      const pattern = stock.pattern || 'Unknown';
+      patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
+    });
+    console.log('Pattern breakdown:', patternCounts);
+
+    // Show pattern columns
+    this.showPatternColumns();
+
+    // Show high-quality patterns by default
+    this.showingPatterns = true;
     this.rowData = []
     setTimeout(() => {
-      this.rowData = this.filterData
+      this.rowData = this.smaPatterns
     }, 100)
   }
 
@@ -486,6 +609,9 @@ export class SimpleMovingComponent implements OnInit {
         this.filterData.push(res);
       }
     });
+
+    // Hide pattern columns for this filter
+    this.hidePatternColumns();
 
     this.rowData = []
     setTimeout(() => {
@@ -516,6 +642,9 @@ export class SimpleMovingComponent implements OnInit {
           }
         });
 
+        // Hide pattern columns for query search
+        this.hidePatternColumns();
+
         this.rowData = []
         setTimeout(() => {
           this.rowData = this.filterData
@@ -525,6 +654,172 @@ export class SimpleMovingComponent implements OnInit {
       }
     } else {
       alert('Empty Query')
+    }
+  }
+
+  // Pattern Detection Methods (same as BB component)
+  isDoji(open: number, close: number, high: number, low: number): { isDoji: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+
+    if (totalRange === 0) return { isDoji: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const upperShadowPercent = (upperShadow / totalRange) * 100;
+    const lowerShadowPercent = (lowerShadow / totalRange) * 100;
+
+    // Dragonfly Doji: Long lower shadow, no/tiny upper shadow
+    if (bodyPercent <= 5 && upperShadowPercent <= 10 && lowerShadowPercent >= 60) {
+      return { isDoji: true, type: 'Dragonfly Doji' };
+    }
+
+    // Gravestone Doji: Long upper shadow, no/tiny lower shadow
+    if (bodyPercent <= 5 && lowerShadowPercent <= 10 && upperShadowPercent >= 60) {
+      return { isDoji: true, type: 'Gravestone Doji' };
+    }
+
+    // Classic Doji: Small body with balanced shadows
+    if (bodyPercent <= 5 && upperShadowPercent >= 20 && lowerShadowPercent >= 20) {
+      return { isDoji: true, type: 'Classic Doji' };
+    }
+
+    return { isDoji: false, type: '' };
+  }
+
+  isHammer(open: number, close: number, high: number, low: number): { isHammer: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+
+    if (totalRange === 0 || bodySize === 0) return { isHammer: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const lowerShadowRatio = lowerShadow / bodySize;
+    const upperShadowRatio = upperShadow / bodySize;
+
+    // Bullish Hammer: Small body at top, long lower shadow
+    if (bodyPercent >= 10 && bodyPercent <= 35 && lowerShadowRatio >= 2 && upperShadowRatio <= 0.5) {
+      return { isHammer: true, type: close > open ? 'Bullish Hammer' : 'Bearish Hammer' };
+    }
+
+    return { isHammer: false, type: '' };
+  }
+
+  isInvertedHammer(open: number, close: number, high: number, low: number): { isInverted: boolean, type: string } {
+    const bodySize = Math.abs(close - open);
+    const totalRange = high - low;
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+
+    if (totalRange === 0 || bodySize === 0) return { isInverted: false, type: '' };
+
+    const bodyPercent = (bodySize / totalRange) * 100;
+    const upperShadowRatio = upperShadow / bodySize;
+    const lowerShadowRatio = lowerShadow / bodySize;
+
+    // Inverted Hammer: Small body at bottom, long upper shadow
+    if (bodyPercent >= 10 && bodyPercent <= 35 && upperShadowRatio >= 2 && lowerShadowRatio <= 0.5) {
+      return { isInverted: true, type: 'Inverted Hammer' };
+    }
+
+    return { isInverted: false, type: '' };
+  }
+
+  getPatternStrength(stock: any): { pattern: string, strength: number, isBullish: boolean, smaPosition: string } {
+    const { open, close, high, low, godFather } = stock;
+    
+    let pattern = 'No Pattern';
+    let baseStrength = 0;
+    let isBullish = false;
+    let smaPosition = '';
+
+    // Check Doji
+    const dojiResult = this.isDoji(open, close, high, low);
+    if (dojiResult.isDoji) {
+      pattern = dojiResult.type;
+      baseStrength = 70;
+      isBullish = dojiResult.type === 'Dragonfly Doji';
+    }
+
+    // Check Hammer
+    const hammerResult = this.isHammer(open, close, high, low);
+    if (hammerResult.isHammer) {
+      pattern = hammerResult.type;
+      baseStrength = 75;
+      isBullish = hammerResult.type === 'Bullish Hammer';
+    }
+
+    // Check Inverted Hammer
+    const invertedResult = this.isInvertedHammer(open, close, high, low);
+    if (invertedResult.isInverted) {
+      pattern = invertedResult.type;
+      baseStrength = 65;
+      isBullish = true;
+    }
+
+    // Calculate SMA200 position
+    const distanceFromSMA200 = Math.abs(((close - godFather) / godFather) * 100);
+    
+    if (low <= godFather && close >= godFather) {
+      smaPosition = 'Bouncing Above 🟢';
+      baseStrength += 15;
+      isBullish = true;
+    } else if (high >= godFather && close <= godFather) {
+      smaPosition = 'Testing Below 🔴';
+      baseStrength += 10;
+      isBullish = false;
+    } else if (distanceFromSMA200 <= 1) {
+      smaPosition = 'On SMA200 🟡';
+      baseStrength += 5;
+    } else if (close > godFather) {
+      smaPosition = `Above (+${distanceFromSMA200.toFixed(1)}%)`;
+    } else {
+      smaPosition = `Below (-${distanceFromSMA200.toFixed(1)}%)`;
+    }
+
+    // Bonus for tight distance to SMA200
+    if (distanceFromSMA200 <= 0.5) {
+      baseStrength += 10;
+    } else if (distanceFromSMA200 <= 1) {
+      baseStrength += 5;
+    }
+
+    return {
+      pattern,
+      strength: Math.min(baseStrength, 100),
+      isBullish,
+      smaPosition
+    };
+  }
+
+  showAllFiltered() {
+    this.showingPatterns = false;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = this.filteredallData;
+    }, 100);
+  }
+
+  showPatternsOnly() {
+    this.showingPatterns = true;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = this.smaPatterns;
+    }, 100);
+  }
+
+  showPatternColumns() {
+    if (this.gridApi) {
+      this.gridApi.setColumnsVisible(['pattern', 'strength', 'smaPosition', 'signal'], true);
+    }
+  }
+
+  hidePatternColumns() {
+    if (this.gridApi) {
+      this.gridApi.setColumnsVisible(['pattern', 'strength', 'smaPosition', 'signal'], false);
     }
   }
 

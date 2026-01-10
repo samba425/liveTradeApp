@@ -160,8 +160,27 @@
       <div class="card">
         <div class="card-header text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-table"></i> SMA Analysis Results</h5>
-            <span class="badge badge-light">{{rowData.length}} stocks</span>
+            <h5 class="mb-0">
+              <i class="fas fa-table"></i> 
+              {{ showingPatterns ? '🎯 Best SMA200 Patterns' : '📊 All SMA200 Filter Results' }}
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+              <button 
+                *ngIf="!showingPatterns && smaPatterns.length > 0" 
+                class="btn btn-sm btn-light"
+                (click)="showPatternsOnly()"
+                style="font-weight: 600;">
+                <i class="fas fa-filter"></i> Show Patterns ({{smaPatterns.length}})
+              </button>
+              <button 
+                *ngIf="showingPatterns && filteredallData.length > 0" 
+                class="btn btn-sm btn-light"
+                (click)="showAllFiltered()"
+                style="font-weight: 600;">
+                <i class="fas fa-list"></i> Show All ({{filteredallData.length}})
+              </button>
+              <span class="badge badge-light">{{rowData.length}} stocks</span>
+            </div>
           </div>
         </div>
         <div class="card-body">
@@ -189,26 +208,29 @@
     <div class="col-md-4">
       <div class="card" style="border-left: 5px solid #10b981;">
         <div class="card-body">
-          <h6><i class="fas fa-info-circle"></i> GOD FATHER Indicator</h6>
-          <p class="mb-0"><strong>Positive (+):</strong> Stock is above 200 SMA</p>
-          <p class="mb-0"><strong>Negative (-):</strong> Stock is below 200 SMA</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card" style="border-left: 5px solid #3b82f6;">
-        <div class="card-body">
-          <h6><i class="fas fa-chart-line"></i> SMA 20/50 Crossover</h6>
-          <p class="mb-0"><strong>Golden Cross:</strong> SMA 20 crosses above SMA 50 (Bullish)</p>
-          <p class="mb-0"><strong>Death Cross:</strong> SMA 20 crosses below SMA 50 (Bearish)</p>
+          <h6><i class="fas fa-crosshairs"></i> SMA200 Position</h6>
+          <p class="mb-0"><strong>🟢 Bouncing Above:</strong> Bullish bounce off SMA200</p>
+          <p class="mb-0"><strong>🔴 Testing Below:</strong> Bearish rejection at SMA200</p>
+          <p class="mb-0"><strong>� On SMA200:</strong> Price at support level</p>
         </div>
       </div>
     </div>
     <div class="col-md-4">
       <div class="card" style="border-left: 5px solid #f59e0b;">
         <div class="card-body">
+          <h6><i class="fas fa-fire"></i> Pattern Strength</h6>
+          <p class="mb-0"><strong>🔥 85+:</strong> Very Strong</p>
+          <p class="mb-0"><strong>✅ 75-84:</strong> Strong</p>
+          <p class="mb-0"><strong>👍 65-74:</strong> Good</p>
+          <p class="mb-0"><strong>👌 55-64:</strong> Moderate</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="border-left: 5px solid #8b5cf6;">
+        <div class="card-body">
           <h6><i class="fas fa-lightbulb"></i> Trading Tip</h6>
-          <p class="mb-0">Look for stocks near SMA 20 with positive GOD FATHER for potential entries</p>
+          <p class="mb-0">Focus on patterns with <strong>Bouncing Above 🟢</strong> + <strong>Strength 75+</strong> for best SMA200 bounce trades</p>
         </div>
       </div>
     </div>

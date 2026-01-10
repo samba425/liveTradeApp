@@ -33,6 +33,7 @@ export class BBComponent implements OnInit {
   pagination = true;
   paginationPageSize = 20;
   isLoading = false;
+  showingPatterns = true; // Track which view is active
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
     { 
@@ -362,23 +363,34 @@ export class BBComponent implements OnInit {
             //   console.log('-checlk thsi..111.',res['d'][0], (res['d'][22] / res['d'][25]),res['d'][7])
                 
             //   }
+          
+          // Get pattern info for all filtered stocks
+          const patternInfo = this.getPatternStrength(res['d'][22], res['d'][23], res['d'][24], res['d'][25]);
+          
+          // Add to filtered list with pattern data
           this.filteredallData.push({
-          name: res['d'][0],
-          close: res['d'][25],
-          high: res['d'][23],
-          low: res['d'][24],
-          bb: res['d'][21],
-          volume: res['d'][7],
-          HIGH52: res['d'][28],
-          sector: res['d'][18],
-          industry: res['d'][31]
+            name: res['d'][0],
+            close: res['d'][25],
+            high: res['d'][23],
+            low: res['d'][24],
+            bb: res['d'][21],
+            volume: res['d'][7],
+            HIGH52: res['d'][28],
+            sector: res['d'][18],
+            industry: res['d'][31],
+            pattern: patternInfo.pattern !== 'none' ? patternInfo.pattern : 'No Pattern',
+            strength: patternInfo.strength,
+            isBullish: patternInfo.isBullish
           });
             
             // Enhanced pattern detection with strength scoring
-            const patternInfo = this.getPatternStrength(res['d'][22], res['d'][23], res['d'][24], res['d'][25]);
+            // Debug: Log pattern detection
+            if (patternInfo.strength > 0) {
+              console.log('Pattern detected:', res['d'][0], patternInfo);
+            }
             
-            // Only include patterns with strength >= 60 and bullish signals
-            if (patternInfo.strength >= 60 && patternInfo.isBullish) {
+            // Lower threshold to 50 to show more patterns
+            if (patternInfo.strength >= 50 && patternInfo.pattern !== 'none') {
               this.dojjiHammer.push({
                 name: res['d'][0],
                 close: res['d'][25],
@@ -394,7 +406,7 @@ export class BBComponent implements OnInit {
                 isBullish: patternInfo.isBullish
               });
             }
-            // Fallback: Use basic detection for patterns that don't meet strength threshold
+            // Fallback: Use basic detection for any valid pattern
             else if (this.isDoji(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) || 
                      this.isHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) ||
                      this.isInvertedHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25])) {
@@ -408,20 +420,36 @@ export class BBComponent implements OnInit {
                 HIGH52: res['d'][28],
                 sector: res['d'][18],
                 industry: res['d'][31],
-                pattern: patternInfo.pattern || 'Pattern Detected',
-                strength: patternInfo.strength || 50,
-                isBullish: patternInfo.isBullish
+                pattern: 'Pattern Detected',
+                strength: 45,
+                isBullish: true
               });
             }
       }
 
       // } 
     });
+    
+    // Debug logging
+    console.log('Total BB touches:', this.allData.length);
+    console.log('Filtered patterns:', this.filteredallData.length);
+    console.log('Doji/Hammer patterns:', this.dojjiHammer.length);
+    console.log('Weak patterns:', this.filteredallData.length - this.dojjiHammer.length);
+    
+    // Show breakdown by pattern type
+    const patternCounts = {};
+    this.filteredallData.forEach(stock => {
+      const pattern = stock.pattern || 'Unknown';
+      patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
+    });
+    console.log('Pattern breakdown:', patternCounts);
+    
     this.rowData = []
     this.filteredrowData = []
     setTimeout(() => {
       this.rowData = this.allData
-      this.filteredrowData = this.filteredallData
+      // Show pattern data by default instead of all filtered data
+      this.filteredrowData = this.dojjiHammer.length > 0 ? this.dojjiHammer : this.filteredallData
     }, 100)
 
   }
@@ -599,8 +627,17 @@ export class BBComponent implements OnInit {
     this.filteredrowData = []
     setTimeout(() => {
       this.filteredrowData = this.dojjiHammer
+      this.showingPatterns = true;
     }, 100)
-
+  }
+  
+  showAllFiltered() {
+    this.filteredrowData = []
+    setTimeout(() => {
+      this.filteredrowData = this.filteredallData
+      this.showingPatterns = false;
+      console.log('Showing all filtered stocks with pattern info');
+    }, 100)
   }
 }
 
