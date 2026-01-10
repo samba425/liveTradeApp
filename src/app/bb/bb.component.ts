@@ -151,6 +151,73 @@ export class BBComponent implements OnInit {
       }
     },
     {
+      headerName: "🎯 Pattern",
+      field: "pattern",
+      resizable: true,
+      sortable: true,
+      width: 160,
+      filter: "agTextColumnFilter",
+      cellStyle: params => {
+        if (!params.value) return {};
+        if (params.value === 'Dragonfly Doji') return { color: '#00C853', fontWeight: 'bold', fontSize: '13px' };
+        if (params.value === 'Bullish Hammer') return { color: '#00E676', fontWeight: 'bold', fontSize: '13px' };
+        if (params.value === 'Classic Doji') return { color: '#76FF03', fontWeight: '600', fontSize: '13px' };
+        if (params.value === 'Inverted Hammer') return { color: '#AEEA00', fontWeight: '600', fontSize: '13px' };
+        if (params.value === 'Bearish Hammer') return { color: '#FF6D00', fontWeight: '600', fontSize: '13px' };
+        return { fontSize: '13px' };
+      },
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "💪 Strength",
+      field: "strength",
+      resizable: true,
+      sortable: true,
+      width: 110,
+      filter: "agNumberColumnFilter",
+      cellRenderer: params => {
+        if (!params.value) return '';
+        const val = params.value;
+        let color = '#FF5252';
+        let emoji = '⚠️';
+        if (val >= 85) { color = '#00C853'; emoji = '🔥'; }
+        else if (val >= 75) { color = '#00E676'; emoji = '✅'; }
+        else if (val >= 65) { color = '#76FF03'; emoji = '👍'; }
+        else if (val >= 55) { color = '#CDDC39'; emoji = '👌'; }
+        
+        return `<span style="color: ${color}; font-weight: bold; font-size: 14px;">${emoji} ${val}</span>`;
+      },
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
+      headerName: "📊 Signal",
+      field: "isBullish",
+      resizable: true,
+      sortable: true,
+      width: 110,
+      filter: "agTextColumnFilter",
+      valueFormatter: params => {
+        if (params.value === undefined || params.value === null) return '';
+        return params.value ? '🟢 Bullish' : '🔴 Bearish';
+      },
+      cellStyle: params => {
+        if (params.value === undefined || params.value === null) return {};
+        return params.value ? 
+          { color: '#00C853', fontWeight: 'bold', fontSize: '13px' } : 
+          { color: '#FF5252', fontWeight: 'bold', fontSize: '13px' };
+      },
+      filterParams: {
+        numAlwaysVisibleConditions: 2,
+        defaultJoinOperator: "OR"
+      }
+    },
+    {
       headerName: "industry", field: "industry", resizable: true, sortable: true, filter: "agNumberColumnFilter", minWidth: 150,
       filterParams: {
         numAlwaysVisibleConditions: 2,
@@ -307,20 +374,45 @@ export class BBComponent implements OnInit {
           industry: res['d'][31]
           });
             
-            // best dojji,hammer logic
-            if(this.isDoji(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) || this.isHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25])) {
-        this.dojjiHammer.push({
-          name: res['d'][0],
-          close: res['d'][25],
-          high: res['d'][23],
-          low: res['d'][24],
-          bb: res['d'][21],
-          volume: res['d'][7],
-          HIGH52: res['d'][28],
-          sector: res['d'][18],
-          industry: res['d'][31]
-        });
-      }
+            // Enhanced pattern detection with strength scoring
+            const patternInfo = this.getPatternStrength(res['d'][22], res['d'][23], res['d'][24], res['d'][25]);
+            
+            // Only include patterns with strength >= 60 and bullish signals
+            if (patternInfo.strength >= 60 && patternInfo.isBullish) {
+              this.dojjiHammer.push({
+                name: res['d'][0],
+                close: res['d'][25],
+                high: res['d'][23],
+                low: res['d'][24],
+                bb: res['d'][21],
+                volume: res['d'][7],
+                HIGH52: res['d'][28],
+                sector: res['d'][18],
+                industry: res['d'][31],
+                pattern: patternInfo.pattern,
+                strength: patternInfo.strength,
+                isBullish: patternInfo.isBullish
+              });
+            }
+            // Fallback: Use basic detection for patterns that don't meet strength threshold
+            else if (this.isDoji(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) || 
+                     this.isHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25]) ||
+                     this.isInvertedHammer(res['d'][22],res['d'][23],res['d'][24],res['d'][25])) {
+              this.dojjiHammer.push({
+                name: res['d'][0],
+                close: res['d'][25],
+                high: res['d'][23],
+                low: res['d'][24],
+                bb: res['d'][21],
+                volume: res['d'][7],
+                HIGH52: res['d'][28],
+                sector: res['d'][18],
+                industry: res['d'][31],
+                pattern: patternInfo.pattern || 'Pattern Detected',
+                strength: patternInfo.strength || 50,
+                isBullish: patternInfo.isBullish
+              });
+            }
       }
 
       // } 
@@ -364,23 +456,143 @@ export class BBComponent implements OnInit {
     this.gridApiFiltered.exportDataAsCsv({ fileName: `SMA(${d.toLocaleDateString()}).csv` });
   }
   
-   isDoji(open, high, low, close) {
+  isDoji(open, high, low, close) {
     const bodySize = Math.abs(open - close);
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
     const range = high - low;
-    return bodySize <= range * 0.1;
+    
+    // Edge case: Flat candle or very small range
+    if (range === 0 || range < 0.01) return false;
+    
+    // Body should be small AND shadows must exist on both sides
+    return (
+      bodySize <= range * 0.1 &&        // Small body (original check)
+      upperShadow >= range * 0.2 &&     // Upper shadow must exist
+      lowerShadow >= range * 0.2        // Lower shadow must exist
+    );
   }
   
-   isHammer(open, high, low, close) {
+  isHammer(open, high, low, close) {
     const realBody = Math.abs(open - close);
     const lowerShadow = Math.min(open, close) - low;
     const upperShadow = high - Math.max(open, close);
     const totalRange = high - low;
-  
-    return (
+    
+    // Edge case: Flat candle or very small range
+    if (totalRange === 0 || totalRange < 0.01) return false;
+    
+    // Hammer criteria with preference for bullish candles
+    const meetsBasicCriteria = (
       lowerShadow >= 2 * realBody &&
       upperShadow <= realBody * 0.3 &&
       realBody <= totalRange * 0.4
     );
+    
+    // At BB lower band, bullish hammers (close > open) are stronger signals
+    const isBullish = close > open;
+    
+    // Accept both bullish and bearish, but bullish is preferred
+    return meetsBasicCriteria;
+  }
+  
+  isInvertedHammer(open, high, low, close) {
+    const realBody = Math.abs(open - close);
+    const upperShadow = high - Math.max(open, close);
+    const lowerShadow = Math.min(open, close) - low;
+    const totalRange = high - low;
+    
+    // Edge case: Flat candle or very small range
+    if (totalRange === 0 || totalRange < 0.01) return false;
+    
+    // Inverted Hammer: Long upper shadow, small lower shadow, small body
+    return (
+      upperShadow >= 2 * realBody &&
+      lowerShadow <= realBody * 0.3 &&
+      realBody <= totalRange * 0.4 &&
+      upperShadow >= totalRange * 0.6
+    );
+  }
+  
+  getPatternStrength(open, high, low, close) {
+    const realBody = Math.abs(close - open);
+    const lowerShadow = Math.min(open, close) - low;
+    const upperShadow = high - Math.max(open, close);
+    const totalRange = high - low;
+    
+    if (totalRange === 0 || totalRange < 0.01) {
+      return { pattern: 'none', strength: 0, isBullish: false };
+    }
+    
+    const bodyRatio = realBody / totalRange;
+    const lowerShadowRatio = lowerShadow / totalRange;
+    const upperShadowRatio = upperShadow / totalRange;
+    
+    // Check Dragonfly Doji (strongest at support)
+    if (bodyRatio < 0.1 && lowerShadowRatio > 0.65 && upperShadowRatio < 0.15) {
+      const strength = Math.min(100, lowerShadowRatio * 120 + (close > open ? 20 : 0));
+      return { 
+        pattern: 'Dragonfly Doji', 
+        strength: Math.round(strength), 
+        isBullish: true 
+      };
+    }
+    
+    // Check Bullish Hammer (very strong)
+    if (lowerShadow >= 2 * realBody && upperShadowRatio < 0.1 && 
+        bodyRatio < 0.35 && lowerShadowRatio > 0.6 && close > open) {
+      const strength = Math.min(100, 
+        (lowerShadowRatio * 80) + 
+        ((1 - bodyRatio) * 10) + 
+        ((close - open) / totalRange * 10)
+      );
+      return { 
+        pattern: 'Bullish Hammer', 
+        strength: Math.round(strength), 
+        isBullish: true 
+      };
+    }
+    
+    // Check Classic Doji
+    if (bodyRatio < 0.1 && upperShadowRatio > 0.25 && lowerShadowRatio > 0.25) {
+      const strength = Math.min(100, 
+        (1 - bodyRatio) * 70 + 
+        Math.min(upperShadowRatio, lowerShadowRatio) * 30
+      );
+      return { 
+        pattern: 'Classic Doji', 
+        strength: Math.round(strength), 
+        isBullish: true 
+      };
+    }
+    
+    // Check Inverted Hammer
+    if (upperShadow >= 2 * realBody && lowerShadowRatio < 0.1 && 
+        bodyRatio < 0.35 && upperShadowRatio > 0.6) {
+      const strength = Math.min(100, 
+        (upperShadowRatio * 70) + 
+        ((close >= open ? 20 : 0)) + 
+        ((1 - bodyRatio) * 10)
+      );
+      return { 
+        pattern: 'Inverted Hammer', 
+        strength: Math.round(strength), 
+        isBullish: true 
+      };
+    }
+    
+    // Check Bearish Hammer (weaker at support)
+    if (lowerShadow >= 2 * realBody && upperShadowRatio < 0.15 && 
+        bodyRatio < 0.35 && lowerShadowRatio > 0.55 && close < open) {
+      const strength = Math.min(80, lowerShadowRatio * 60 + (1 - bodyRatio) * 20);
+      return { 
+        pattern: 'Bearish Hammer', 
+        strength: Math.round(strength), 
+        isBullish: false 
+      };
+    }
+    
+    return { pattern: 'none', strength: 0, isBullish: false };
   }
   
   onlyDojiHammer() {
