@@ -19,6 +19,7 @@ import { StockDetailComponent } from './stock-detail/stock-detail.component';
 import { NewsComponent } from './news/news.component';
 import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
 import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
+import { CamarillaComponent } from './camarilla/camarilla.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
@@ -39,7 +40,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     StockDetailComponent,
     NewsComponent,
     SectorTrackerComponent,
-    PositionCalculatorComponent
+    PositionCalculatorComponent,
+    CamarillaComponent
   ],
   imports: [
     BrowserModule,

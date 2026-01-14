@@ -12,6 +12,7 @@ import { StockDetailComponent } from './stock-detail/stock-detail.component';
 import { NewsComponent } from './news/news.component';
 import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
 import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
+import { CamarillaComponent } from './camarilla/camarilla.component';
 
 @NgModule({
   declarations: [ 
@@ -32,6 +33,7 @@ import { PositionCalculatorComponent } from './position-calculator/position-calc
       { path: 'stock/:symbol', component: StockDetailComponent },
       { path: 'sectors', component: SectorTrackerComponent },
       { path: 'calculator', component: PositionCalculatorComponent },
+      { path: 'cross', component: CamarillaComponent },
       { path: '**', redirectTo: '/home', pathMatch: 'full' },
     ])
   ],

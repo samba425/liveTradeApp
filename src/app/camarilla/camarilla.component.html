@@ -1,0 +1,263 @@
+<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
+  
+  <!-- Header Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; box-shadow: 0 8px 16px rgba(0,0,0,0.2);">
+        <div class="card-body">
+          <h2 class="mb-2">
+            <i class="fas fa-bullseye"></i> 🎯 Cross Detection
+          </h2>
+          <small style="opacity: 0.85; display: block; margin-top: 8px;">
+            💡 Toggle Weekly/Daily → Save data → Detect crosses → Trade high-probability setups
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeframe Toggle -->
+  <div class="row mb-3">
+    <div class="col-12 text-center">
+      <div class="btn-group" role="group" style="box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+        <button type="button" 
+                class="btn btn-lg" 
+                [class.active]="timeframe === 'weekly'"
+                (click)="toggleTimeframe('weekly')"
+                [style.background]="timeframe === 'weekly' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8f9fa'"
+                [style.color]="timeframe === 'weekly' ? 'white' : '#333'"
+                style="border: none; padding: 12px 40px; font-weight: 600; transition: all 0.3s;">
+          📅 Weekly
+        </button>
+        <button type="button" 
+                class="btn btn-lg" 
+                [class.active]="timeframe === 'daily'"
+                (click)="toggleTimeframe('daily')"
+                [style.background]="timeframe === 'daily' ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' : '#f8f9fa'"
+                [style.color]="timeframe === 'daily' ? 'white' : '#333'"
+                style="border: none; padding: 12px 40px; font-weight: 600; transition: all 0.3s;">
+          📊 Daily
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Buttons -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <button class="btn btn-lg mr-2" (click)="refreshData()" [disabled]="isLoading"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; font-weight: 600; color: white;">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> 
+        {{ isLoading ? 'Loading...' : 'Refresh Data' }}
+      </button>
+      
+      <button class="btn btn-lg mr-2" 
+              *ngIf="timeframe === 'weekly'"
+              (click)="saveWeeklyDataToStorage()" 
+              style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border: none; padding: 12px 30px; font-weight: 600; color: white;">
+        <i class="fas fa-save"></i> Save Weekly Data
+      </button>
+      
+      <button class="btn btn-lg mr-2" 
+              *ngIf="timeframe === 'daily'"
+              (click)="saveDailyDataToStorage()" 
+              style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; padding: 12px 30px; font-weight: 600; color: white;">
+        <i class="fas fa-save"></i> Save Daily Data
+      </button>
+      
+      <button class="btn btn-lg mr-2" (click)="clearOldData()" 
+              style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border: none; padding: 12px 30px; font-weight: 600; color: white;">
+        <i class="fas fa-trash-alt"></i> Clear Old Data
+      </button>
+      
+      <span *ngIf="isLoading" class="ml-3 text-muted">
+        <i class="fas fa-spinner fa-spin"></i> Fetching latest data...
+      </span>
+    </div>
+  </div>
+
+  <!-- Data Freshness Status Banner -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="alert mb-0" 
+           [class.alert-success]="dataFreshnessStatus.warningLevel === 'info'"
+           [class.alert-warning]="dataFreshnessStatus.warningLevel === 'warning'"
+           [class.alert-danger]="dataFreshnessStatus.warningLevel === 'error'"
+           [style.border-left]="dataFreshnessStatus.warningLevel === 'info' ? '6px solid #28a745' : dataFreshnessStatus.warningLevel === 'warning' ? '6px solid #ffc107' : '6px solid #dc3545'"
+           style="font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-2x" 
+               [class.fa-check-circle]="dataFreshnessStatus.warningLevel === 'info'"
+               [class.fa-exclamation-triangle]="dataFreshnessStatus.warningLevel === 'warning'"
+               [class.fa-times-circle]="dataFreshnessStatus.warningLevel === 'error'"
+               [style.color]="dataFreshnessStatus.warningLevel === 'info' ? '#28a745' : dataFreshnessStatus.warningLevel === 'warning' ? '#ffc107' : '#dc3545'"></i>
+            <div>
+              <div style="font-size: 16px; font-weight: 700; margin-bottom: 3px;">
+                {{ timeframe === 'weekly' ? '📅 WEEKLY' : '📊 DAILY' }} DATA STATUS
+              </div>
+              <div style="font-size: 14px; font-weight: 500; opacity: 0.95;">
+                {{ dataFreshnessStatus.message }}
+              </div>
+              <div *ngIf="dataFreshnessStatus.warningLevel === 'error'" style="font-size: 12px; margin-top: 5px; color: #721c24;">
+                ⛔ <strong>Detection Blocked!</strong> Signals would be WRONG with old data. Save fresh data to continue.
+              </div>
+              <div *ngIf="dataFreshnessStatus.warningLevel === 'warning'" style="font-size: 12px; margin-top: 5px; color: #856404;">
+                ⚠️ <strong>Caution!</strong> Data is getting old. Signals may not be accurate. Consider saving fresh data.
+              </div>
+              <div *ngIf="dataFreshnessStatus.warningLevel === 'info'" style="font-size: 12px; margin-top: 5px; color: #155724;">
+                ✅ <strong>Safe to Trade!</strong> Data is fresh and signals are accurate.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!dataFreshnessStatus.isValid" style="margin-left: 20px;">
+          <button class="btn btn-lg"
+                  [style.background]="timeframe === 'weekly' ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'"
+                  style="border: none; padding: 12px 25px; font-weight: 700; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+                  (click)="timeframe === 'weekly' ? saveWeeklyDataToStorage() : saveDailyDataToStorage()">
+            <i class="fas fa-save"></i> Save Fresh {{ timeframe === 'weekly' ? 'Weekly' : 'Daily' }} Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="row mb-4" *ngIf="camarillaCrosses.length > 0">
+    <div class="col-12 text-center mb-3">
+      <span class="badge badge-lg" 
+            [style.background]="timeframe === 'weekly' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'"
+            style="color: white; padding: 10px 20px; font-size: 16px; font-weight: 600;">
+        {{ timeframe === 'weekly' ? '📅 WEEKLY' : '📊 DAILY' }} CAMARILLA LEVELS
+      </span>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card text-center" style="background: linear-gradient(135deg, #00C853 0%, #00E676 100%); color: white; border: none;">
+        <div class="card-body">
+          <h3 class="mb-0">{{ getH4BreakoutCount() }}</h3>
+          <p class="mb-0"><small>🚀 H4 Breakouts</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card text-center" style="background: linear-gradient(135deg, #00E676 0%, #76FF03 100%); color: white; border: none;">
+        <div class="card-body">
+          <h3 class="mb-0">{{ getH3CrossUpCount() }}</h3>
+          <p class="mb-0"><small>✅ H3 Crosses</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card text-center" style="background: linear-gradient(135deg, #76FF03 0%, #CDDC39 100%); color: white; border: none;">
+        <div class="card-body">
+          <h3 class="mb-0">{{ getL3BounceUpCount() }}</h3>
+          <p class="mb-0"><small>📈 L3 Bounces</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card text-center" style="background: linear-gradient(135deg, #FF5252 0%, #F44336 100%); color: white; border: none;">
+        <div class="card-body">
+          <h3 class="mb-0">{{ getL3CrossDownCount() }}</h3>
+          <p class="mb-0"><small>🔻 L3 Breakdowns</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <div class="card-body">
+          <h3 class="mb-0">{{ camarillaCrosses.length }}</h3>
+          <p class="mb-0"><small>🎯 Total Crosses</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Detecting crosses...</p>
+  </div>
+
+  <!-- Main Grid -->
+  <div *ngIf="!isLoading">
+    <div class="row m-2">
+      <div class="col-sm-10">
+        <div class="card mb-2" style="border-left: 4px solid #4facfe;">
+          <div class="card-body py-2">
+            <h4 class="mb-0">
+              <i class="fas fa-chart-line"></i>  H3/L3 Crosses
+              <span class="badge badge-primary ml-2" style="font-size: 14px;">{{ camarillaCrosses.length }} stocks</span>
+            </h4>
+            <small class="text-muted" *ngIf="camarillaCrosses.length > 0">
+              Showing stocks crossing {{ timeframe }}  levels • Sorted by strength
+            </small>
+            <small class="text-danger" *ngIf="camarillaCrosses.length === 0">
+              ⚠️ No crosses found. Make sure {{ timeframe }} data is saved in localStorage.
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-warning btn-block" (click)="onBtnExport()" [disabled]="camarillaCrosses.length === 0">
+          <i class="fas fa-download"></i> Download CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="row m-2">
+      <div class="col-12">
+        <input class="form-control form-control-lg" type="text" [(ngModel)]="searchQuery"
+          (input)="onSearchInputChange()" placeholder="🔍 Search by stock name, level, pattern...">
+      </div>
+    </div>
+
+    <div class="example-wrapper mt-3">
+      <ag-grid-angular 
+        class="ag-theme-quartz" 
+        style="height: 700px; width: 100%" 
+        [rowData]="camarillaCrosses"
+        [suppressExcelExport]="true" 
+        [rowSelection]="rowSelection" 
+        [gridOptions]="gridOptions" 
+        [pagination]="pagination"
+        [defaultColDef]="defaultColDef" 
+        [paginationPageSize]="paginationPageSize"
+        [domLayout]="'normal'" 
+        [columnDefs]="colDefs"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </div>
+
+  <!-- Help Section - Weekly vs Daily Logic -->
+  <div class="row mt-4">
+    <!-- Data Freshness Validation Info -->
+    <div class="col-12 mb-4">
+      <div class="alert alert-warning" style="border-left: 5px solid #ff9800; font-size: 14px;">
+        <h6 class="alert-heading">
+          <i class="fas fa-shield-alt"></i> 🛡️ AUTOMATIC DATA VALIDATION & TIME ENFORCEMENT
+        </h6>
+        <p class="mb-2">
+          <strong>The system enforces STRICT time windows and data freshness checks!</strong>
+        </p>
+        <ul class="mb-2" style="font-size: 13px;">
+          <li><strong>⏰ Weekly Save Window:</strong> ONLY Friday 3:30 PM - Monday 9:15 AM IST. Blocked outside this window!</li>
+          <li><strong>⏰ Daily Save Window:</strong> ONLY after 3:30 PM OR before 9:15 AM next day. Blocked during market hours!</li>
+          <li><strong>📅 Data Freshness:</strong> Weekly data must be < 7 days old, Daily data must be < 30 hours old.</li>
+          <li><strong>🛡️ Protection:</strong> System BLOCKS detection if data is too old or save time is invalid to prevent WRONG signals!</li>
+        </ul>
+        <div class="bg-white p-2 rounded" style="font-size: 12px;">
+          <strong>Status Indicators:</strong><br>
+          ✅ <span class="text-success">GREEN (Info):</span> Data is fresh and saved at correct time - safe to trade<br>
+          ⚠️ <span class="text-warning">YELLOW (Warning):</span> Data is getting old, signals may be wrong - proceed with caution<br>
+          ❌ <span class="text-danger">RED (Error):</span> Data TOO OLD or WRONG save time - system blocks, you MUST save fresh data first
+        </div>
+      </div>
+    </div>
+ 
+
+</div>
