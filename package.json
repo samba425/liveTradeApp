@@ -29,6 +29,7 @@
     "moment": "^2.30.1",
     "ngx-markdown": "^19.0.0",
     "ngx-toastr": "^19.0.0",
+    "node-cron": "^4.2.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "rxjs": "~7.8.0",

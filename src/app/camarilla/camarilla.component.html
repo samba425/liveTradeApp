@@ -42,6 +42,44 @@
     </div>
   </div>
 
+  <!-- Data Save Timestamp Display -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+        <div class="card-body" style="padding: 15px 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <i class="fas fa-server" style="font-size: 28px; color: white;"></i>
+              <div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                  🤖 {{ timeframe === 'weekly' ? '📅 Weekly Data' : '📊 Daily Data' }} - Server Auto-Save
+                </div>
+                <div style="font-size: 16px; color: white; font-weight: 700; margin-top: 2px;">
+                  {{ getSaveTimestamp() }}
+                </div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; margin-top: 4px; font-family: monospace;">
+                  ISO: {{ getISOTimestamp() }}
+                </div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; margin-bottom: 6px;">
+                📍 Next Auto-Save Schedule
+              </div>
+              <div style="font-size: 14px; color: rgba(255,255,255,0.95); font-weight: 700; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 6px;">
+                <i class="fas fa-clock"></i> 
+                {{ timeframe === 'weekly' ? 'Every Friday 3:30 PM IST' : 'Mon-Fri 3:30 PM IST' }}
+              </div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px;">
+                Cron: {{ timeframe === 'weekly' ? '0 10 * * 5 (UTC)' : '0 10 * * 1-5 (UTC)' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Control Buttons -->
   <div class="row mb-3">
     <div class="col-12">
@@ -132,43 +170,93 @@
         {{ timeframe === 'weekly' ? '📅 WEEKLY' : '📊 DAILY' }} CAMARILLA LEVELS
       </span>
     </div>
+    
+    <!-- H4 Breakout Card -->
     <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card text-center" style="background: linear-gradient(135deg, #00C853 0%, #00E676 100%); color: white; border: none;">
+      <div class="card text-center" 
+           (click)="filterBySignal('H4 Breakout')"
+           [style.background]="isFilterActive('H4 Breakout') ? 'linear-gradient(135deg, #00A040 0%, #00C853 100%)' : 'linear-gradient(135deg, #00C853 0%, #00E676 100%)'"
+           [style.transform]="isFilterActive('H4 Breakout') ? 'scale(1.05)' : 'scale(1)'"
+           [style.box-shadow]="isFilterActive('H4 Breakout') ? '0 8px 24px rgba(0,200,83,0.4)' : '0 4px 8px rgba(0,0,0,0.1)'"
+           style="color: white; border: none; cursor: pointer; transition: all 0.3s ease;">
         <div class="card-body">
           <h3 class="mb-0">{{ getH4BreakoutCount() }}</h3>
           <p class="mb-0"><small>🚀 H4 Breakouts</small></p>
+          <small *ngIf="isFilterActive('H4 Breakout')" style="font-size: 10px; opacity: 0.9;">
+            <i class="fas fa-filter"></i> FILTERED
+          </small>
         </div>
       </div>
     </div>
+    
+    <!-- H3 Cross UP Card -->
     <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card text-center" style="background: linear-gradient(135deg, #00E676 0%, #76FF03 100%); color: white; border: none;">
+      <div class="card text-center" 
+           (click)="filterBySignal('H3 Cross UP')"
+           [style.background]="isFilterActive('H3 Cross UP') ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : 'linear-gradient(135deg, #00E676 0%, #76FF03 100%)'"
+           [style.transform]="isFilterActive('H3 Cross UP') ? 'scale(1.05)' : 'scale(1)'"
+           [style.box-shadow]="isFilterActive('H3 Cross UP') ? '0 8px 24px rgba(0,230,118,0.4)' : '0 4px 8px rgba(0,0,0,0.1)'"
+           style="color: white; border: none; cursor: pointer; transition: all 0.3s ease;">
         <div class="card-body">
           <h3 class="mb-0">{{ getH3CrossUpCount() }}</h3>
           <p class="mb-0"><small>✅ H3 Crosses</small></p>
+          <small *ngIf="isFilterActive('H3 Cross UP')" style="font-size: 10px; opacity: 0.9;">
+            <i class="fas fa-filter"></i> FILTERED
+          </small>
         </div>
       </div>
     </div>
+    
+    <!-- L3 Bounce UP Card -->
     <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card text-center" style="background: linear-gradient(135deg, #76FF03 0%, #CDDC39 100%); color: white; border: none;">
+      <div class="card text-center" 
+           (click)="filterBySignal('L3 Bounce UP')"
+           [style.background]="isFilterActive('L3 Bounce UP') ? 'linear-gradient(135deg, #64DD17 0%, #76FF03 100%)' : 'linear-gradient(135deg, #76FF03 0%, #CDDC39 100%)'"
+           [style.transform]="isFilterActive('L3 Bounce UP') ? 'scale(1.05)' : 'scale(1)'"
+           [style.box-shadow]="isFilterActive('L3 Bounce UP') ? '0 8px 24px rgba(118,255,3,0.4)' : '0 4px 8px rgba(0,0,0,0.1)'"
+           style="color: white; border: none; cursor: pointer; transition: all 0.3s ease;">
         <div class="card-body">
           <h3 class="mb-0">{{ getL3BounceUpCount() }}</h3>
           <p class="mb-0"><small>📈 L3 Bounces</small></p>
+          <small *ngIf="isFilterActive('L3 Bounce UP')" style="font-size: 10px; opacity: 0.9;">
+            <i class="fas fa-filter"></i> FILTERED
+          </small>
         </div>
       </div>
     </div>
+    
+    <!-- L3 Cross DOWN Card -->
     <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card text-center" style="background: linear-gradient(135deg, #FF5252 0%, #F44336 100%); color: white; border: none;">
+      <div class="card text-center" 
+           (click)="filterBySignal('L3 Cross DOWN')"
+           [style.background]="isFilterActive('L3 Cross DOWN') ? 'linear-gradient(135deg, #D32F2F 0%, #FF5252 100%)' : 'linear-gradient(135deg, #FF5252 0%, #F44336 100%)'"
+           [style.transform]="isFilterActive('L3 Cross DOWN') ? 'scale(1.05)' : 'scale(1)'"
+           [style.box-shadow]="isFilterActive('L3 Cross DOWN') ? '0 8px 24px rgba(255,82,82,0.4)' : '0 4px 8px rgba(0,0,0,0.1)'"
+           style="color: white; border: none; cursor: pointer; transition: all 0.3s ease;">
         <div class="card-body">
           <h3 class="mb-0">{{ getL3CrossDownCount() }}</h3>
           <p class="mb-0"><small>🔻 L3 Breakdowns</small></p>
+          <small *ngIf="isFilterActive('L3 Cross DOWN')" style="font-size: 10px; opacity: 0.9;">
+            <i class="fas fa-filter"></i> FILTERED
+          </small>
         </div>
       </div>
     </div>
+    
+    <!-- Total Crosses Card -->
     <div class="col-md-3 col-sm-6 mb-3">
-      <div class="card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+      <div class="card text-center" 
+           (click)="filterBySignal(null)"
+           [style.background]="activeSignalFilter === null ? 'linear-gradient(135deg, #4a5568 0%, #667eea 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'"
+           [style.transform]="activeSignalFilter === null ? 'scale(1.05)' : 'scale(1)'"
+           [style.box-shadow]="activeSignalFilter === null ? '0 8px 24px rgba(102,126,234,0.4)' : '0 4px 8px rgba(0,0,0,0.1)'"
+           style="color: white; border: none; cursor: pointer; transition: all 0.3s ease;">
         <div class="card-body">
           <h3 class="mb-0">{{ camarillaCrosses.length }}</h3>
           <p class="mb-0"><small>🎯 Total Crosses</small></p>
+          <small *ngIf="activeSignalFilter === null" style="font-size: 10px; opacity: 0.9;">
+            <i class="fas fa-list"></i> ALL SIGNALS
+          </small>
         </div>
       </div>
     </div>

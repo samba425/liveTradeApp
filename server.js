@@ -1,6 +1,9 @@
 const express = require('express');
 const request = require('request-promise').defaults({ strictSSL: false });
 var cors = require('cors');
+const cron = require('node-cron');
+const fs = require('fs');
+const path = require('path');
 
 var app = express()
 app.use(cors());
@@ -9,6 +12,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const port = process.env.PORT || 5001;
+
+// Create data directory if it doesn't exist
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+	fs.mkdirSync(DATA_DIR);
+}
+
+const WEEKLY_DATA_FILE = path.join(DATA_DIR, 'weekly-camarilla.json');
+const DAILY_DATA_FILE = path.join(DATA_DIR, 'daily-camarilla.json');
 
 async function fetchTradingViewData(indexType) {
 	let query = []
@@ -142,6 +154,264 @@ async function fetchTradingViewData(indexType) {
 app.get('/health', (req, res) => {
 	res.status(200).send('OK');
 });
+
+// ============ CAMARILLA AUTO-SAVE FUNCTIONS ============
+
+/**
+ * Process weekly data for Camarilla calculations
+ */
+function processWeeklyData(tradingViewData) {
+	if (!tradingViewData || !tradingViewData.data) return [];
+	
+	return tradingViewData.data.map(stock => ({
+		name: stock.d[0],
+		weeklyOpen: stock.d[22],
+		weeklyHigh: stock.d[23],
+		weeklyLow: stock.d[24],
+		weeklyClose: stock.d[25]
+	})).filter(stock => stock.weeklyHigh && stock.weeklyLow && stock.weeklyClose);
+}
+
+/**
+ * Process daily data for Camarilla calculations
+ * Column indices from TradingView API:
+ * [0] = name
+ * [1] = open
+ * [2] = high
+ * [3] = low
+ * [4] = close
+ * [5] = change (%)
+ */
+function processDailyData(tradingViewData) {
+	if (!tradingViewData || !tradingViewData.data) return [];
+	
+	return tradingViewData.data.map(stock => ({
+		name: stock.d[0],
+		dailyHigh: stock.d[2],  // Fixed: [2] = high (was [3])
+		dailyLow: stock.d[3],   // Fixed: [3] = low (was [4])
+		dailyClose: stock.d[4]  // Fixed: [4] = close (was [5] which was change%)
+	})).filter(stock => stock.dailyHigh && stock.dailyLow && stock.dailyClose);
+}
+
+/**
+ * Auto-save WEEKLY Camarilla data
+ * Runs every Friday at 3:30 PM IST (10:00 UTC)
+ */
+async function autoSaveWeeklyData() {
+	console.log('🕒 [CRON] Auto-saving WEEKLY Camarilla data...');
+	
+	try {
+		const data = await fetchTradingViewData({});
+		const weeklyData = processWeeklyData(data);
+		
+		const saveData = {
+			data: weeklyData,
+			timestamp: new Date().toISOString(),
+			timeframe: 'weekly',
+			savedBy: 'auto-cron'
+		};
+		
+		fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
+		console.log(`✅ [CRON] Weekly data saved! ${weeklyData.length} stocks processed.`);
+	} catch (error) {
+		console.error('❌ [CRON] Error saving weekly data:', error.message);
+	}
+}
+
+/**
+ * Auto-save DAILY Camarilla data
+ * Runs every weekday at 3:30 PM IST (10:00 UTC)
+ */
+async function autoSaveDailyData() {
+	console.log('🕒 [CRON] Auto-saving DAILY Camarilla data...');
+	
+	try {
+		const data = await fetchTradingViewData({});
+		const dailyData = processDailyData(data);
+		
+		const saveData = {
+			data: dailyData,
+			timestamp: new Date().toISOString(),
+			timeframe: 'daily',
+			savedBy: 'auto-cron'
+		};
+		
+		fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
+		console.log(`✅ [CRON] Daily data saved! ${dailyData.length} stocks processed.`);
+	} catch (error) {
+		console.error('❌ [CRON] Error saving daily data:', error.message);
+	}
+}
+
+// Schedule WEEKLY auto-save: Every Friday at 3:30 PM IST (10:00 UTC)
+cron.schedule('0 10 * * 5', autoSaveWeeklyData, {
+	timezone: "UTC"
+});
+console.log('📅 Scheduled WEEKLY Camarilla auto-save: Every Friday at 3:30 PM IST');
+
+// Schedule DAILY auto-save: Every weekday at 3:30 PM IST (10:00 UTC)
+cron.schedule('0 10 * * 1-5', autoSaveDailyData, {
+	timezone: "UTC"
+});
+console.log('📅 Scheduled DAILY Camarilla auto-save: Mon-Fri at 3:30 PM IST');
+
+/**
+ * Check if data needs to be saved on server startup
+ * This handles:
+ * 1. Server restarts after 3:30 PM (missed cron window)
+ * 2. First-time setup (no data exists)
+ * 3. Missed cron runs (server was down)
+ */
+async function checkAndSaveOnStartup() {
+	console.log('\n🔍 [STARTUP] Checking if Camarilla data needs to be saved...');
+	
+	const now = new Date();
+	const currentDay = now.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
+	const currentHour = now.getHours();
+	
+	// Check if it's a weekday
+	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
+	
+	// Check if it's after 3:30 PM IST (15:30)
+	// Note: Server time might be different, but we check local
+	const isAfter330PM = currentHour >= 15 || currentHour < 9; // After 3:30 PM or before 9:15 AM next day
+	
+	// ===== CHECK DAILY DATA =====
+	if (isWeekday) {
+		try {
+			if (!fs.existsSync(DAILY_DATA_FILE)) {
+				console.log('📊 [STARTUP] No DAILY data found. Saving now...');
+				await autoSaveDailyData();
+			} else {
+				const savedData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
+				const savedDate = new Date(savedData.timestamp);
+				const today = new Date();
+				
+				// Check if saved data is from a previous day
+				const isSameDay = savedDate.toDateString() === today.toDateString();
+				
+				if (!isSameDay && isAfter330PM) {
+					console.log('📊 [STARTUP] DAILY data is old. Saving fresh data...');
+					await autoSaveDailyData();
+				} else {
+					console.log(`✅ [STARTUP] DAILY data is current (saved: ${savedDate.toLocaleString()})`);
+				}
+			}
+		} catch (error) {
+			console.error('❌ [STARTUP] Error checking daily data:', error.message);
+		}
+	}
+	
+	// ===== CHECK WEEKLY DATA =====
+	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM
+	const isFriday = currentDay === 5;
+	
+	try {
+		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
+			// Only save if it's Friday after 3:30 PM
+			if (isFriday && isAfter330PM) {
+				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM. Saving now...');
+				await autoSaveWeeklyData();
+			} else {
+				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM to save...');
+			}
+		} else {
+			const savedData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
+			const savedDate = new Date(savedData.timestamp);
+			const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
+			
+			// ONLY save on Friday after 3:30 PM, and only if data is more than 6 days old
+			if (isFriday && isAfter330PM && daysSinceLastSave >= 6) {
+				console.log('📅 [STARTUP] It\'s Friday after 3:30 PM and WEEKLY data is old. Saving fresh data...');
+				await autoSaveWeeklyData();
+			} else {
+				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()})`);
+				if (!isFriday) {
+					console.log(`   ⏰ Next save: Friday 3:30 PM IST`);
+				}
+			}
+		}
+	} catch (error) {
+		console.error('❌ [STARTUP] Error checking weekly data:', error.message);
+	}
+	
+	console.log('✅ [STARTUP] Data check complete!\n');
+}
+
+// Run startup check after a short delay (to let server fully initialize)
+setTimeout(checkAndSaveOnStartup, 2000);
+
+// ============ CAMARILLA API ENDPOINTS ============
+
+/**
+ * Get saved Camarilla data (weekly or daily)
+ */
+app.get('/getCamarillaData', (req, res) => {
+	const timeframe = req.query.timeframe || 'weekly'; // 'daily' or 'weekly'
+	
+	try {
+		const file = timeframe === 'weekly' ? WEEKLY_DATA_FILE : DAILY_DATA_FILE;
+		
+		if (!fs.existsSync(file)) {
+			return res.status(404).json({
+				success: false,
+				message: `No ${timeframe} data found. Waiting for auto-save...`,
+				timeframe: timeframe
+			});
+		}
+		
+		const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+		
+		console.log(`📊 Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+		
+		res.json({
+			success: true,
+			data: savedData.data,
+			timestamp: savedData.timestamp,
+			timeframe: timeframe,
+			savedBy: savedData.savedBy || 'unknown'
+		});
+	} catch (error) {
+		console.error('Error reading Camarilla data:', error);
+		res.status(500).json({
+			success: false,
+			message: 'Error reading saved data',
+			error: error.message
+		});
+	}
+});
+
+/**
+ * Manual trigger for saving Camarilla data (for testing/override)
+ */
+app.post('/saveCamarillaData', async (req, res) => {
+	const timeframe = req.body.timeframe || 'weekly';
+	
+	console.log(`📝 Manual save triggered for ${timeframe} data`);
+	
+	try {
+		if (timeframe === 'weekly') {
+			await autoSaveWeeklyData();
+		} else {
+			await autoSaveDailyData();
+		}
+		
+		res.json({
+			success: true,
+			message: `${timeframe} data saved successfully`,
+			timeframe: timeframe
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: 'Error saving data',
+			error: error.message
+		});
+	}
+});
+
+// ============ EXISTING ENDPOINTS ============
+
 
 app.get('/getData', async (req, res) => {
 	// res.send('hello...')

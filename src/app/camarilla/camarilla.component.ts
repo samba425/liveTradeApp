@@ -52,6 +52,9 @@ export class CamarillaComponent implements OnInit {
   // Toggle between Daily and Weekly Camarilla
   timeframe: 'daily' | 'weekly' = 'weekly'; // Default to weekly
   
+  // Active filter for signal types
+  activeSignalFilter: string | null = null; // null = show all, or 'H4 Breakout', 'H3 Cross UP', etc.
+  
   // Data freshness status
   dataFreshnessStatus: { message: string, isValid: boolean, warningLevel: 'error' | 'warning' | 'info' } = {
     message: 'No data saved yet',
@@ -269,16 +272,86 @@ export class CamarillaComponent implements OnInit {
     this.gridOptions = <GridOptions>{};
 
     setTimeout(() => {
-      this.updateDataFreshnessStatus(); // Check status on load
+      this.loadCamarillaDataFromServer(); // Load auto-saved data from server
       this.fetchLiveData();
     }, 100);
   }
 
+  /**
+   * Load auto-saved Camarilla data from server (with smart caching)
+   * Only calls API if:
+   * 1. No data in localStorage
+   * 2. Data is stale/old
+   * Otherwise uses cached localStorage data (same day = same data!)
+   */
+  loadCamarillaDataFromServer() {
+    const dataKey = this.timeframe === 'weekly' ? 'lastWeekData' : 'lastDayData';
+    const timestampKey = this.timeframe === 'weekly' ? 'lastWeekDataTimestamp' : 'lastDayDataTimestamp';
+    
+    // Check if we have fresh data in localStorage
+    const cachedData = localStorage.getItem(dataKey);
+    const cachedTimestamp = localStorage.getItem(timestampKey);
+    
+    if (cachedData && cachedTimestamp) {
+      const savedDate = new Date(cachedTimestamp);
+      const now = new Date();
+      
+      // For DAILY: Check if it's from today
+      // For WEEKLY: Check if it's less than 7 days old
+      const isFresh = this.timeframe === 'daily' 
+        ? savedDate.toDateString() === now.toDateString() // Same day
+        : (now.getTime() - savedDate.getTime()) < (7 * 24 * 60 * 60 * 1000); // Less than 7 days
+      
+      if (isFresh) {
+        console.log(`💾 Using cached ${this.timeframe} data from localStorage (saved: ${savedDate.toLocaleString()})`);
+        console.log(`   ⚡ No API call needed - data is fresh!`);
+        this.updateDataFreshnessStatus();
+        return; // Don't call API - use cache!
+      } else {
+        console.log(`⚠️ Cached ${this.timeframe} data is stale (saved: ${savedDate.toLocaleString()})`);
+        console.log(`   📡 Fetching fresh data from server...`);
+      }
+    } else {
+      console.log(`📡 No cached ${this.timeframe} data found. Fetching from server...`);
+    }
+    
+    // Only reach here if cache is missing or stale - call API
+    const apiUrl = 'http://localhost:5001/getCamarillaData';
+    const url = `${apiUrl}?timeframe=${this.timeframe}`;
+    
+    this.http.get<any>(url).subscribe(
+      response => {
+        if (response.success) {
+          console.log(`✅ Loaded ${this.timeframe} data from server (${response.data.length} stocks)`);
+          console.log(`📅 Saved at: ${new Date(response.timestamp).toLocaleString()}`);
+          console.log(`🤖 Saved by: ${response.savedBy}`);
+          
+          // Store in localStorage as cache
+          localStorage.setItem(dataKey, JSON.stringify(response.data));
+          localStorage.setItem(timestampKey, response.timestamp);
+          
+          this.updateDataFreshnessStatus();
+        }
+      },
+      error => {
+        console.warn(`⚠️ No ${this.timeframe} data on server yet. Waiting for auto-save...`);
+        // Try to use localStorage as fallback
+        this.updateDataFreshnessStatus();
+      }
+    );
+  }
+
   fetchLiveData() {
     this.isLoading = true;
+    
+    // Trigger fresh API call to get live market data for ALL stocks
+    console.log('🔄 Triggering fresh API call for ALL live data...');
+    this.commonservice.fetchLiveData(null); // null = get ALL stocks, not just NIFTY
+    
+    // Subscribe to the updated data
     this.commonservice.getData.subscribe(data => {
       this.inputValue = data;
-      this.autoSaveWeeklyData();
+      // Server auto-saves data via cron jobs - no manual save needed
       this.updateDataFreshnessStatus(); // Update status after data load
       this.detectCamarillaCrosses();
       this.isLoading = false;
@@ -288,7 +361,15 @@ export class CamarillaComponent implements OnInit {
     });
   }
 
+  /**
+   * Refresh live data
+   * This fetches FRESH LIVE PRICES from TradingView (current market prices)
+   * The saved data (high/low/close) stays the same, but CURRENT PRICE updates
+   * This allows detection of NEW crosses as price moves during the day
+   */
   refreshData() {
+    console.log('🔄 Refreshing LIVE market data (current prices)...');
+    this.activeSignalFilter = null; // Clear any active filter
     this.fetchLiveData();
   }
 
@@ -297,6 +378,7 @@ export class CamarillaComponent implements OnInit {
    */
   toggleTimeframe(tf: 'daily' | 'weekly') {
     this.timeframe = tf;
+    this.loadCamarillaDataFromServer(); // Load data for new timeframe from server
     this.updateDataFreshnessStatus(); // Check freshness when switching
     this.detectCamarillaCrosses(); // Re-detect with new timeframe
     console.log(`🔄 Switched to ${tf.toUpperCase()} Camarilla levels`);
@@ -307,6 +389,55 @@ export class CamarillaComponent implements OnInit {
    */
   updateDataFreshnessStatus() {
     this.dataFreshnessStatus = this.validateDataFreshness();
+  }
+
+  /**
+   * Get formatted save timestamp for UI display
+   * This shows SERVER-SIDE save time (from cron job), not UI cache time
+   */
+  getSaveTimestamp(): string {
+    const key = this.timeframe === 'weekly' ? 'lastWeekDataTimestamp' : 'lastDayDataTimestamp';
+    const timestamp = localStorage.getItem(key);
+    
+    if (!timestamp) {
+      return 'No data saved yet - waiting for server auto-save...';
+    }
+    
+    const saveDate = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - saveDate.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    // Format: "Saved on Friday, 14 Jan 2026 at 3:30 PM IST (2 days ago)"
+    const dayName = saveDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const dateStr = saveDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = saveDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    
+    let ago = '';
+    if (diffDays > 0) {
+      ago = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    } else if (diffHours > 0) {
+      ago = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    } else {
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      if (diffMinutes > 0) {
+        ago = `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+      } else {
+        ago = 'just now';
+      }
+    }
+    
+    return `Server saved: ${dayName}, ${dateStr} at ${timeStr} IST (${ago})`;
+  }
+  
+  /**
+   * Get ISO timestamp for detailed view
+   */
+  getISOTimestamp(): string {
+    const key = this.timeframe === 'weekly' ? 'lastWeekDataTimestamp' : 'lastDayDataTimestamp';
+    const timestamp = localStorage.getItem(key);
+    return timestamp || 'N/A';
   }
 
   /**
@@ -906,6 +1037,9 @@ export class CamarillaComponent implements OnInit {
       l4Breakdown: crosses.filter(c => c.crossedLevel === 'L4 Breakdown').length,
       h3Rejection: crosses.filter(c => c.crossedLevel === 'H3 Rejection').length
     });
+    
+    // Update grid with filtered data
+    this.updateGridData();
   }
 
   /**
@@ -999,6 +1133,45 @@ export class CamarillaComponent implements OnInit {
 
   getL3CrossDownCount(): number {
     return this.camarillaCrosses.filter(c => c.crossedLevel === 'L3 Cross DOWN').length;
+  }
+
+  /**
+   * Filter stocks by signal type
+   * @param signalType - 'H4 Breakout', 'H3 Cross UP', 'L3 Bounce UP', 'L3 Cross DOWN', or null for all
+   */
+  filterBySignal(signalType: string | null) {
+    if (this.activeSignalFilter === signalType) {
+      // Toggle off if clicking same filter
+      this.activeSignalFilter = null;
+      console.log('🔍 Filter cleared - showing all signals');
+    } else {
+      this.activeSignalFilter = signalType;
+      console.log(`🔍 Filtering by: ${signalType}`);
+    }
+    
+    // Update grid data
+    this.updateGridData();
+  }
+
+  /**
+   * Update grid with filtered data
+   */
+  updateGridData() {
+    if (!this.gridApi) return;
+    
+    const filteredData = this.activeSignalFilter 
+      ? this.camarillaCrosses.filter(c => c.crossedLevel === this.activeSignalFilter)
+      : this.camarillaCrosses;
+    
+    this.gridApi.setGridOption('rowData', filteredData);
+    console.log(`📊 Grid updated: ${filteredData.length} stocks displayed`);
+  }
+
+  /**
+   * Check if a filter is active
+   */
+  isFilterActive(signalType: string): boolean {
+    return this.activeSignalFilter === signalType;
   }
 
   // Grid handlers
