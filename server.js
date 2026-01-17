@@ -368,21 +368,75 @@ setTimeout(checkAndSaveOnStartup, 2000);
 
 /**
  * Get saved Camarilla data (weekly or daily)
+ * If data is missing, checks if it should auto-save based on current time
  */
-app.get('/getCamarillaData', (req, res) => {
+app.get('/getCamarillaData', async (req, res) => {
 	const timeframe = req.query.timeframe || 'weekly'; // 'daily' or 'weekly'
 	
 	try {
 		const file = timeframe === 'weekly' ? WEEKLY_DATA_FILE : DAILY_DATA_FILE;
 		
+		// If file doesn't exist, check if we should save it now
 		if (!fs.existsSync(file)) {
+			console.log(`⚠️ No ${timeframe} data found. Checking if we should save now...`);
+			
+			// Calculate IST time
+			const now = new Date();
+			const istOffset = 5.5 * 60 * 60 * 1000;
+			const istTime = new Date(now.getTime() + istOffset);
+			const istHour = istTime.getHours();
+			const istMinutes = istHour * 60 + istTime.getMinutes();
+			const currentDay = now.getDay();
+			
+			const isWeekday = currentDay >= 1 && currentDay <= 5;
+			const isFriday = currentDay === 5;
+			const isWeekend = currentDay === 0 || currentDay === 6;
+			const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
+			const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
+			
+			let shouldSave = false;
+			
+			if (timeframe === 'daily') {
+				// Save daily data if:
+				// 1. It's a weekday AND (after 3:30 PM OR before market open next day)
+				if (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
+					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getMinutes()})`);
+					shouldSave = true;
+					await autoSaveDailyData();
+				}
+			} else if (timeframe === 'weekly') {
+				// Save weekly data if:
+				// 1. Friday after 3:30 PM IST
+				// 2. OR weekend (catch up from missed Friday)
+				if ((isFriday && isAfter330PM_IST) || isWeekend) {
+					console.log(`💾 [API] Saving WEEKLY data (${isWeekend ? 'weekend catchup' : 'Friday after 3:30 PM'})`);
+					shouldSave = true;
+					await autoSaveWeeklyData();
+				}
+			}
+			
+			// If we saved, try to read the file again
+			if (shouldSave && fs.existsSync(file)) {
+				const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+				console.log(`📊 Serving freshly saved ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+				return res.json({
+					success: true,
+					data: savedData.data,
+					timestamp: savedData.timestamp,
+					timeframe: timeframe,
+					savedBy: savedData.savedBy || 'api-triggered'
+				});
+			}
+			
+			// Still no data - return 404
 			return res.status(404).json({
 				success: false,
-				message: `No ${timeframe} data found. Waiting for auto-save...`,
+				message: `No ${timeframe} data found. ${timeframe === 'weekly' ? 'Waiting for Friday 3:30 PM IST' : 'Waiting for weekday after 3:30 PM IST'}`,
 				timeframe: timeframe
 			});
 		}
 		
+		// File exists - serve it
 		const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
 		
 		console.log(`📊 Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
