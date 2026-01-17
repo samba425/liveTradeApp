@@ -271,8 +271,8 @@ async function checkAndSaveOnStartup() {
 	// Convert to IST (UTC + 5:30)
 	const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
 	const istTime = new Date(now.getTime() + istOffset);
-	const istHour = istTime.getHours();
-	const istMinutes = istHour * 60 + istTime.getMinutes();
+	const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
+	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
 	
 	// Check if it's a weekday
 	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
@@ -282,7 +282,7 @@ async function checkAndSaveOnStartup() {
 	const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
 	
 	console.log(`📅 Current time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
-	console.log(`🕐 IST Hour: ${istHour}:${istTime.getMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
+	console.log(`🕐 IST Hour: ${istHour}:${istTime.getUTCMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
 	
 	// ===== CHECK DAILY DATA =====
 	if (isWeekday) {
@@ -384,8 +384,8 @@ app.get('/getCamarillaData', async (req, res) => {
 			const now = new Date();
 			const istOffset = 5.5 * 60 * 60 * 1000;
 			const istTime = new Date(now.getTime() + istOffset);
-			const istHour = istTime.getHours();
-			const istMinutes = istHour * 60 + istTime.getMinutes();
+			const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
+			const istMinutes = istHour * 60 + istTime.getUTCMinutes();
 			const currentDay = now.getDay();
 			
 			const isWeekday = currentDay >= 1 && currentDay <= 5;
@@ -400,7 +400,7 @@ app.get('/getCamarillaData', async (req, res) => {
 				// Save daily data if:
 				// 1. It's a weekday AND (after 3:30 PM OR before market open next day)
 				if (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
-					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getMinutes()})`);
+					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getUTCMinutes()})`);
 					shouldSave = true;
 					await autoSaveDailyData();
 				}
