@@ -266,23 +266,24 @@ async function checkAndSaveOnStartup() {
 	console.log('\n🔍 [STARTUP] Checking if Camarilla data needs to be saved...');
 	
 	const now = new Date();
-	const currentDay = now.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
 	
 	// Convert to IST (UTC + 5:30)
 	const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
 	const istTime = new Date(now.getTime() + istOffset);
 	const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
 	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
+	const currentDay = istTime.getUTCDay(); // Get IST day of week (0=Sunday, 1=Monday, ..., 5=Friday)
 	
-	// Check if it's a weekday
+	// Check if it's a weekday (in IST timezone)
 	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
 	
 	// Check if it's after 3:30 PM IST (15:30 = 930 minutes)
 	const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
 	const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
 	
-	console.log(`📅 Current time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
-	console.log(`🕐 IST Hour: ${istHour}:${istTime.getUTCMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
+	const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	console.log(`📅 Current IST time: ${dayNames[currentDay]}, ${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')}`);
+	console.log(`🕐 IST Minutes from midnight: ${istMinutes} (After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST})`);
 	
 	// ===== CHECK DAILY DATA =====
 	if (isWeekday) {
@@ -386,7 +387,7 @@ app.get('/getCamarillaData', async (req, res) => {
 			const istTime = new Date(now.getTime() + istOffset);
 			const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
 			const istMinutes = istHour * 60 + istTime.getUTCMinutes();
-			const currentDay = now.getDay();
+			const currentDay = istTime.getUTCDay(); // Get IST day of week
 			
 			const isWeekday = currentDay >= 1 && currentDay <= 5;
 			const isFriday = currentDay === 5;
