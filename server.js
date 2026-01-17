@@ -286,11 +286,20 @@ async function checkAndSaveOnStartup() {
 	console.log(`🕐 IST Minutes from midnight: ${istMinutes} (After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST})`);
 	
 	// ===== CHECK DAILY DATA =====
-	if (isWeekday) {
+	// Save daily data if:
+	// 1. Weekday after 3:30 PM or before 9:15 AM (next day's data)
+	// 2. Weekend (save Friday's data for Monday trading)
+	const isWeekend = currentDay === 0 || currentDay === 6; // Saturday or Sunday
+	
+	if (isWeekday || isWeekend) {
 		try {
 			if (!fs.existsSync(DAILY_DATA_FILE)) {
-				console.log('📊 [STARTUP] No DAILY data found. Saving now...');
-				await autoSaveDailyData();
+				if (isWeekend || isAfter330PM_IST || isBeforeMarketOpen_IST) {
+					console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - Friday data' : 'Weekday'})`);
+					await autoSaveDailyData();
+				} else {
+					console.log('⏸️  [STARTUP] No DAILY data, but waiting until after 3:30 PM to save');
+				}
 			} else {
 				const savedData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
 				const savedDate = new Date(savedData.timestamp);
@@ -299,9 +308,9 @@ async function checkAndSaveOnStartup() {
 				// Check if saved data is from a previous day
 				const isSameDay = savedDate.toDateString() === today.toDateString();
 				
-				// Save if data is old AND we're after market close OR before market open (meaning yesterday's data is stale)
-				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
-					console.log('📊 [STARTUP] DAILY data is old. Saving fresh data...');
+				// Save if data is old AND (we're after market close OR before market open OR it's weekend)
+				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST || isWeekend)) {
+					console.log(`📊 [STARTUP] DAILY data is old. Saving fresh data... (${isWeekend ? 'Weekend - Friday data' : 'Weekday'})`);
 					await autoSaveDailyData();
 				} else {
 					console.log(`✅ [STARTUP] DAILY data is current (saved: ${savedDate.toLocaleString()})`);
@@ -310,16 +319,11 @@ async function checkAndSaveOnStartup() {
 		} catch (error) {
 			console.error('❌ [STARTUP] Error checking daily data:', error.message);
 		}
-	} else {
-		console.log('⏸️  [STARTUP] Today is weekend - skipping daily data check');
 	}
 	
 	// ===== CHECK WEEKLY DATA =====
 	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM IST
 	const isFriday = currentDay === 5;
-	const isSaturday = currentDay === 6;
-	const isSunday = currentDay === 0;
-	const isWeekend = isSaturday || isSunday;
 	
 	try {
 		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
@@ -395,15 +399,21 @@ app.get('/getCamarillaData', async (req, res) => {
 			const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
 			const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
 			
+			const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+			console.log(`🕐 [API] Current IST: ${dayNames[currentDay]}, ${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')}`);
+			
 			let shouldSave = false;
 			
 			if (timeframe === 'daily') {
 				// Save daily data if:
-				// 1. It's a weekday AND (after 3:30 PM OR before market open next day)
-				if (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
-					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getUTCMinutes()})`);
+				// 1. Weekday after 3:30 PM OR before market open
+				// 2. Weekend (Friday's data for Monday)
+				if (isWeekend || (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST))) {
+					console.log(`💾 [API] Saving DAILY data (${isWeekend ? 'Weekend - Friday data for Monday' : 'Weekday'})`);
 					shouldSave = true;
 					await autoSaveDailyData();
+				} else {
+					console.log(`⏸️  [API] NOT saving DAILY data: Weekday during market hours (9:15 AM - 3:30 PM)`);
 				}
 			} else if (timeframe === 'weekly') {
 				// Save weekly data if:
@@ -413,6 +423,8 @@ app.get('/getCamarillaData', async (req, res) => {
 					console.log(`💾 [API] Saving WEEKLY data (${isWeekend ? 'weekend catchup' : 'Friday after 3:30 PM'})`);
 					shouldSave = true;
 					await autoSaveWeeklyData();
+				} else {
+					console.log(`⏸️  [API] NOT saving WEEKLY data: Waiting for Friday 3:30 PM or weekend`);
 				}
 			}
 			
