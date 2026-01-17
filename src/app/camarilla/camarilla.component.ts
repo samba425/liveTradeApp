@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
+import { environment } from '../../environments/environment';
 
 /**
  * Camarilla H3/L3 Weekly Cross Detection Component
@@ -316,8 +317,7 @@ export class CamarillaComponent implements OnInit {
     }
     
     // Only reach here if cache is missing or stale - call API
-    const apiUrl = 'http://localhost:5001/getCamarillaData';
-    const url = `${apiUrl}?timeframe=${this.timeframe}`;
+    const url = `${environment.baseUrl}getCamarillaData?timeframe=${this.timeframe}`;
     
     this.http.get<any>(url).subscribe(
       response => {
