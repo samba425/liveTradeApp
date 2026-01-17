@@ -267,14 +267,22 @@ async function checkAndSaveOnStartup() {
 	
 	const now = new Date();
 	const currentDay = now.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
-	const currentHour = now.getHours();
+	
+	// Convert to IST (UTC + 5:30)
+	const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
+	const istTime = new Date(now.getTime() + istOffset);
+	const istHour = istTime.getHours();
+	const istMinutes = istHour * 60 + istTime.getMinutes();
 	
 	// Check if it's a weekday
 	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
 	
-	// Check if it's after 3:30 PM IST (15:30)
-	// Note: Server time might be different, but we check local
-	const isAfter330PM = currentHour >= 15 || currentHour < 9; // After 3:30 PM or before 9:15 AM next day
+	// Check if it's after 3:30 PM IST (15:30 = 930 minutes)
+	const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
+	const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
+	
+	console.log(`📅 Current time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+	console.log(`🕐 IST Hour: ${istHour}:${istTime.getMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
 	
 	// ===== CHECK DAILY DATA =====
 	if (isWeekday) {
@@ -290,7 +298,8 @@ async function checkAndSaveOnStartup() {
 				// Check if saved data is from a previous day
 				const isSameDay = savedDate.toDateString() === today.toDateString();
 				
-				if (!isSameDay && isAfter330PM) {
+				// Save if data is old AND we're after market close OR before market open (meaning yesterday's data is stale)
+				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
 					console.log('📊 [STARTUP] DAILY data is old. Saving fresh data...');
 					await autoSaveDailyData();
 				} else {
@@ -300,33 +309,47 @@ async function checkAndSaveOnStartup() {
 		} catch (error) {
 			console.error('❌ [STARTUP] Error checking daily data:', error.message);
 		}
+	} else {
+		console.log('⏸️  [STARTUP] Today is weekend - skipping daily data check');
 	}
 	
 	// ===== CHECK WEEKLY DATA =====
-	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM
+	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM IST
 	const isFriday = currentDay === 5;
+	const isSaturday = currentDay === 6;
+	const isSunday = currentDay === 0;
+	const isWeekend = isSaturday || isSunday;
 	
 	try {
 		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
-			// Only save if it's Friday after 3:30 PM
-			if (isFriday && isAfter330PM) {
-				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM. Saving now...');
+			// Save if it's Friday after 3:30 PM IST
+			if (isFriday && isAfter330PM_IST) {
+				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM IST. Saving now...');
 				await autoSaveWeeklyData();
-			} else {
-				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM to save...');
+			}
+			// OR if it's weekend (missed Friday save) - save Friday's data
+			else if (isWeekend) {
+				console.log('📅 [STARTUP] No WEEKLY data found and it\'s weekend. Saving Friday\'s data now...');
+				await autoSaveWeeklyData();
+			}
+			else {
+				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM IST to save...');
 			}
 		} else {
 			const savedData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
 			const savedDate = new Date(savedData.timestamp);
 			const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
 			
-			// ONLY save on Friday after 3:30 PM, and only if data is more than 6 days old
-			if (isFriday && isAfter330PM && daysSinceLastSave >= 6) {
-				console.log('📅 [STARTUP] It\'s Friday after 3:30 PM and WEEKLY data is old. Saving fresh data...');
+			// Save if:
+			// 1. It's Friday after 3:30 PM IST AND data is >6 days old
+			// 2. OR it's weekend AND data is >6 days old (missed Friday save)
+			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 6) || 
+			    (isWeekend && daysSinceLastSave >= 6)) {
+				console.log('📅 [STARTUP] WEEKLY data is old. Saving fresh data...');
 				await autoSaveWeeklyData();
 			} else {
 				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()})`);
-				if (!isFriday) {
+				if (!isFriday && !isWeekend) {
 					console.log(`   ⏰ Next save: Friday 3:30 PM IST`);
 				}
 			}
