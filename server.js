@@ -267,14 +267,22 @@ async function checkAndSaveOnStartup() {
 	
 	const now = new Date();
 	const currentDay = now.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
-	const currentHour = now.getHours();
+	
+	// Convert to IST (UTC + 5:30)
+	const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
+	const istTime = new Date(now.getTime() + istOffset);
+	const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
+	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
 	
 	// Check if it's a weekday
 	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
 	
-	// Check if it's after 3:30 PM IST (15:30)
-	// Note: Server time might be different, but we check local
-	const isAfter330PM = currentHour >= 15 || currentHour < 9; // After 3:30 PM or before 9:15 AM next day
+	// Check if it's after 3:30 PM IST (15:30 = 930 minutes)
+	const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
+	const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
+	
+	console.log(`📅 Current time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+	console.log(`🕐 IST Hour: ${istHour}:${istTime.getUTCMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
 	
 	// ===== CHECK DAILY DATA =====
 	if (isWeekday) {
@@ -290,7 +298,8 @@ async function checkAndSaveOnStartup() {
 				// Check if saved data is from a previous day
 				const isSameDay = savedDate.toDateString() === today.toDateString();
 				
-				if (!isSameDay && isAfter330PM) {
+				// Save if data is old AND we're after market close OR before market open (meaning yesterday's data is stale)
+				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
 					console.log('📊 [STARTUP] DAILY data is old. Saving fresh data...');
 					await autoSaveDailyData();
 				} else {
@@ -300,33 +309,47 @@ async function checkAndSaveOnStartup() {
 		} catch (error) {
 			console.error('❌ [STARTUP] Error checking daily data:', error.message);
 		}
+	} else {
+		console.log('⏸️  [STARTUP] Today is weekend - skipping daily data check');
 	}
 	
 	// ===== CHECK WEEKLY DATA =====
-	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM
+	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM IST
 	const isFriday = currentDay === 5;
+	const isSaturday = currentDay === 6;
+	const isSunday = currentDay === 0;
+	const isWeekend = isSaturday || isSunday;
 	
 	try {
 		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
-			// Only save if it's Friday after 3:30 PM
-			if (isFriday && isAfter330PM) {
-				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM. Saving now...');
+			// Save if it's Friday after 3:30 PM IST
+			if (isFriday && isAfter330PM_IST) {
+				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM IST. Saving now...');
 				await autoSaveWeeklyData();
-			} else {
-				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM to save...');
+			}
+			// OR if it's weekend (missed Friday save) - save Friday's data
+			else if (isWeekend) {
+				console.log('📅 [STARTUP] No WEEKLY data found and it\'s weekend. Saving Friday\'s data now...');
+				await autoSaveWeeklyData();
+			}
+			else {
+				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM IST to save...');
 			}
 		} else {
 			const savedData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
 			const savedDate = new Date(savedData.timestamp);
 			const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
 			
-			// ONLY save on Friday after 3:30 PM, and only if data is more than 6 days old
-			if (isFriday && isAfter330PM && daysSinceLastSave >= 6) {
-				console.log('📅 [STARTUP] It\'s Friday after 3:30 PM and WEEKLY data is old. Saving fresh data...');
+			// Save if:
+			// 1. It's Friday after 3:30 PM IST AND data is >6 days old
+			// 2. OR it's weekend AND data is >6 days old (missed Friday save)
+			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 6) || 
+			    (isWeekend && daysSinceLastSave >= 6)) {
+				console.log('📅 [STARTUP] WEEKLY data is old. Saving fresh data...');
 				await autoSaveWeeklyData();
 			} else {
 				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()})`);
-				if (!isFriday) {
+				if (!isFriday && !isWeekend) {
 					console.log(`   ⏰ Next save: Friday 3:30 PM IST`);
 				}
 			}
@@ -345,21 +368,75 @@ setTimeout(checkAndSaveOnStartup, 2000);
 
 /**
  * Get saved Camarilla data (weekly or daily)
+ * If data is missing, checks if it should auto-save based on current time
  */
-app.get('/getCamarillaData', (req, res) => {
+app.get('/getCamarillaData', async (req, res) => {
 	const timeframe = req.query.timeframe || 'weekly'; // 'daily' or 'weekly'
 	
 	try {
 		const file = timeframe === 'weekly' ? WEEKLY_DATA_FILE : DAILY_DATA_FILE;
 		
+		// If file doesn't exist, check if we should save it now
 		if (!fs.existsSync(file)) {
+			console.log(`⚠️ No ${timeframe} data found. Checking if we should save now...`);
+			
+			// Calculate IST time
+			const now = new Date();
+			const istOffset = 5.5 * 60 * 60 * 1000;
+			const istTime = new Date(now.getTime() + istOffset);
+			const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
+			const istMinutes = istHour * 60 + istTime.getUTCMinutes();
+			const currentDay = now.getDay();
+			
+			const isWeekday = currentDay >= 1 && currentDay <= 5;
+			const isFriday = currentDay === 5;
+			const isWeekend = currentDay === 0 || currentDay === 6;
+			const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
+			const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
+			
+			let shouldSave = false;
+			
+			if (timeframe === 'daily') {
+				// Save daily data if:
+				// 1. It's a weekday AND (after 3:30 PM OR before market open next day)
+				if (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
+					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getUTCMinutes()})`);
+					shouldSave = true;
+					await autoSaveDailyData();
+				}
+			} else if (timeframe === 'weekly') {
+				// Save weekly data if:
+				// 1. Friday after 3:30 PM IST
+				// 2. OR weekend (catch up from missed Friday)
+				if ((isFriday && isAfter330PM_IST) || isWeekend) {
+					console.log(`💾 [API] Saving WEEKLY data (${isWeekend ? 'weekend catchup' : 'Friday after 3:30 PM'})`);
+					shouldSave = true;
+					await autoSaveWeeklyData();
+				}
+			}
+			
+			// If we saved, try to read the file again
+			if (shouldSave && fs.existsSync(file)) {
+				const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+				console.log(`📊 Serving freshly saved ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+				return res.json({
+					success: true,
+					data: savedData.data,
+					timestamp: savedData.timestamp,
+					timeframe: timeframe,
+					savedBy: savedData.savedBy || 'api-triggered'
+				});
+			}
+			
+			// Still no data - return 404
 			return res.status(404).json({
 				success: false,
-				message: `No ${timeframe} data found. Waiting for auto-save...`,
+				message: `No ${timeframe} data found. ${timeframe === 'weekly' ? 'Waiting for Friday 3:30 PM IST' : 'Waiting for weekday after 3:30 PM IST'}`,
 				timeframe: timeframe
 			});
 		}
 		
+		// File exists - serve it
 		const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
 		
 		console.log(`📊 Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
