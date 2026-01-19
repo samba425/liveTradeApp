@@ -409,10 +409,14 @@ export class CamarillaComponent implements OnInit {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
     
+    // Convert to IST for display
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istDate = new Date(saveDate.getTime() + istOffset);
+    
     // Format: "Saved on Friday, 14 Jan 2026 at 3:30 PM IST (2 days ago)"
-    const dayName = saveDate.toLocaleDateString('en-US', { weekday: 'long' });
-    const dateStr = saveDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    const timeStr = saveDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    const dayName = istDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+    const dateStr = istDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    const timeStr = istDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' });
     
     let ago = '';
     if (diffDays > 0) {
