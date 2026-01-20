@@ -1,4 +1,32 @@
 <div class="container-fluid mt-4">
+  <!-- Calculator Mode Selector -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="btn-group btn-group-lg w-100" role="group">
+        <button type="button" 
+                class="btn" 
+                [ngClass]="calculatorMode === 'stock' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="switchCalculator('stock')">
+          <i class="fas fa-chart-line"></i> Stock Position
+        </button>
+        <button type="button" 
+                class="btn" 
+                [ngClass]="calculatorMode === 'option' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="switchCalculator('option')">
+          <i class="fas fa-dice"></i> Options P&L
+        </button>
+        <button type="button" 
+                class="btn" 
+                [ngClass]="calculatorMode === 'blackscholes' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="switchCalculator('blackscholes')">
+          <i class="fas fa-calculator"></i> Black-Scholes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCK CALCULATOR -->
+  <div *ngIf="calculatorMode === 'stock'">
   <div class="row">
     <div class="col-12">
       <h2><i class="fas fa-calculator"></i> Position Size & Risk Calculator</h2>
@@ -230,21 +258,662 @@
       </div>
     </div>
   </div>
+  </div>
+  <!-- END STOCK CALCULATOR -->
 
-  <!-- Risk Management Tips -->
+<!-- OPTIONS STOP LOSS CALCULATOR - COMPACT LEFT-RIGHT LAYOUT -->
+  <div *ngIf="calculatorMode === 'option'">
+    <div class="row mb-2">
+      <div class="col-12">
+        <h4 class="mb-1"><i class="fas fa-calculator"></i> Options Stop Loss Calculator</h4>
+      </div>
+    </div>
+
+    <!-- LEFT: FORM | RIGHT: RESULTS -->
+    <div class="row">
+      <!-- LEFT SIDE - FORM (40% width) -->
+      <div class="col-md-5">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white py-2">
+            <h6 class="mb-0"><i class="fas fa-edit"></i> Trade Details</h6>
+          </div>
+          <div class="card-body p-3">
+            <!-- Type & Action -->
+            <div class="row mb-2">
+              <div class="col-6">
+                <label class="small mb-1">Type</label>
+                <div class="btn-group btn-group-sm w-100">
+                  <button type="button" class="btn" [ngClass]="optionType === 'call' ? 'btn-success' : 'btn-outline-success'" (click)="optionType = 'call'">CALL</button>
+                  <button type="button" class="btn" [ngClass]="optionType === 'put' ? 'btn-danger' : 'btn-outline-danger'" (click)="optionType = 'put'">PUT</button>
+                </div>
+              </div>
+              <div class="col-6">
+                <label class="small mb-1">Action</label>
+                <div class="btn-group btn-group-sm w-100">
+                  <button type="button" class="btn" [ngClass]="optionAction === 'buy' ? 'btn-primary' : 'btn-outline-primary'" (click)="optionAction = 'buy'">BUY</button>
+                  <button type="button" class="btn" [ngClass]="optionAction === 'sell' ? 'btn-warning' : 'btn-outline-warning'" (click)="optionAction = 'sell'">SELL</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Current Price & Strike -->
+            <div class="row mb-2">
+              <div class="col-6">
+                <label class="small mb-1">Current Price</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="currentPrice" placeholder="500">
+              </div>
+              <div class="col-6">
+                <label class="small mb-1">Strike <span class="text-danger">*</span></label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="strikePrice" placeholder="490">
+              </div>
+            </div>
+
+            <!-- Strike Selection Guide -->
+            <div class="alert alert-info py-1 px-2 mb-2" *ngIf="currentPrice" style="font-size: 0.7rem;">
+              <strong><i class="fas fa-lightbulb"></i> Strike Guide:</strong><br>
+              <small>
+                <strong>ATM:</strong> ~₹{{ currentPrice | number:'1.0-0' }} (Balanced)<br>
+                <strong>OTM:</strong> ₹{{ currentPrice + 10 | number:'1.0-0' }}, ₹{{ currentPrice + 20 | number:'1.0-0' }} (Cheaper, riskier)<br>
+                <strong>ITM:</strong> ₹{{ currentPrice - 10 | number:'1.0-0' }}, ₹{{ currentPrice - 20 | number:'1.0-0' }} (Costlier, safer)
+              </small>
+            </div>
+
+            <!-- Strike Type Indicator -->
+            <div class="mb-2" *ngIf="currentPrice && strikePrice">
+              <small class="badge" [ngClass]="{
+                'badge-success': Math.abs(strikePrice - currentPrice) <= 5,
+                'badge-warning': strikePrice > currentPrice && Math.abs(strikePrice - currentPrice) > 5,
+                'badge-info': strikePrice < currentPrice && Math.abs(strikePrice - currentPrice) > 5
+              }">
+                <span *ngIf="Math.abs(strikePrice - currentPrice) <= 5">ATM - At The Money</span>
+                <span *ngIf="strikePrice > currentPrice && Math.abs(strikePrice - currentPrice) > 5">OTM - Out of Money (Lower premium)</span>
+                <span *ngIf="strikePrice < currentPrice && Math.abs(strikePrice - currentPrice) > 5">ITM - In The Money (Higher premium)</span>
+              </small>
+            </div>
+
+            <!-- Premium -->
+            <div class="form-group mb-2">
+              <label class="small mb-1">Premium (₹/share) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="premium" placeholder="5" step="0.05">
+            </div>
+
+            <!-- Lot Size -->
+            <div class="form-group mb-2">
+              <label class="small mb-1">Lot Size (Shares per Lot) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="customLotSize" placeholder="700" min="1">
+              <small class="text-muted" style="font-size: 0.7rem;">NIFTY=25, BANKNIFTY=15, FINNIFTY=40, or enter custom</small>
+            </div>
+
+            <!-- Number of Lots -->
+            <div class="form-group mb-2">
+              <label class="small mb-1">Lots <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="quantity" placeholder="5" min="1">
+            </div>
+
+            <!-- Investment Summary -->
+            <div class="alert alert-info py-2 px-2 mb-2" *ngIf="premium && (isCustomLotSize ? customLotSize : lotSize) && quantity" style="font-size: 0.85rem;">
+              <div class="row text-center">
+                <div class="col-4">
+                  <small class="d-block">Lot Size</small>
+                  <strong>{{ isCustomLotSize ? customLotSize : lotSize }}</strong>
+                </div>
+                <div class="col-4">
+                  <small class="d-block">Lots</small>
+                  <strong>{{ quantity }}</strong>
+                </div>
+                <div class="col-4">
+                  <small class="d-block">Total</small>
+                  <strong>{{ (isCustomLotSize ? customLotSize : lotSize) * quantity }}</strong>
+                </div>
+              </div>
+              <hr class="my-1">
+              <div class="text-center">
+                <h6 class="mb-0 text-primary">₹{{ (premium * (isCustomLotSize ? customLotSize : lotSize) * quantity) | number:'1.0-0' }}</h6>
+                <small>Investment</small>
+              </div>
+            </div>
+
+            <hr class="my-2">
+
+            <!-- Days to Expiry -->
+            <div class="form-group mb-2">
+              <label class="small mb-1"><i class="fas fa-calendar"></i> Expiry Date</label>
+              <input type="date" class="form-control form-control-sm" [(ngModel)]="expiryDate" (change)="calculateDaysToExpiry()">
+            </div>
+
+            <div class="alert py-1 px-2 mb-2" *ngIf="daysToExpiry > 0" [ngClass]="{
+              'alert-danger': getTimeDecayWarning() === 'critical',
+              'alert-warning': getTimeDecayWarning() === 'high',
+              'alert-info': getTimeDecayWarning() === 'medium' || getTimeDecayWarning() === 'low'
+            }" style="font-size: 0.75rem;">
+              <strong>{{ daysToExpiry }} days to expiry</strong>
+              <span *ngIf="getTimeDecayWarning() === 'critical'" class="text-danger">
+                <br><i class="fas fa-exclamation-triangle"></i> Critical! High theta decay
+              </span>
+              <span *ngIf="getTimeDecayWarning() === 'high'" class="text-warning">
+                <br><i class="fas fa-exclamation-circle"></i> High time decay risk
+              </span>
+            </div>
+
+            <hr class="my-2">
+
+            <!-- Position Sizing -->
+            <div class="alert alert-info py-1 px-2 mb-2" style="font-size: 0.7rem;">
+              <strong><i class="fas fa-info-circle"></i> Position Sizing Guide</strong>
+              <br><small>Enter your total trading capital and how much % you want to risk per trade. 
+              <br>Example: ₹1,00,000 capital with 2% risk = Maximum ₹2,000 risk per trade.
+              <br>This helps calculate safe lot size based on your stop loss.</small>
+            </div>
+
+            <div class="mb-2">
+              <label class="small mb-1"><i class="fas fa-wallet"></i> Total Capital</label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="totalCapital" placeholder="100000" step="10000">
+            </div>
+
+            <div class="mb-2">
+              <label class="small mb-1">Risk per Trade (%)</label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="riskPerTradePercent" placeholder="2" step="0.5" min="0.5" max="5">
+            </div>
+
+            <div class="alert alert-success py-1 px-2 mb-2" *ngIf="totalCapital && premium && getRecommendedLots() > 0" style="font-size: 0.75rem;">
+              <strong><i class="fas fa-lightbulb"></i> Recommended: {{ getRecommendedLots() }} lots</strong>
+              <br><small>Based on {{riskPerTradePercent}}% risk = ₹{{ (totalCapital * riskPerTradePercent / 100) | number:'1.0-0' }} max loss per trade</small>
+              <br><small *ngIf="!maxRiskPercentage && !optionCapital" class="text-warning">⚠️ Set Stop Loss for accurate calculation</small>
+            </div>
+
+            <hr class="my-2">
+
+            <!-- Stop Loss Method -->
+            <div class="form-group mb-2">
+              <label class="small mb-1">Stop Loss By:</label>
+              <div class="btn-group btn-group-sm w-100">
+                <button type="button" class="btn" [ngClass]="maxRiskPercentage > 0 ? 'btn-danger' : 'btn-outline-danger'" (click)="maxRiskPercentage = 5; optionCapital = 0">% Loss</button>
+                <button type="button" class="btn" [ngClass]="optionCapital > 0 ? 'btn-danger' : 'btn-outline-danger'" (click)="optionCapital = 1000; maxRiskPercentage = 0">₹ Amount</button>
+              </div>
+            </div>
+
+            <!-- Percentage or Amount Input -->
+            <div class="form-group mb-2" *ngIf="maxRiskPercentage > 0">
+              <label class="small mb-1">Max Loss % <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="maxRiskPercentage" placeholder="20" step="5">
+            </div>
+
+            <div class="form-group mb-2" *ngIf="optionCapital > 0">
+              <label class="small mb-1">Max Loss ₹ <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="optionCapital" placeholder="1000" step="100">
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="mb-2">
+              <label class="small mb-1"><i class="fas fa-magic"></i> Quick Presets:</label>
+              <div class="btn-group btn-group-sm w-100 mb-1">
+                <button type="button" class="btn btn-outline-info" (click)="applyConservativePreset()" title="10% SL, 25% Target">
+                  <small>Conservative</small>
+                </button>
+                <button type="button" class="btn btn-outline-warning" (click)="applyModeratePreset()" title="20% SL, 50% Target">
+                  <small>Moderate</small>
+                </button>
+                <button type="button" class="btn btn-outline-danger" (click)="applyAggressivePreset()" title="30% SL, 100% Target">
+                  <small>Aggressive</small>
+                </button>
+              </div>
+              <small class="text-muted d-block" style="font-size: 0.65rem;">Auto-sets SL & Targets based on strategy</small>
+            </div>
+
+            <hr class="my-2">
+
+            <!-- Multiple Targets -->
+            <div class="mb-2">
+              <label class="small mb-1 text-success"><i class="fas fa-bullseye"></i> Multiple Targets (Optional)</label>
+              <div class="row">
+                <div class="col-4 pr-1">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="target1Premium" placeholder="T1" step="0.5">
+                  <small class="text-muted" style="font-size: 0.65rem;">Target 1</small>
+                </div>
+                <div class="col-4 px-1">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="target2Premium" placeholder="T2" step="0.5">
+                  <small class="text-muted" style="font-size: 0.65rem;">Target 2</small>
+                </div>
+                <div class="col-4 pl-1">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="target3Premium" placeholder="T3" step="0.5">
+                  <small class="text-muted" style="font-size: 0.65rem;">Target 3</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Target -->
+            <div class="form-group mb-2">
+              <label class="small mb-1 text-success">Main Target Premium ₹</label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="targetPremium" placeholder="10" step="0.5">
+            </div>
+
+            <!-- Buttons -->
+            <button class="btn btn-danger btn-sm btn-block mb-1" (click)="calculateOptionStopLoss()">
+              <i class="fas fa-calculator"></i> Calculate
+            </button>
+            <button class="btn btn-outline-secondary btn-sm btn-block" (click)="resetAllCalculations()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE - RESULTS (60% width) -->
+      <div class="col-md-7">
+        <!-- Empty State -->
+        <div class="card shadow-sm" *ngIf="!optionSLResult">
+          <div class="card-body text-center py-5">
+            <i class="fas fa-calculator fa-3x text-muted mb-2"></i>
+            <h6 class="text-muted">Fill form and click Calculate</h6>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div *ngIf="optionSLResult">
+          <!-- Risk & Profit Side by Side -->
+          <div class="row">
+            <!-- Risk Card -->
+            <div class="col-6 pr-1">
+              <div class="card border-danger shadow-sm mb-2">
+                <div class="card-header bg-danger text-white py-1">
+                  <small class="mb-0"><i class="fas fa-hand-paper"></i> Risk</small>
+                </div>
+                <div class="card-body p-2" style="font-size: 0.8rem;">
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.75rem;">
+                    <tr>
+                      <td>Entry:</td>
+                      <td class="text-right"><strong>₹{{ premium }}</strong></td>
+                    </tr>
+                    <tr>
+                      <td>Exit:</td>
+                      <td class="text-right"><strong>₹{{ optionSLResult.stopLossPrice | number:'1.2-2' }}</strong></td>
+                    </tr>
+                    <tr>
+                      <td>Loss/Share:</td>
+                      <td class="text-right text-danger">₹{{ (premium - optionSLResult.stopLossPrice) | number:'1.2-2' }}</td>
+                    </tr>
+                    <tr class="bg-danger text-white">
+                      <td><strong>Total Loss:</strong></td>
+                      <td class="text-right"><strong>₹{{ optionSLResult.stopLossAmount | number:'1.0-0' }}</strong></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profit Card -->
+            <div class="col-6 pl-1">
+              <div class="card border-success shadow-sm mb-2">
+                <div class="card-header bg-success text-white py-1">
+                  <small class="mb-0"><i class="fas fa-bullseye"></i> Profit</small>
+                </div>
+                <div class="card-body p-2" style="font-size: 0.8rem;">
+                  <div *ngIf="!targetPremium || targetPremium <= premium" class="text-center py-3 text-muted">
+                    <small>Set target above</small>
+                  </div>
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.75rem;" *ngIf="targetPremium && targetPremium > premium">
+                    <tr>
+                      <td>Entry:</td>
+                      <td class="text-right"><strong>₹{{ premium }}</strong></td>
+                    </tr>
+                    <tr>
+                      <td>Target:</td>
+                      <td class="text-right"><strong>₹{{ targetPremium }}</strong></td>
+                    </tr>
+                    <tr>
+                      <td>Profit/Share:</td>
+                      <td class="text-right text-success">₹{{ (targetPremium - premium) | number:'1.2-2' }}</td>
+                    </tr>
+                    <tr class="bg-success text-white">
+                      <td><strong>Total Profit:</strong></td>
+                      <td class="text-right"><strong>₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk:Reward -->
+          <div class="card shadow-sm mb-2" *ngIf="targetPremium && targetPremium > premium" [ngClass]="{
+            'border-success': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 2,
+            'border-warning': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 2,
+            'border-danger': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 1
+          }">
+            <div class="card-body p-2">
+              <div class="row text-center" style="font-size: 0.85rem;">
+                <div class="col-4">
+                  <small class="d-block text-muted">Risk</small>
+                  <strong class="text-danger">₹{{ optionSLResult.stopLossAmount | number:'1.0-0' }}</strong>
+                </div>
+                <div class="col-4">
+                  <small class="d-block text-muted">Ratio</small>
+                  <h5 class="mb-0" [ngClass]="{
+                    'text-success': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 2,
+                    'text-warning': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 2,
+                    'text-danger': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 1
+                  }">1:{{ (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) | number:'1.1-1' }}</h5>
+                </div>
+                <div class="col-4">
+                  <small class="d-block text-muted">Reward</small>
+                  <strong class="text-success">₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trade Summary -->
+          <div class="card shadow-sm mb-2">
+            <div class="card-header bg-info text-white py-1">
+              <small class="mb-0"><i class="fas fa-clipboard-list"></i> Summary</small>
+            </div>
+            <div class="card-body p-2">
+              <table class="table table-sm table-borderless mb-0" style="font-size: 0.75rem;">
+                <tr>
+                  <td>Strike:</td>
+                  <td class="text-right"><strong>{{ strikePrice }} {{ optionType === 'call' ? 'CE' : 'PE' }}</strong></td>
+                </tr>
+                <tr>
+                  <td>Entry:</td>
+                  <td class="text-right">₹{{ premium }}</td>
+                </tr>
+                <tr>
+                  <td>Lots:</td>
+                  <td class="text-right">{{ quantity }} × {{ isCustomLotSize ? customLotSize : lotSize }}</td>
+                </tr>
+                <tr>
+                  <td>Total Shares:</td>
+                  <td class="text-right"><strong>{{ quantity * (isCustomLotSize ? customLotSize : lotSize) }}</strong></td>
+                </tr>
+                <tr class="table-primary">
+                  <td><strong>Investment:</strong></td>
+                  <td class="text-right"><strong>₹{{ optionSLResult.totalInvestment | number:'1.0-0' }}</strong></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Break-Even Price -->
+          <div class="card shadow-sm mb-2 border-warning">
+            <div class="card-header bg-warning py-1">
+              <small class="mb-0"><i class="fas fa-balance-scale"></i> Break-Even</small>
+            </div>
+            <div class="card-body p-2">
+              <div class="row text-center" style="font-size: 0.8rem;">
+                <div class="col-4">
+                  <small class="d-block text-muted">Strike</small>
+                  <strong>₹{{ strikePrice }}</strong>
+                </div>
+                <div class="col-4">
+                  <small class="d-block text-muted">Premium</small>
+                  <strong>₹{{ premium }}</strong>
+                </div>
+                <div class="col-4">
+                  <small class="d-block text-muted">Break-Even</small>
+                  <strong class="text-warning">₹{{ getBreakEvenPrice() | number:'1.2-2' }}</strong>
+                </div>
+              </div>
+              <div class="text-center mt-1" *ngIf="currentPrice">
+                <small style="font-size: 0.7rem;">
+                  Stock needs to move: <strong>{{ optionType === 'call' ? '+' : '-' }}₹{{ Math.abs(getBreakEvenPrice() - currentPrice) | number:'1.0-0' }}</strong>
+                  ({{ Math.abs((getBreakEvenPrice() - currentPrice) / currentPrice * 100) | number:'1.1-1' }}%)
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multiple Targets -->
+          <div class="card shadow-sm mb-2 border-success" *ngIf="target1Premium || target2Premium || target3Premium">
+            <div class="card-header bg-success text-white py-1">
+              <small class="mb-0"><i class="fas fa-layer-group"></i> Multiple Targets</small>
+            </div>
+            <div class="card-body p-2">
+              <table class="table table-sm table-borderless mb-0" style="font-size: 0.75rem;">
+                <tr *ngIf="target1Premium && target1Premium > premium">
+                  <td><strong>Target 1:</strong></td>
+                  <td class="text-right">₹{{ target1Premium }}</td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target1Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right"><small>({{ ((target1Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
+                </tr>
+                <tr *ngIf="target2Premium && target2Premium > premium">
+                  <td><strong>Target 2:</strong></td>
+                  <td class="text-right">₹{{ target2Premium }}</td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target2Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right"><small>({{ ((target2Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
+                </tr>
+                <tr *ngIf="target3Premium && target3Premium > premium">
+                  <td><strong>Target 3:</strong></td>
+                  <td class="text-right">₹{{ target3Premium }}</td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target3Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right"><small>({{ ((target3Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
+                </tr>
+              </table>
+              <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">
+                <i class="fas fa-lightbulb"></i> Tip: Book partial profits at each target
+              </small>
+            </div>
+          </div>
+
+          <!-- Action Plan -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-1">
+              <small class="mb-0"><i class="fas fa-tasks"></i> Action Plan</small>
+            </div>
+            <div class="card-body p-2">
+              <ol class="mb-0 pl-3" style="font-size: 0.75rem; line-height: 1.6;">
+                <li>Buy <strong>{{ quantity }} lots</strong> × <strong>{{ strikePrice }} {{ optionType === 'call' ? 'CE' : 'PE' }}</strong></li>
+                <li>Entry: <strong>₹{{ premium }}</strong>/share</li>
+                <li class="text-danger"><strong>SL: ₹{{ optionSLResult.stopLossPrice | number:'1.2-2' }}</strong> (Loss: ₹{{ optionSLResult.stopLossAmount | number:'1.0-0' }})</li>
+                <li class="text-warning" *ngIf="getBreakEvenPrice()"><strong>Break-Even: ₹{{ getBreakEvenPrice() | number:'1.2-2' }}</strong></li>
+                <li class="text-success" *ngIf="target1Premium && target1Premium > premium"><strong>T1: ₹{{ target1Premium }}</strong> (Book 30-40%)</li>
+                <li class="text-success" *ngIf="target2Premium && target2Premium > premium"><strong>T2: ₹{{ target2Premium }}</strong> (Book 30-40%)</li>
+                <li class="text-success" *ngIf="target3Premium && target3Premium > premium"><strong>T3: ₹{{ target3Premium }}</strong> (Book remaining)</li>
+                <li class="text-success" *ngIf="targetPremium && targetPremium > premium && !target1Premium"><strong>Target: ₹{{ targetPremium }}</strong> (Profit: ₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }})</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- END OPTIONS CALCULATOR -->
+
+
+  <!-- BLACK-SCHOLES CALCULATOR -->
+  <div *ngIf="calculatorMode === 'blackscholes'">
+    <div class="row">
+      <div class="col-12">
+        <h2><i class="fas fa-calculator"></i> Black-Scholes Option Pricing Model</h2>
+        <p class="text-muted">Calculate theoretical option price and Greeks (Delta, Gamma, Theta, Vega, Rho)</p>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <!-- Black-Scholes Input Form -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h5 class="mb-0"><i class="fas fa-chart-area"></i> Option Parameters</h5>
+          </div>
+          <div class="card-body">
+            <!-- Option Type -->
+            <div class="form-group">
+              <label><i class="fas fa-arrows-alt-v"></i> Option Type</label>
+              <div class="btn-group w-100" role="group">
+                <button type="button" 
+                        class="btn" 
+                        [ngClass]="optionType === 'call' ? 'btn-success' : 'btn-outline-success'"
+                        (click)="optionType = 'call'; resetAllCalculations()">
+                  CALL
+                </button>
+                <button type="button" 
+                        class="btn" 
+                        [ngClass]="optionType === 'put' ? 'btn-danger' : 'btn-outline-danger'"
+                        (click)="optionType = 'put'; resetAllCalculations()">
+                  PUT
+                </button>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Stock Price -->
+            <div class="form-group">
+              <label><i class="fas fa-chart-line"></i> Current Stock/Index Price (₹) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" [(ngModel)]="stockPrice" placeholder="25000" step="10">
+              <small class="text-muted">Current market price of the underlying</small>
+            </div>
+
+            <!-- Strike Price -->
+            <div class="form-group">
+              <label><i class="fas fa-crosshairs"></i> Strike Price (₹) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" [(ngModel)]="bsStrikePrice" placeholder="25000" step="50">
+              <small class="text-muted">Option strike price</small>
+            </div>
+
+            <!-- Time to Expiry -->
+            <div class="form-group">
+              <label><i class="fas fa-calendar-alt"></i> Days to Expiry <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" [(ngModel)]="timeToExpiry" placeholder="30" min="1">
+              <small class="text-muted">Number of days until option expires</small>
+            </div>
+
+            <!-- Volatility -->
+            <div class="form-group">
+              <label><i class="fas fa-wave-square"></i> Implied Volatility (%) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" [(ngModel)]="volatility" placeholder="20" step="0.5" min="0">
+              <small class="text-muted">Historical or implied volatility (annualized)</small>
+            </div>
+
+            <!-- Risk-Free Rate -->
+            <div class="form-group">
+              <label><i class="fas fa-percent"></i> Risk-Free Interest Rate (%)</label>
+              <input type="number" class="form-control" [(ngModel)]="riskFreeRate" placeholder="6.5" step="0.1">
+              <small class="text-muted">Current government bond rate (default: 6.5%)</small>
+            </div>
+
+            <!-- Calculate Button -->
+            <button class="btn btn-primary btn-lg btn-block" (click)="calculateBlackScholes()">
+              <i class="fas fa-calculator"></i> Calculate Theoretical Price & Greeks
+            </button>
+            
+            <button class="btn btn-outline-secondary btn-block mt-2" (click)="resetAllCalculations()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Black-Scholes Results -->
+      <div class="col-md-6">
+        <div class="card" *ngIf="!greeksResult">
+          <div class="card-body text-center py-5">
+            <i class="fas fa-calculator fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Fill in the parameters and click Calculate to see theoretical price and Greeks</p>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="greeksResult">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Black-Scholes Results</h5>
+          </div>
+          <div class="card-body">
+            <!-- Theoretical Price -->
+            <div class="result-item mb-3 p-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+              <h6 class="mb-1" style="opacity: 0.9;">Theoretical {{ optionType.toUpperCase() }} Price</h6>
+              <h1 class="mb-0">₹{{ greeksResult.theoreticalPrice | number:'1.2-2' }}</h1>
+            </div>
+
+            <!-- Greeks -->
+            <h6 class="mb-3"><i class="fas fa-greek"></i> The Greeks</h6>
+            
+            <table class="table table-bordered">
+              <tbody>
+                <tr>
+                  <td><strong>Delta (Δ)</strong><br><small class="text-muted">Price sensitivity</small></td>
+                  <td class="text-right">
+                    <h5 class="mb-0">{{ greeksResult.delta | number:'1.4-4' }}</h5>
+                    <small class="text-muted">For ₹1 move in stock</small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Gamma (Γ)</strong><br><small class="text-muted">Delta change rate</small></td>
+                  <td class="text-right">
+                    <h5 class="mb-0">{{ greeksResult.gamma | number:'1.4-4' }}</h5>
+                    <small class="text-muted">Delta change per ₹1</small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Theta (Θ)</strong><br><small class="text-muted">Time decay</small></td>
+                  <td class="text-right">
+                    <h5 class="mb-0 text-danger">{{ greeksResult.theta | number:'1.2-2' }}</h5>
+                    <small class="text-muted">Value lost per day</small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Vega (ν)</strong><br><small class="text-muted">Volatility sensitivity</small></td>
+                  <td class="text-right">
+                    <h5 class="mb-0">{{ greeksResult.vega | number:'1.2-2' }}</h5>
+                    <small class="text-muted">For 1% IV change</small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Rho (ρ)</strong><br><small class="text-muted">Interest rate sensitivity</small></td>
+                  <td class="text-right">
+                    <h5 class="mb-0">{{ greeksResult.rho | number:'1.2-2' }}</h5>
+                    <small class="text-muted">For 1% rate change</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Greeks Explanation -->
+            <div class="alert alert-info">
+              <strong><i class="fas fa-info-circle"></i> Quick Guide:</strong>
+              <ul class="mb-0 mt-2" style="font-size: 0.9rem;">
+                <li><strong>Delta:</strong> If stock moves ₹1, option moves ₹{{ Math.abs(greeksResult.delta) | number:'1.2-2' }}</li>
+                <li><strong>Theta:</strong> Option loses ₹{{ Math.abs(greeksResult.theta) | number:'1.2-2' }} per day</li>
+                <li><strong>Vega:</strong> If IV increases 1%, option gains ₹{{ greeksResult.vega | number:'1.2-2' }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END BLACK-SCHOLES CALCULATOR -->
+
+  <!-- Risk Management Tips (Shown for all modes) -->
   <div class="row mt-4">
     <div class="col-md-6">
       <div class="card border-warning">
         <div class="card-header bg-warning">
-          <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Risk Management Rules</h6>
+          <h6 class="mb-0"><i class="fas fa-shield-alt"></i> 
+            {{ calculatorMode === 'stock' ? 'Risk Management Rules' : 'Options Trading Rules' }}
+          </h6>
         </div>
         <div class="card-body">
-          <ul class="mb-0">
+          <ul class="mb-0" *ngIf="calculatorMode === 'stock'">
             <li><strong>Never risk more than 1-2%</strong> of your capital per trade</li>
             <li><strong>Always use stop loss</strong> - no exceptions</li>
             <li><strong>Aim for minimum 1:2 Risk:Reward</strong> ratio</li>
             <li><strong>Don't trade without a plan</strong> - calculate before entering</li>
             <li><strong>Keep position sizes small</strong> to avoid large drawdowns</li>
+          </ul>
+          <ul class="mb-0" *ngIf="calculatorMode === 'option'">
+            <li><strong>Options can expire worthless</strong> - never risk more than you can afford to lose</li>
+            <li><strong>Time decay (Theta)</strong> works against option buyers</li>
+            <li><strong>Selling options requires margin</strong> and has unlimited risk (Calls)</li>
+            <li><strong>Know your break-even point</strong> before entering</li>
+            <li><strong>Volatility is your friend/enemy</strong> - understand Vega</li>
+          </ul>
+          <ul class="mb-0" *ngIf="calculatorMode === 'blackscholes'">
+            <li><strong>Black-Scholes gives theoretical price</strong> - actual market price may differ</li>
+            <li><strong>Implied Volatility (IV)</strong> is the most important input</li>
+            <li><strong>Greeks change constantly</strong> - monitor Delta, Theta, Vega</li>
+            <li><strong>ATM options have highest Gamma</strong> - most sensitive to price moves</li>
+            <li><strong>Time decay accelerates</strong> in the last 30 days before expiry</li>
           </ul>
         </div>
       </div>
@@ -256,12 +925,26 @@
           <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Pro Tips</h6>
         </div>
         <div class="card-body">
-          <ul class="mb-0">
+          <ul class="mb-0" *ngIf="calculatorMode === 'stock'">
             <li>Risk 1% on uncertain trades, 2% on high-confidence setups</li>
             <li>Use tighter stop loss for intraday, wider for swing trades</li>
             <li>Account for brokerage and taxes in your calculations</li>
             <li>Reduce position size during volatile market conditions</li>
             <li>Track all trades to improve your risk management</li>
+          </ul>
+          <ul class="mb-0" *ngIf="calculatorMode === 'option'">
+            <li>Buy options when IV is low, sell when IV is high</li>
+            <li>NIFTY lot size is 25, BANKNIFTY is 15 shares per lot</li>
+            <li>ITM options have higher Delta, OTM have lower Delta</li>
+            <li>Consider weekly options for short-term trades (less premium)</li>
+            <li>Use spreads to reduce risk and capital requirement</li>
+          </ul>
+          <ul class="mb-0" *ngIf="calculatorMode === 'blackscholes'">
+            <li>Use India VIX as proxy for NIFTY volatility (divide by √12 for monthly)</li>
+            <li>Delta of 0.5 means ATM, >0.5 ITM, <0.5 OTM for Calls</li>
+            <li>High Gamma means option price is very sensitive</li>
+            <li>Sell options when Theta decay is fastest (last 15-30 days)</li>
+            <li>Compare theoretical price with market price to find mispriced options</li>
           </ul>
         </div>
       </div>
