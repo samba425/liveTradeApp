@@ -289,28 +289,40 @@ async function checkAndSaveOnStartup() {
 	// Save daily data if:
 	// 1. Weekday after 3:30 PM or before 9:15 AM (next day's data)
 	// 2. Weekend (save Friday's data for Monday trading)
+	// 3. NO DATA EXISTS - always save to ensure data availability
 	const isWeekend = currentDay === 0 || currentDay === 6; // Saturday or Sunday
 	
 	if (isWeekday || isWeekend) {
 		try {
 			if (!fs.existsSync(DAILY_DATA_FILE)) {
-				if (isWeekend || isAfter330PM_IST || isBeforeMarketOpen_IST) {
-					console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - Friday data' : 'Weekday'})`);
-					await autoSaveDailyData();
-				} else {
-					console.log('⏸️  [STARTUP] No DAILY data, but waiting until after 3:30 PM to save');
-				}
+				// ALWAYS save if no data exists, regardless of time
+				// This prevents 404 errors when server restarts during market hours
+				console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - Friday data' : isBeforeMarketOpen_IST ? 'Before market open' : isAfter330PM_IST ? 'After market close' : 'During market hours - ensuring data availability'})`);
+				await autoSaveDailyData();
 			} else {
 				const savedData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
 				const savedDate = new Date(savedData.timestamp);
-				const today = new Date();
+				const savedDateIST = new Date(savedDate.getTime() + istOffset);
+				const todayIST = new Date(now.getTime() + istOffset);
 				
-				// Check if saved data is from a previous day
-				const isSameDay = savedDate.toDateString() === today.toDateString();
+				// Check if saved data is from today (IST date comparison)
+				const isSameDay = savedDateIST.getUTCDate() === todayIST.getUTCDate() && 
+				                  savedDateIST.getUTCMonth() === todayIST.getUTCMonth() && 
+				                  savedDateIST.getUTCFullYear() === todayIST.getUTCFullYear();
 				
-				// Save if data is old AND (we're after market close OR before market open OR it's weekend)
+				// Save if:
+				// 1. Data is from a different day AND we're after 3:30 PM IST (market closed)
+				// 2. Data is from a different day AND it's before market open (9:15 AM IST)
+				// 3. Data is from a different day AND it's weekend
+				// 4. It's the same day BUT it's after 3:30 PM AND data was saved before 3:30 PM (catch missed cron)
+				const savedTimeMinutes = savedDateIST.getUTCHours() * 60 + savedDateIST.getUTCMinutes();
+				const wasSavedBefore330PM = savedTimeMinutes < 930; // Saved before 3:30 PM IST
+				
 				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST || isWeekend)) {
-					console.log(`📊 [STARTUP] DAILY data is old. Saving fresh data... (${isWeekend ? 'Weekend - Friday data' : 'Weekday'})`);
+					console.log(`📊 [STARTUP] DAILY data is from previous day. Saving fresh data... (${isWeekend ? 'Weekend - Friday data' : 'Weekday'})`);
+					await autoSaveDailyData();
+				} else if (isSameDay && isAfter330PM_IST && wasSavedBefore330PM) {
+					console.log(`📊 [STARTUP] DAILY data saved before 3:30 PM today. Saving updated data after market close...`);
 					await autoSaveDailyData();
 				} else {
 					console.log(`✅ [STARTUP] DAILY data is current (saved: ${savedDate.toLocaleString()})`);
@@ -408,8 +420,14 @@ app.get('/getCamarillaData', async (req, res) => {
 				// Save daily data if:
 				// 1. Weekday after 3:30 PM OR before market open
 				// 2. Weekend (Friday's data for Monday)
+				// 3. During market hours if no data exists (fallback to ensure availability)
 				if (isWeekend || (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST))) {
 					console.log(`💾 [API] Saving DAILY data (${isWeekend ? 'Weekend - Friday data for Monday' : 'Weekday'})`);
+					shouldSave = true;
+					await autoSaveDailyData();
+				} else if (isWeekday) {
+					// During market hours but no data exists - save it anyway
+					console.log(`💾 [API] Saving DAILY data during market hours (no data exists - ensuring availability)`);
 					shouldSave = true;
 					await autoSaveDailyData();
 				} else {
