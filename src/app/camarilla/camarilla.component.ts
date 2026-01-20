@@ -273,6 +273,7 @@ export class CamarillaComponent implements OnInit {
     this.gridOptions = <GridOptions>{};
 
     setTimeout(() => {
+      this.autoCleanStaleData(); // Clean stale data first
       this.loadCamarillaDataFromServer(); // Load auto-saved data from server
       this.fetchLiveData();
     }, 100);
@@ -442,6 +443,51 @@ export class CamarillaComponent implements OnInit {
     const key = this.timeframe === 'weekly' ? 'lastWeekDataTimestamp' : 'lastDayDataTimestamp';
     const timestamp = localStorage.getItem(key);
     return timestamp || 'N/A';
+  }
+
+  /**
+   * Automatically clean stale data from localStorage on component init
+   * This ensures accurate data on UI every time
+   * - Daily data: Cleared if older than 1 day
+   * - Weekly data: Cleared if older than 7 days
+   */
+  autoCleanStaleData() {
+    let cleaned = false;
+    
+    // Check and clean daily data
+    const dailyTimestamp = localStorage.getItem('lastDayDataTimestamp');
+    if (dailyTimestamp) {
+      const savedDate = new Date(dailyTimestamp);
+      const now = new Date();
+      const isSameDay = savedDate.toDateString() === now.toDateString();
+      
+      if (!isSameDay) {
+        localStorage.removeItem('lastDayData');
+        localStorage.removeItem('lastDayDataTimestamp');
+        console.log('🧹 Auto-cleaned stale DAILY data from localStorage');
+        cleaned = true;
+      }
+    }
+    
+    // Check and clean weekly data
+    const weeklyTimestamp = localStorage.getItem('lastWeekDataTimestamp');
+    if (weeklyTimestamp) {
+      const savedDate = new Date(weeklyTimestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - savedDate.getTime();
+      const diffDays = diffMs / (24 * 60 * 60 * 1000);
+      
+      if (diffDays >= 7) {
+        localStorage.removeItem('lastWeekData');
+        localStorage.removeItem('lastWeekDataTimestamp');
+        console.log('🧹 Auto-cleaned stale WEEKLY data from localStorage (older than 7 days)');
+        cleaned = true;
+      }
+    }
+    
+    if (!cleaned) {
+      console.log('✅ localStorage data is fresh - no cleanup needed');
+    }
   }
 
   /**
