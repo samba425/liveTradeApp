@@ -223,7 +223,25 @@ async function autoSaveWeeklyData(triggeredBy = 'auto-cron') {
  * Runs every weekday at 3:30 PM IST (10:00 UTC)
  */
 async function autoSaveDailyData(triggeredBy = 'auto-cron') {
-	console.log('🕒 [CRON] Auto-saving DAILY Camarilla data...');
+	console.log(`🕒 [SAVE] Auto-saving DAILY Camarilla data... (triggered by: ${triggeredBy})`);
+	
+	// SAFETY CHECK: Prevent saving during market hours on weekdays
+	const now = new Date();
+	const istOffset = 5.5 * 60 * 60 * 1000;
+	const istTime = new Date(now.getTime() + istOffset);
+	const istHour = istTime.getUTCHours();
+	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
+	const currentDay = istTime.getUTCDay();
+	const isWeekday = currentDay >= 1 && currentDay <= 5;
+	const isWeekend = currentDay === 0 || currentDay === 6;
+	const isAfter330PM_IST = istMinutes >= 930;
+	
+	// CRITICAL: On weekdays, ONLY save after 3:30 PM IST
+	if (isWeekday && !isAfter330PM_IST && triggeredBy !== 'manual-trigger') {
+		console.log(`❌ [SAVE] BLOCKING Daily data save during market hours! (${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')} IST on weekday)`);
+		console.log(`⏰ [SAVE] Will save after 3:30 PM IST. Current triggeredBy: ${triggeredBy}`);
+		return; // Don't save!
+	}
 	
 	try {
 		const data = await fetchTradingViewData({});
@@ -237,9 +255,9 @@ async function autoSaveDailyData(triggeredBy = 'auto-cron') {
 		};
 		
 		fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
-		console.log(`✅ [CRON] Daily data saved! ${dailyData.length} stocks processed.`);
+		console.log(`✅ [SAVE] Daily data saved! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
 	} catch (error) {
-		console.error('❌ [CRON] Error saving daily data:', error.message);
+		console.error('❌ [SAVE] Error saving daily data:', error.message);
 	}
 }
 
