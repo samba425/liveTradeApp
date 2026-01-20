@@ -59,9 +59,7 @@ export class PositionCalculatorComponent implements OnInit {
   optionAction: 'buy' | 'sell' = 'buy';
   strikePrice: number = null;
   premium: number = null;
-  lotSize: number = 25; // Default for NIFTY
-  customLotSize: number = 700; // For custom lot size input - default 700
-  isCustomLotSize: boolean = false; // Flag to show custom input
+  customLotSize: number = 700; // Lot size (shares per lot) - default 700
   currentPrice: number = null;
   quantity: number = 1; // Number of lots
   
@@ -254,9 +252,7 @@ export class PositionCalculatorComponent implements OnInit {
     this.premium = null;
     this.currentPrice = null;
     this.quantity = 1;
-    this.lotSize = 25;
     this.customLotSize = 700;
-    this.isCustomLotSize = false;
     
     // Stop loss and targets
     this.optionCapital = 0;
@@ -298,7 +294,7 @@ export class PositionCalculatorComponent implements OnInit {
    * Calculate Options P&L
    */
   calculateOption() {
-    const effectiveLotSize = this.isCustomLotSize ? this.customLotSize : this.lotSize;
+    const effectiveLotSize = this.customLotSize;
     
     if (!this.strikePrice || !this.premium || !this.currentPrice || !effectiveLotSize || effectiveLotSize <= 0) {
       alert('Please fill all required fields (including custom lot size if selected)');
@@ -367,7 +363,7 @@ export class PositionCalculatorComponent implements OnInit {
    * Support both percentage-based and amount-based risk management
    */
   calculateOptionStopLoss() {
-    const effectiveLotSize = this.isCustomLotSize ? this.customLotSize : this.lotSize;
+    const effectiveLotSize = this.customLotSize;
     
     if (!this.premium || this.premium <= 0 || !effectiveLotSize || effectiveLotSize <= 0 || !this.quantity || this.quantity <= 0) {
       alert('Please fill all required fields (premium, lot size, and number of lots)');
@@ -514,7 +510,7 @@ export class PositionCalculatorComponent implements OnInit {
     
     const scenarios = [];
     const movements = [10, 5, 2, 0, -2, -5, -10];
-    const totalShares = (this.isCustomLotSize ? this.customLotSize : this.lotSize) * this.quantity;
+    const totalShares = this.customLotSize * this.quantity;
     
     movements.forEach(pct => {
       const newStockPrice = this.currentPrice * (1 + pct / 100);
@@ -559,7 +555,7 @@ export class PositionCalculatorComponent implements OnInit {
   getRecommendedLots(): number {
     if (!this.premium || !this.totalCapital || !this.riskPerTradePercent) return 0;
     
-    const lotSize = this.isCustomLotSize ? this.customLotSize : this.lotSize;
+    const lotSize = this.customLotSize;
     if (!lotSize || lotSize <= 0) return 0;
     
     // Calculate max risk amount per trade
@@ -591,7 +587,7 @@ export class PositionCalculatorComponent implements OnInit {
    */
   getTotalPositionValue(): number {
     if (!this.premium) return 0;
-    const lotSize = this.isCustomLotSize ? this.customLotSize : this.lotSize;
+    const lotSize = this.customLotSize;
     return this.premium * lotSize * this.quantity;
   }
 
@@ -681,14 +677,5 @@ export class PositionCalculatorComponent implements OnInit {
 
   getOptionLabel(): string {
     return `${this.optionAction.toUpperCase()} ${this.optionType.toUpperCase()}`;
-  }
-
-  onLotSizeChange() {
-    // Convert to number to handle string comparison
-    this.isCustomLotSize = (Number(this.lotSize) === 1);
-    if (!this.isCustomLotSize) {
-      this.customLotSize = 700; // Reset to default when switching back
-    }
-    console.log('Lot size changed:', this.lotSize, 'isCustom:', this.isCustomLotSize);
   }
 }

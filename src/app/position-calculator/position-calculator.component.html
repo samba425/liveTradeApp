@@ -351,11 +351,11 @@
             </div>
 
             <!-- Investment Summary -->
-            <div class="alert alert-info py-2 px-2 mb-2" *ngIf="premium && (isCustomLotSize ? customLotSize : lotSize) && quantity" style="font-size: 0.85rem;">
+            <div class="alert alert-info py-2 px-2 mb-2" *ngIf="premium && (customLotSize) && quantity" style="font-size: 0.85rem;">
               <div class="row text-center">
                 <div class="col-4">
                   <small class="d-block">Lot Size</small>
-                  <strong>{{ isCustomLotSize ? customLotSize : lotSize }}</strong>
+                  <strong>{{ customLotSize }}</strong>
                 </div>
                 <div class="col-4">
                   <small class="d-block">Lots</small>
@@ -363,12 +363,12 @@
                 </div>
                 <div class="col-4">
                   <small class="d-block">Total</small>
-                  <strong>{{ (isCustomLotSize ? customLotSize : lotSize) * quantity }}</strong>
+                  <strong>{{ (customLotSize) * quantity }}</strong>
                 </div>
               </div>
               <hr class="my-1">
               <div class="text-center">
-                <h6 class="mb-0 text-primary">₹{{ (premium * (isCustomLotSize ? customLotSize : lotSize) * quantity) | number:'1.0-0' }}</h6>
+                <h6 class="mb-0 text-primary">₹{{ (premium * (customLotSize) * quantity) | number:'1.0-0' }}</h6>
                 <small>Investment</small>
               </div>
             </div>
@@ -566,7 +566,7 @@
                     </tr>
                     <tr class="bg-success text-white">
                       <td><strong>Total Profit:</strong></td>
-                      <td class="text-right"><strong>₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                      <td class="text-right"><strong>₹{{ ((targetPremium - premium) * quantity * (customLotSize)) | number:'1.0-0' }}</strong></td>
                     </tr>
                   </table>
                 </div>
@@ -576,9 +576,9 @@
 
           <!-- Risk:Reward -->
           <div class="card shadow-sm mb-2" *ngIf="targetPremium && targetPremium > premium" [ngClass]="{
-            'border-success': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 2,
-            'border-warning': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 2,
-            'border-danger': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 1
+            'border-success': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) >= 2,
+            'border-warning': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) < 2,
+            'border-danger': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) < 1
           }">
             <div class="card-body p-2">
               <div class="row text-center" style="font-size: 0.85rem;">
@@ -589,14 +589,14 @@
                 <div class="col-4">
                   <small class="d-block text-muted">Ratio</small>
                   <h5 class="mb-0" [ngClass]="{
-                    'text-success': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 2,
-                    'text-warning': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 2,
-                    'text-danger': (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) < 1
-                  }">1:{{ (((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) / optionSLResult.stopLossAmount) | number:'1.1-1' }}</h5>
+                    'text-success': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) >= 2,
+                    'text-warning': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) >= 1 && (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) < 2,
+                    'text-danger': (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) < 1
+                  }">1:{{ (((targetPremium - premium) * quantity * (customLotSize)) / optionSLResult.stopLossAmount) | number:'1.1-1' }}</h5>
                 </div>
                 <div class="col-4">
                   <small class="d-block text-muted">Reward</small>
-                  <strong class="text-success">₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong>
+                  <strong class="text-success">₹{{ ((targetPremium - premium) * quantity * (customLotSize)) | number:'1.0-0' }}</strong>
                 </div>
               </div>
             </div>
@@ -619,11 +619,11 @@
                 </tr>
                 <tr>
                   <td>Lots:</td>
-                  <td class="text-right">{{ quantity }} × {{ isCustomLotSize ? customLotSize : lotSize }}</td>
+                  <td class="text-right">{{ quantity }} × {{ customLotSize }}</td>
                 </tr>
                 <tr>
                   <td>Total Shares:</td>
-                  <td class="text-right"><strong>{{ quantity * (isCustomLotSize ? customLotSize : lotSize) }}</strong></td>
+                  <td class="text-right"><strong>{{ quantity * (customLotSize) }}</strong></td>
                 </tr>
                 <tr class="table-primary">
                   <td><strong>Investment:</strong></td>
@@ -672,19 +672,19 @@
                 <tr *ngIf="target1Premium && target1Premium > premium">
                   <td><strong>Target 1:</strong></td>
                   <td class="text-right">₹{{ target1Premium }}</td>
-                  <td class="text-right text-success"><strong>+₹{{ ((target1Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target1Premium - premium) * quantity * (customLotSize)) | number:'1.0-0' }}</strong></td>
                   <td class="text-right"><small>({{ ((target1Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
                 </tr>
                 <tr *ngIf="target2Premium && target2Premium > premium">
                   <td><strong>Target 2:</strong></td>
                   <td class="text-right">₹{{ target2Premium }}</td>
-                  <td class="text-right text-success"><strong>+₹{{ ((target2Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target2Premium - premium) * quantity * (customLotSize)) | number:'1.0-0' }}</strong></td>
                   <td class="text-right"><small>({{ ((target2Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
                 </tr>
                 <tr *ngIf="target3Premium && target3Premium > premium">
                   <td><strong>Target 3:</strong></td>
                   <td class="text-right">₹{{ target3Premium }}</td>
-                  <td class="text-right text-success"><strong>+₹{{ ((target3Premium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }}</strong></td>
+                  <td class="text-right text-success"><strong>+₹{{ ((target3Premium - premium) * quantity * (customLotSize)) | number:'1.0-0' }}</strong></td>
                   <td class="text-right"><small>({{ ((target3Premium - premium) / premium * 100) | number:'1.0-0' }}%)</small></td>
                 </tr>
               </table>
@@ -708,7 +708,7 @@
                 <li class="text-success" *ngIf="target1Premium && target1Premium > premium"><strong>T1: ₹{{ target1Premium }}</strong> (Book 30-40%)</li>
                 <li class="text-success" *ngIf="target2Premium && target2Premium > premium"><strong>T2: ₹{{ target2Premium }}</strong> (Book 30-40%)</li>
                 <li class="text-success" *ngIf="target3Premium && target3Premium > premium"><strong>T3: ₹{{ target3Premium }}</strong> (Book remaining)</li>
-                <li class="text-success" *ngIf="targetPremium && targetPremium > premium && !target1Premium"><strong>Target: ₹{{ targetPremium }}</strong> (Profit: ₹{{ ((targetPremium - premium) * quantity * (isCustomLotSize ? customLotSize : lotSize)) | number:'1.0-0' }})</li>
+                <li class="text-success" *ngIf="targetPremium && targetPremium > premium && !target1Premium"><strong>Target: ₹{{ targetPremium }}</strong> (Profit: ₹{{ ((targetPremium - premium) * quantity * (customLotSize)) | number:'1.0-0' }})</li>
               </ol>
             </div>
           </div>
