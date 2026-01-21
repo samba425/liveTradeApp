@@ -236,10 +236,13 @@ async function autoSaveDailyData(triggeredBy = 'auto-cron') {
 	const isWeekend = currentDay === 0 || currentDay === 6;
 	const isAfter330PM_IST = istMinutes >= 930;
 	
-	// CRITICAL: On weekdays, ONLY save after 3:30 PM IST
-	if (isWeekday && !isAfter330PM_IST && triggeredBy !== 'manual-trigger') {
+	// CRITICAL: On weekdays, ONLY save after 3:30 PM IST OR before 9:15 AM IST (pre-market)
+	// Between 9:15 AM - 3:30 PM = Market hours, prices changing, don't save!
+	const isDuringMarketHours = isWeekday && istMinutes >= 555 && istMinutes < 930; // 9:15 AM - 3:30 PM
+	
+	if (isDuringMarketHours && triggeredBy !== 'manual-trigger') {
 		console.log(`❌ [SAVE] BLOCKING Daily data save during market hours! (${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')} IST on weekday)`);
-		console.log(`⏰ [SAVE] Will save after 3:30 PM IST. Current triggeredBy: ${triggeredBy}`);
+		console.log(`⏰ [SAVE] Will save after 3:30 PM IST or before 9:15 AM IST. Current triggeredBy: ${triggeredBy}`);
 		return; // Don't save!
 	}
 	
@@ -312,10 +315,10 @@ async function checkAndSaveOnStartup() {
 	if (isWeekday || isWeekend) {
 		try {
 			if (!fs.existsSync(DAILY_DATA_FILE)) {
-				// Weekday: Only save if after 3:30 PM IST (need market close)
+				// Weekday: Save if after 3:30 PM IST OR before 9:15 AM IST (pre-market uses previous day close)
 				// Weekend: Save anytime (Friday's close data already available)
-				if (isWeekend || isAfter330PM_IST) {
-					console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - anytime OK, using Friday close' : 'After 3:30 PM - market close'})`);
+				if (isWeekend || isAfter330PM_IST || isBeforeMarketOpen_IST) {
+					console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
 					await autoSaveDailyData('startup-check');
 				} else {
 					console.log('⏸️  [STARTUP] No DAILY data, but waiting until after 3:30 PM IST (need today\'s market close for Camarilla)');
@@ -332,18 +335,18 @@ async function checkAndSaveOnStartup() {
 				                  savedDateIST.getUTCFullYear() === todayIST.getUTCFullYear();
 				
 				// Save if:
-				// 1. Data is from a different day AND (we're after 3:30 PM IST OR it's weekend)
+				// 1. Data is from a different day AND (after 3:30 PM OR before 9:15 AM OR weekend)
 				// 2. Same day BUT after 3:30 PM AND data was saved before 3:30 PM (refresh with market close)
 				const savedTimeMinutes = savedDateIST.getUTCHours() * 60 + savedDateIST.getUTCMinutes();
 				const wasSavedBefore330PM = savedTimeMinutes < 930; // Saved before 3:30 PM IST
 				
-				if (!isSameDay && (isAfter330PM_IST || isWeekend)) {
-					console.log(`📊 [STARTUP] DAILY data is from previous day. Saving fresh data... (${isWeekend ? 'Weekend - anytime OK' : 'After 3:30 PM - market close'})`);
+				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST || isWeekend)) {
+					console.log(`📊 [STARTUP] DAILY data is from previous day. Saving fresh data... (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
 					await autoSaveDailyData('startup-refresh');
 				} else if (isSameDay && isAfter330PM_IST && wasSavedBefore330PM) {
 					console.log(`📊 [STARTUP] DAILY data saved before 3:30 PM today. Refreshing with market close data...`);
 					await autoSaveDailyData('startup-refresh');
-				} else if (!isSameDay && isWeekday && !isAfter330PM_IST) {
+				} else if (!isSameDay && isWeekday && !isAfter330PM_IST && !isBeforeMarketOpen_IST) {
 					console.log(`⏸️  [STARTUP] DAILY data is old, but waiting until after 3:30 PM IST for today's market close`);
 				} else {
 					console.log(`✅ [STARTUP] DAILY data is current (saved: ${savedDate.toLocaleString()})`);
@@ -443,10 +446,10 @@ app.get('/getCamarillaData', async (req, res) => {
 			
 			if (timeframe === 'daily') {
 				// IMPORTANT: 
-				// - Mon-Fri: Save ONLY after 3:30 PM IST (need today's close for Camarilla)
+				// - Mon-Fri: Save ONLY after 3:30 PM IST OR before 9:15 AM IST
 				// - Sat-Sun: Save ANYTIME (Friday's close already available for Monday's Camarilla)
-				if (isWeekend || (isWeekday && isAfter330PM_IST)) {
-					console.log(`💾 [API] Saving DAILY data (${isWeekend ? 'Weekend - anytime OK, using Friday close' : 'After 3:30 PM - market close'})`);
+				if (isWeekend || (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST))) {
+					console.log(`💾 [API] Saving DAILY data (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
 					shouldSave = true;
 					await autoSaveDailyData('api-request');
 				} else {

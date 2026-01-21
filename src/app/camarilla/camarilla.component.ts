@@ -298,11 +298,61 @@ export class CamarillaComponent implements OnInit {
       const savedDate = new Date(cachedTimestamp);
       const now = new Date();
       
-      // For DAILY: Check if it's from today
+      // For DAILY: Check if data is fresh based on 3:30 PM cutoff
       // For WEEKLY: Check if it's less than 7 days old
-      const isFresh = this.timeframe === 'daily' 
-        ? savedDate.toDateString() === now.toDateString() // Same day
-        : (now.getTime() - savedDate.getTime()) < (7 * 24 * 60 * 60 * 1000); // Less than 7 days
+      let isFresh = false;
+      
+      if (this.timeframe === 'daily') {
+        // Daily data freshness logic:
+        // Data is fresh if:
+        // 1. It's from today AND current time is BEFORE 3:30 PM IST
+        // 2. It's from today AND saved time is AFTER 3:30 PM IST (today's auto-save already happened)
+        
+        // Convert to IST for comparison (UTC + 5:30)
+        const savedIST = new Date(savedDate.getTime() + (5.5 * 60 * 60 * 1000));
+        const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+        
+        const savedISTHours = savedIST.getUTCHours();
+        const savedISTMinutes = savedIST.getUTCMinutes();
+        const nowISTHours = nowIST.getUTCHours();
+        const nowISTMinutes = nowIST.getUTCMinutes();
+        
+        const savedTimeInMinutes = savedISTHours * 60 + savedISTMinutes;
+        const nowTimeInMinutes = nowISTHours * 60 + nowISTMinutes;
+        const cutoffTimeInMinutes = 15 * 60 + 30; // 3:30 PM = 15:30 = 930 minutes
+        
+        const isSameDay = savedIST.toDateString() === nowIST.toDateString();
+        
+        if (isSameDay) {
+          // Same day - check if we've crossed 3:30 PM
+          if (nowTimeInMinutes < cutoffTimeInMinutes) {
+            // Before 3:30 PM - any data from today is fresh
+            isFresh = true;
+          } else {
+            // After 3:30 PM - data must be from after 3:30 PM to be fresh
+            isFresh = savedTimeInMinutes >= cutoffTimeInMinutes;
+          }
+        } else {
+          // Different day - check if saved yesterday after 3:30 PM and now before 3:30 PM
+          const daysDiff = Math.floor((nowIST.getTime() - savedIST.getTime()) / (24 * 60 * 60 * 1000));
+          
+          if (daysDiff === 1 && nowTimeInMinutes < cutoffTimeInMinutes && savedTimeInMinutes >= cutoffTimeInMinutes) {
+            // Saved yesterday after 3:30 PM, and we're still before 3:30 PM today
+            isFresh = true;
+          } else {
+            isFresh = false;
+          }
+        }
+        
+        console.log(`🕐 Freshness Check (Daily):`);
+        console.log(`   Saved: ${savedIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${savedTimeInMinutes} min)`);
+        console.log(`   Now:   ${nowIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${nowTimeInMinutes} min)`);
+        console.log(`   Cutoff: 3:30 PM IST (${cutoffTimeInMinutes} min)`);
+        console.log(`   Same Day: ${isSameDay}, Fresh: ${isFresh}`);
+      } else {
+        // Weekly: Less than 7 days old
+        isFresh = (now.getTime() - savedDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
+      }
       
       if (isFresh) {
         console.log(`💾 Using cached ${this.timeframe} data from localStorage (saved: ${savedDate.toLocaleString()})`);
