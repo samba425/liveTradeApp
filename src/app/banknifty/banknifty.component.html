@@ -243,5 +243,380 @@
     <app-sector-tracker></app-sector-tracker>
   </div>
   <!-- END SECTORS VIEW -->
-  
+
+  <!-- OI & IV Quick Reference Guide -->
+  <style>
+    .table .badge {
+      color: #fff !important;
+    }
+    .table .badge-secondary {
+      background-color: #6c757d !important;
+      color: #fff !important;
+    }
+    .table .badge-success {
+      background-color: #28a745 !important;
+      color: #fff !important;
+    }
+    .table .badge-danger {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+    }
+    .table .badge-warning {
+      background-color: #ffc107 !important;
+      color: #000 !important;
+    }
+    .table .badge-info {
+      background-color: #17a2b8 !important;
+      color: #fff !important;
+    }
+  </style>
+  <div class="row mt-4 mb-4">
+    <div class="col-12">
+      <div class="card shadow-lg" style="border: none; border-radius: 15px; overflow: hidden;">
+        <div class="card-header text-white text-center py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <h4 class="mb-0"><i class="fas fa-book-open"></i> OI & IV Quick Reference Guide</h4>
+          <p class="mb-0 mt-2" style="font-size: 0.9rem; opacity: 0.9;">Master Option Trading Signals - Key Indicators Explained</p>
+        </div>
+        <div class="card-body p-0">
+          
+          <!-- OI (Open Interest) Table -->
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-chart-bar"></i> OI (Open Interest) - "Smart Money Tracking"
+                  </th>
+                </tr>
+                <tr style="background: #1e40af; color: white;">
+                  <th style="width: 15%;">Scenario</th>
+                  <th style="width: 20%;">Call OI</th>
+                  <th style="width: 20%;">Put OI</th>
+                  <th style="width: 15%;">Signal</th>
+                  <th style="width: 15%;">Action</th>
+                  <th style="width: 15%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #dfffd6; color: #000;">
+                  <td><strong style="color: #000;">🔴 High Call OI</strong></td>
+                  <td><span class="badge badge-danger">Very High (>1L)</span></td>
+                  <td><span class="badge badge-secondary">Low</span></td>
+                  <td><strong style="color: #dc2626;">RESISTANCE</strong></td>
+                  <td><span class="badge badge-warning">⚠️ Don't Buy Above</span></td>
+                  <td><small style="color: #000;">Nifty 19500 has 2L Call OI</small></td>
+                </tr>
+                <tr style="background: #fff4d6; color: #000;">
+                  <td><strong style="color: #000;">🟢 High Put OI</strong></td>
+                  <td><span class="badge badge-secondary">Low</span></td>
+                  <td><span class="badge badge-success">Very High (>1L)</span></td>
+                  <td><strong style="color: #16a34a;">SUPPORT</strong></td>
+                  <td><span class="badge badge-success">✅ Buy Zone</span></td>
+                  <td><small style="color: #000;">Nifty 19000 has 1.5L Put OI</small></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">⚖️ Balanced OI</strong></td>
+                  <td><span class="badge badge-info">Medium</span></td>
+                  <td><span class="badge badge-info">Medium</span></td>
+                  <td><strong style="color: #0284c7;">NEUTRAL</strong></td>
+                  <td><span class="badge badge-info">📊 Wait & Watch</span></td>
+                  <td><small style="color: #000;">ATM strike - equal interest</small></td>
+                </tr>
+                <tr style="background: #ffe4e4; color: #000;">
+                  <td><strong style="color: #000;">📈 Call OI Increasing</strong></td>
+                  <td><span class="badge badge-danger">+50% ↑</span></td>
+                  <td><span class="badge badge-secondary">Stable</span></td>
+                  <td><strong style="color: #dc2626;">Building Resistance</strong></td>
+                  <td><span class="badge badge-warning">⚠️ Caution - Book Profit</span></td>
+                  <td><small style="color: #000;">BankNifty 44500 +870%</small></td>
+                </tr>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">📉 Put OI Increasing</strong></td>
+                  <td><span class="badge badge-secondary">Stable</span></td>
+                  <td><span class="badge badge-success">+40% ↑</span></td>
+                  <td><strong style="color: #16a34a;">Building Support</strong></td>
+                  <td><span class="badge badge-success">✅ Buying Opportunity</span></td>
+                  <td><small style="color: #000;">BankNifty 44000 +560%</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">🔄 Both OI Increasing</strong></td>
+                  <td><span class="badge badge-danger">+30% ↑</span></td>
+                  <td><span class="badge badge-success">+35% ↑</span></td>
+                  <td><strong style="color: #ca8a04;">RANGE BOUND</strong></td>
+                  <td><span class="badge badge-warning">📊 Trade Range Only</span></td>
+                  <td><small style="color: #000;">Market stuck 19000-19500</small></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">⚡ Both OI Decreasing</strong></td>
+                  <td><span class="badge badge-danger">-20% ↓</span></td>
+                  <td><span class="badge badge-success">-25% ↓</span></td>
+                  <td><strong style="color: #991b1b;">UNWINDING</strong></td>
+                  <td><span class="badge badge-danger">🚫 Exit Positions</span></td>
+                  <td><small style="color: #000;">Trend reversal likely</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- IV (Implied Volatility) Table -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-bolt"></i> IV (Implied Volatility) - "Market Panic Meter"
+                  </th>
+                </tr>
+                <tr style="background: #6d28d9; color: white;">
+                  <th style="width: 15%;">IV Level</th>
+                  <th style="width: 15%;">Range</th>
+                  <th style="width: 20%;">Market State</th>
+                  <th style="width: 20%;">Premium Cost</th>
+                  <th style="width: 15%;">Action</th>
+                  <th style="width: 15%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">😴 Very Low IV</strong></td>
+                  <td><span class="badge badge-success">< 12%</span></td>
+                  <td><strong style="color: #059669;">Calm Market</strong><br><small style="color: #000;">No panic, low movement</small></td>
+                  <td><span class="badge badge-success">💰 Very Cheap</span></td>
+                  <td><span class="badge badge-success">✅ BUY Options</span></td>
+                  <td><small style="color: #000;">VIX at 10-11</small></td>
+                </tr>
+                <tr style="background: #dfffd6; color: #000;">
+                  <td><strong style="color: #000;">😊 Low IV</strong></td>
+                  <td><span class="badge badge-success">12-18%</span></td>
+                  <td><strong style="color: #16a34a;">Stable Market</strong><br><small style="color: #000;">Normal trading</small></td>
+                  <td><span class="badge badge-success">💵 Cheap</span></td>
+                  <td><span class="badge badge-success">✅ Good to Buy</span></td>
+                  <td><small style="color: #000;">VIX at 12-15</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">😐 Medium IV</strong></td>
+                  <td><span class="badge badge-warning">18-25%</span></td>
+                  <td><strong style="color: #ca8a04;">Normal Volatility</strong><br><small style="color: #000;">Moderate swings</small></td>
+                  <td><span class="badge badge-warning">💳 Fair Price</span></td>
+                  <td><span class="badge badge-info">📊 Neutral - Cautious</span></td>
+                  <td><small style="color: #000;">VIX at 16-20</small></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">😰 High IV</strong></td>
+                  <td><span class="badge badge-warning">25-35%</span></td>
+                  <td><strong style="color: #ea580c;">Nervous Market</strong><br><small style="color: #000;">Big moves expected</small></td>
+                  <td><span class="badge badge-danger">💸 Expensive</span></td>
+                  <td><span class="badge badge-warning">⚠️ Don't Buy - Wait</span></td>
+                  <td><small style="color: #000;">VIX at 21-28</small></td>
+                </tr>
+                <tr style="background: #fecaca; color: #000;">
+                  <td><strong style="color: #000;">😱 Very High IV</strong></td>
+                  <td><span class="badge badge-danger">> 35%</span></td>
+                  <td><strong style="color: #dc2626;">Panic/Crisis</strong><br><small style="color: #000;">Extreme volatility</small></td>
+                  <td><span class="badge badge-danger">🔥 Very Expensive</span></td>
+                  <td><span class="badge badge-danger">🚫 AVOID Buying</span></td>
+                  <td><small style="color: #000;">VIX at 30+ (COVID era)</small></td>
+                </tr>
+                <tr style="background: #e0e7ff; color: #000;">
+                  <td><strong style="color: #000;">📈 IV Increasing</strong></td>
+                  <td><span class="badge badge-info">+5-10% ↑</span></td>
+                  <td><strong style="color: #4f46e5;">Fear Building</strong><br><small style="color: #000;">Uncertainty rising</small></td>
+                  <td><span class="badge badge-warning">💸 Getting Expensive</span></td>
+                  <td><span class="badge badge-warning">⚠️ Exit Long Options</span></td>
+                  <td><small style="color: #000;">Event upcoming</small></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">📉 IV Decreasing</strong></td>
+                  <td><span class="badge badge-info">-5-10% ↓</span></td>
+                  <td><strong style="color: #7c3aed;">Fear Cooling</strong><br><small style="color: #000;">Calm returning</small></td>
+                  <td><span class="badge badge-success">💰 Getting Cheaper</span></td>
+                  <td><span class="badge badge-success">✅ Good Time to Enter</span></td>
+                  <td><small style="color: #000;">After event/result</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Combined Strategy Table -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                <tr>
+                  <th colspan="5" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-lightbulb"></i> Combined OI + IV Strategy - "Pro Trading Signals"
+                  </th>
+                </tr>
+                <tr style="background: #b45309; color: white;">
+                  <th style="width: 25%;">Market Condition</th>
+                  <th style="width: 20%;">OI Signal</th>
+                  <th style="width: 20%;">IV Level</th>
+                  <th style="width: 20%;">Best Strategy</th>
+                  <th style="width: 15%;">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">🚀 Perfect Buy Setup</strong></td>
+                  <td><span class="badge badge-success">High Put OI (Support)</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #059669;">BUY ATM Calls</strong><br><small style="color: #000;">Target: High Call OI strike</small></td>
+                  <td><span class="badge badge-success">✅ Low Risk</span></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">⚠️ Risky Buy Zone</strong></td>
+                  <td><span class="badge badge-success">High Put OI (Support)</span></td>
+                  <td><span class="badge badge-danger">High IV (>25%)</span></td>
+                  <td><strong style="color: #ca8a04;">WAIT for IV to Drop</strong><br><small style="color: #000;">Premiums too expensive</small></td>
+                  <td><span class="badge badge-warning">⚠️ High Risk</span></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">🛑 Danger Zone</strong></td>
+                  <td><span class="badge badge-danger">High Call OI (Resistance)</span></td>
+                  <td><span class="badge badge-danger">High IV (>25%)</span></td>
+                  <td><strong style="color: #dc2626;">DON'T BUY - EXIT</strong><br><small style="color: #000;">Resistance + Expensive = Bad</small></td>
+                  <td><span class="badge badge-danger">🚫 Very High</span></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">📊 Range Trading</strong></td>
+                  <td><span class="badge badge-info">Both OI High</span></td>
+                  <td><span class="badge badge-info">Medium IV (18-25%)</span></td>
+                  <td><strong style="color: #0284c7;">Sell Options (Iron Condor)</strong><br><small style="color: #000;">Trade the range only</small></td>
+                  <td><span class="badge badge-info">📊 Medium</span></td>
+                </tr>
+                <tr style="background: #fce7f3; color: #000;">
+                  <td><strong style="color: #000;">🎯 Breakout Trade</strong></td>
+                  <td><span class="badge badge-danger">Call OI Break</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #ec4899;">BUY ATM Calls Aggressively</strong><br><small style="color: #000;">Resistance broken = Big move</small></td>
+                  <td><span class="badge badge-warning">⚠️ Medium</span></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">📉 Short Selling Setup</strong></td>
+                  <td><span class="badge badge-success">Put OI Break Down</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #7c3aed;">BUY ATM Puts</strong><br><small style="color: #000;">Support broken = Fall likely</small></td>
+                  <td><span class="badge badge-warning">⚠️ Medium</span></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">⏰ Event Trading</strong></td>
+                  <td><span class="badge badge-info">OI Building Up</span></td>
+                  <td><span class="badge badge-danger">IV Spiking (>30%)</span></td>
+                  <td><strong style="color: #ea580c;">AVOID Trading</strong><br><small style="color: #000;">Wait for event to pass</small></td>
+                  <td><span class="badge badge-danger">🚫 Extreme</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Real Market Examples -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-chart-line"></i> Real Market Examples - "Learn from Live Data"
+                  </th>
+                </tr>
+                <tr style="background: #047857; color: white;">
+                  <th style="width: 15%;">Index/Stock</th>
+                  <th style="width: 20%;">Scenario</th>
+                  <th style="width: 20%;">OI Data</th>
+                  <th style="width: 15%;">IV Data</th>
+                  <th style="width: 15%;">Signal</th>
+                  <th style="width: 15%;">Action Taken</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Nifty 50</strong></td>
+                  <td style="color: #000;">Strike 19500 has 2.5L Call OI</td>
+                  <td><span class="badge badge-danger">Call: 2.5L</span><br><span class="badge badge-secondary">Put: 0.3L</span></td>
+                  <td><span class="badge badge-success">IV: 14%</span></td>
+                  <td><span class="badge badge-danger">⚠️ Strong Resistance</span></td>
+                  <td><small style="color: #000;">Booked profit at 19450</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">BankNifty</strong></td>
+                  <td style="color: #000;">Strike 44000 Put OI +560%</td>
+                  <td><span class="badge badge-success">Put: 1.8L (+560%)</span><br><span class="badge badge-secondary">Call: 0.5L</span></td>
+                  <td><span class="badge badge-success">IV: 16%</span></td>
+                  <td><span class="badge badge-success">✅ Strong Support</span></td>
+                  <td><small style="color: #000;">Bought Calls at 44020</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Reliance</strong></td>
+                  <td style="color: #000;">Strike 2500 balanced OI</td>
+                  <td><span class="badge badge-info">Call: 0.8L</span><br><span class="badge badge-info">Put: 0.85L</span></td>
+                  <td><span class="badge badge-warning">IV: 22%</span></td>
+                  <td><span class="badge badge-info">📊 ATM - Neutral</span></td>
+                  <td><small style="color: #000;">Waited for direction</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">TCS</strong></td>
+                  <td style="color: #000;">Pre-result IV spike</td>
+                  <td><span class="badge badge-danger">Call: 1.2L</span><br><span class="badge badge-success">Put: 1.3L</span></td>
+                  <td><span class="badge badge-danger">IV: 38%</span></td>
+                  <td><span class="badge badge-danger">🚫 Avoid - Too Expensive</span></td>
+                  <td><small style="color: #000;">Waited post-result</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">HDFC Bank</strong></td>
+                  <td style="color: #000;">Support break at 1500</td>
+                  <td><span class="badge badge-warning">Put: 0.6L (was 1.2L)</span><br><span class="badge badge-secondary">Call: 0.4L</span></td>
+                  <td><span class="badge badge-success">IV: 15%</span></td>
+                  <td><span class="badge badge-warning">⚠️ Support Broken</span></td>
+                  <td><small style="color: #000;">Bought Puts at 1498</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Nifty IT</strong></td>
+                  <td style="color: #000;">IV crush after event</td>
+                  <td><span class="badge badge-success">Put: 0.9L</span><br><span class="badge badge-info">Call: 0.7L</span></td>
+                  <td><span class="badge badge-success">IV: 12% (was 28%)</span></td>
+                  <td><span class="badge badge-success">✅ Perfect Entry</span></td>
+                  <td><small style="color: #000;">Bought ATM Calls cheap</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Key Terms Legend -->
+          <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px;">
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-key"></i> Key Terms:</h6>
+                <ul style="font-size: 0.85rem; line-height: 1.8;">
+                  <li><strong>OI (Open Interest):</strong> Number of active contracts</li>
+                  <li><strong>Call OI:</strong> Indicates RESISTANCE (ceiling)</li>
+                  <li><strong>Put OI:</strong> Indicates SUPPORT (floor)</li>
+                  <li><strong>ATM:</strong> At The Money (current price strike)</li>
+                  <li><strong>VIX:</strong> India's volatility index (fear gauge)</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-graduation-cap"></i> Quick Rules:</h6>
+                <ul style="font-size: 0.85rem; line-height: 1.8;">
+                  <li>✅ <strong>Buy when:</strong> Low IV + High Put OI (Support)</li>
+                  <li>⚠️ <strong>Caution when:</strong> High IV + High Call OI (Resistance)</li>
+                  <li>🚫 <strong>Avoid when:</strong> High IV + OI Building at strike</li>
+                  <li>📊 <strong>Range trade when:</strong> Both OI high + Medium IV</li>
+                  <li>🎯 <strong>Breakout when:</strong> OI breaks + Low IV</li>
+                </ul>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12 text-center">
+                <p class="mb-0" style="font-size: 0.8rem; opacity: 0.8;">
+                  <i class="fas fa-info-circle"></i> This guide is for educational purposes. Always do your own research and manage risk properly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End OI & IV Guide -->
+
+
 </div>
