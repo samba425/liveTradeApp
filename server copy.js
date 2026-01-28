@@ -1,13 +1,9 @@
-// Load environment variables
-require('dotenv').config();
-
 const express = require('express');
 const request = require('request-promise').defaults({ strictSSL: false });
 var cors = require('cors');
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
-const { MongoClient } = require('mongodb');
 
 var app = express()
 app.use(cors());
@@ -17,31 +13,7 @@ app.use(bodyParser.json());
 
 const port = process.env.PORT || 5001;
 
-// MongoDB Configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const DB_NAME = 'tradeApp';
-const COLLECTION_NAME = 'camarillaData';
-
-let db;
-let mongoClient;
-
-// Connect to MongoDB
-async function connectToMongoDB() {
-	try {
-		mongoClient = new MongoClient(MONGODB_URI);
-		await mongoClient.connect();
-		db = mongoClient.db(DB_NAME);
-		console.log('✅ Connected to MongoDB successfully');
-		return db;
-	} catch (error) {
-		console.error('❌ MongoDB connection error:', error);
-		// Fallback to file system if MongoDB fails
-		console.log('⚠️  Falling back to file system storage');
-		return null;
-	}
-}
-
-// Create data directory if it doesn't exist (fallback)
+// Create data directory if it doesn't exist
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) {
 	fs.mkdirSync(DATA_DIR);
@@ -225,7 +197,7 @@ function processDailyData(tradingViewData) {
  * Auto-save WEEKLY Camarilla data
  * Runs every Friday at 3:30 PM IST (10:00 UTC)
  */
-async function autoSaveWeeklyData(triggeredBy = 'auto-cron') {
+async function autoSaveWeeklyData() {
 	console.log('🕒 [CRON] Auto-saving WEEKLY Camarilla data...');
 	
 	try {
@@ -233,33 +205,14 @@ async function autoSaveWeeklyData(triggeredBy = 'auto-cron') {
 		const weeklyData = processWeeklyData(data);
 		
 		const saveData = {
-			_id: 'weekly',
 			data: weeklyData,
 			timestamp: new Date().toISOString(),
 			timeframe: 'weekly',
-			savedBy: triggeredBy
+			savedBy: 'auto-cron'
 		};
 		
-		// Save to MongoDB (with file system fallback)
-		if (db) {
-			try {
-				const collection = db.collection(COLLECTION_NAME);
-				await collection.replaceOne(
-					{ _id: 'weekly' },
-					saveData,
-					{ upsert: true }
-				);
-				console.log(`✅ [MONGODB] Weekly data saved! ${weeklyData.length} stocks processed.`);
-			} catch (mongoError) {
-				console.error('❌ [MONGODB] Error, falling back to file system:', mongoError.message);
-				fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
-				console.log(`✅ [FILE] Weekly data saved to file! ${weeklyData.length} stocks processed.`);
-			}
-		} else {
-			// Fallback to file system if MongoDB not connected
-			fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
-			console.log(`✅ [FILE] Weekly data saved to file! ${weeklyData.length} stocks processed.`);
-		}
+		fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
+		console.log(`✅ [CRON] Weekly data saved! ${weeklyData.length} stocks processed.`);
 	} catch (error) {
 		console.error('❌ [CRON] Error saving weekly data:', error.message);
 	}
@@ -269,64 +222,24 @@ async function autoSaveWeeklyData(triggeredBy = 'auto-cron') {
  * Auto-save DAILY Camarilla data
  * Runs every weekday at 3:30 PM IST (10:00 UTC)
  */
-async function autoSaveDailyData(triggeredBy = 'auto-cron') {
-	console.log(`🕒 [SAVE] Auto-saving DAILY Camarilla data... (triggered by: ${triggeredBy})`);
-	
-	// SAFETY CHECK: Prevent saving during market hours on weekdays
-	const now = new Date();
-	const istOffset = 5.5 * 60 * 60 * 1000;
-	const istTime = new Date(now.getTime() + istOffset);
-	const istHour = istTime.getUTCHours();
-	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
-	const currentDay = istTime.getUTCDay();
-	const isWeekday = currentDay >= 1 && currentDay <= 5;
-	const isWeekend = currentDay === 0 || currentDay === 6;
-	const isAfter330PM_IST = istMinutes >= 930;
-	
-	// CRITICAL: On weekdays, ONLY save after 3:30 PM IST OR before 9:15 AM IST (pre-market)
-	// Between 9:15 AM - 3:30 PM = Market hours, prices changing, don't save!
-	const isDuringMarketHours = isWeekday && istMinutes >= 555 && istMinutes < 930; // 9:15 AM - 3:30 PM
-	
-	if (isDuringMarketHours && triggeredBy !== 'manual-trigger') {
-		console.log(`❌ [SAVE] BLOCKING Daily data save during market hours! (${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')} IST on weekday)`);
-		console.log(`⏰ [SAVE] Will save after 3:30 PM IST or before 9:15 AM IST. Current triggeredBy: ${triggeredBy}`);
-		return; // Don't save!
-	}
+async function autoSaveDailyData() {
+	console.log('🕒 [CRON] Auto-saving DAILY Camarilla data...');
 	
 	try {
 		const data = await fetchTradingViewData({});
 		const dailyData = processDailyData(data);
 		
 		const saveData = {
-			_id: 'daily',
 			data: dailyData,
 			timestamp: new Date().toISOString(),
 			timeframe: 'daily',
-			savedBy: triggeredBy
+			savedBy: 'auto-cron'
 		};
 		
-		// Save to MongoDB (with file system fallback)
-		if (db) {
-			try {
-				const collection = db.collection(COLLECTION_NAME);
-				await collection.replaceOne(
-					{ _id: 'daily' },
-					saveData,
-					{ upsert: true }
-				);
-				console.log(`✅ [MONGODB] Daily data saved! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
-			} catch (mongoError) {
-				console.error('❌ [MONGODB] Error, falling back to file system:', mongoError.message);
-				fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
-				console.log(`✅ [FILE] Daily data saved to file! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
-			}
-		} else {
-			// Fallback to file system if MongoDB not connected
-			fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
-			console.log(`✅ [FILE] Daily data saved to file! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
-		}
+		fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
+		console.log(`✅ [CRON] Daily data saved! ${dailyData.length} stocks processed.`);
 	} catch (error) {
-		console.error('❌ [SAVE] Error saving daily data:', error.message);
+		console.error('❌ [CRON] Error saving daily data:', error.message);
 	}
 }
 
@@ -353,67 +266,42 @@ async function checkAndSaveOnStartup() {
 	console.log('\n🔍 [STARTUP] Checking if Camarilla data needs to be saved...');
 	
 	const now = new Date();
+	const currentDay = now.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
 	
 	// Convert to IST (UTC + 5:30)
 	const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
 	const istTime = new Date(now.getTime() + istOffset);
 	const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
 	const istMinutes = istHour * 60 + istTime.getUTCMinutes();
-	const currentDay = istTime.getUTCDay(); // Get IST day of week (0=Sunday, 1=Monday, ..., 5=Friday)
 	
-	// Check if it's a weekday (in IST timezone)
+	// Check if it's a weekday
 	const isWeekday = currentDay >= 1 && currentDay <= 5; // Mon-Fri
 	
 	// Check if it's after 3:30 PM IST (15:30 = 930 minutes)
 	const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
 	const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
 	
-	const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	console.log(`📅 Current IST time: ${dayNames[currentDay]}, ${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')}`);
-	console.log(`🕐 IST Minutes from midnight: ${istMinutes} (After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST})`);
+	console.log(`📅 Current time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+	console.log(`🕐 IST Hour: ${istHour}:${istTime.getUTCMinutes()}, After 3:30 PM: ${isAfter330PM_IST}, Before 9:15 AM: ${isBeforeMarketOpen_IST}`);
 	
 	// ===== CHECK DAILY DATA =====
-	// IMPORTANT: 
-	// - Mon-Fri: Save ONLY after 3:30 PM IST (market close - final prices for Camarilla)
-	// - Sat-Sun: Save ANYTIME (we just need Friday's close data for Monday's Camarilla calculation)
-	const isWeekend = currentDay === 0 || currentDay === 6; // Saturday or Sunday
-	
-	if (isWeekday || isWeekend) {
+	if (isWeekday) {
 		try {
 			if (!fs.existsSync(DAILY_DATA_FILE)) {
-				// Weekday: Save if after 3:30 PM IST OR before 9:15 AM IST (pre-market uses previous day close)
-				// Weekend: Save anytime (Friday's close data already available)
-				if (isWeekend || isAfter330PM_IST || isBeforeMarketOpen_IST) {
-					console.log(`📊 [STARTUP] No DAILY data found. Saving now... (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
-					await autoSaveDailyData('startup-check');
-				} else {
-					console.log('⏸️  [STARTUP] No DAILY data, but waiting until after 3:30 PM IST (need today\'s market close for Camarilla)');
-				}
+				console.log('📊 [STARTUP] No DAILY data found. Saving now...');
+				await autoSaveDailyData();
 			} else {
 				const savedData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
 				const savedDate = new Date(savedData.timestamp);
-				const savedDateIST = new Date(savedDate.getTime() + istOffset);
-				const todayIST = new Date(now.getTime() + istOffset);
+				const today = new Date();
 				
-				// Check if saved data is from today (IST date comparison)
-				const isSameDay = savedDateIST.getUTCDate() === todayIST.getUTCDate() && 
-				                  savedDateIST.getUTCMonth() === todayIST.getUTCMonth() && 
-				                  savedDateIST.getUTCFullYear() === todayIST.getUTCFullYear();
+				// Check if saved data is from a previous day
+				const isSameDay = savedDate.toDateString() === today.toDateString();
 				
-				// Save if:
-				// 1. Data is from a different day AND (after 3:30 PM OR before 9:15 AM OR weekend)
-				// 2. Same day BUT after 3:30 PM AND data was saved before 3:30 PM (refresh with market close)
-				const savedTimeMinutes = savedDateIST.getUTCHours() * 60 + savedDateIST.getUTCMinutes();
-				const wasSavedBefore330PM = savedTimeMinutes < 930; // Saved before 3:30 PM IST
-				
-				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST || isWeekend)) {
-					console.log(`📊 [STARTUP] DAILY data is from previous day. Saving fresh data... (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
-					await autoSaveDailyData('startup-refresh');
-				} else if (isSameDay && isAfter330PM_IST && wasSavedBefore330PM) {
-					console.log(`📊 [STARTUP] DAILY data saved before 3:30 PM today. Refreshing with market close data...`);
-					await autoSaveDailyData('startup-refresh');
-				} else if (!isSameDay && isWeekday && !isAfter330PM_IST && !isBeforeMarketOpen_IST) {
-					console.log(`⏸️  [STARTUP] DAILY data is old, but waiting until after 3:30 PM IST for today's market close`);
+				// Save if data is old AND we're after market close OR before market open (meaning yesterday's data is stale)
+				if (!isSameDay && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
+					console.log('📊 [STARTUP] DAILY data is old. Saving fresh data...');
+					await autoSaveDailyData();
 				} else {
 					console.log(`✅ [STARTUP] DAILY data is current (saved: ${savedDate.toLocaleString()})`);
 				}
@@ -421,23 +309,28 @@ async function checkAndSaveOnStartup() {
 		} catch (error) {
 			console.error('❌ [STARTUP] Error checking daily data:', error.message);
 		}
+	} else {
+		console.log('⏸️  [STARTUP] Today is weekend - skipping daily data check');
 	}
 	
 	// ===== CHECK WEEKLY DATA =====
 	// IMPORTANT: Weekly data should ONLY be saved on FRIDAY after 3:30 PM IST
 	const isFriday = currentDay === 5;
+	const isSaturday = currentDay === 6;
+	const isSunday = currentDay === 0;
+	const isWeekend = isSaturday || isSunday;
 	
 	try {
 		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
 			// Save if it's Friday after 3:30 PM IST
 			if (isFriday && isAfter330PM_IST) {
 				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM IST. Saving now...');
-				await autoSaveWeeklyData('startup-check');
+				await autoSaveWeeklyData();
 			}
 			// OR if it's weekend (missed Friday save) - save Friday's data
 			else if (isWeekend) {
 				console.log('📅 [STARTUP] No WEEKLY data found and it\'s weekend. Saving Friday\'s data now...');
-				await autoSaveWeeklyData('startup-check');
+				await autoSaveWeeklyData();
 			}
 			else {
 				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM IST to save...');
@@ -445,21 +338,17 @@ async function checkAndSaveOnStartup() {
 		} else {
 			const savedData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
 			const savedDate = new Date(savedData.timestamp);
-			const savedDateIST = new Date(savedDate.getTime() + istOffset);
-			const todayIST = new Date(now.getTime() + istOffset);
-			
-			// Check if saved data is from this week (compare week numbers)
 			const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
 			
 			// Save if:
-			// 1. It's Friday after 3:30 PM IST AND data is >=7 days old (new week)
-			// 2. OR it's weekend AND data is >=7 days old (missed Friday save)
-			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 7) || 
-			    (isWeekend && daysSinceLastSave >= 7)) {
-				console.log(`📅 [STARTUP] WEEKLY data is old (${daysSinceLastSave} days). Saving fresh data...`);
-				await autoSaveWeeklyData('startup-refresh');
+			// 1. It's Friday after 3:30 PM IST AND data is >6 days old
+			// 2. OR it's weekend AND data is >6 days old (missed Friday save)
+			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 6) || 
+			    (isWeekend && daysSinceLastSave >= 6)) {
+				console.log('📅 [STARTUP] WEEKLY data is old. Saving fresh data...');
+				await autoSaveWeeklyData();
 			} else {
-				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()}, ${daysSinceLastSave} days ago)`);
+				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()})`);
 				if (!isFriday && !isWeekend) {
 					console.log(`   ⏰ Next save: Friday 3:30 PM IST`);
 				}
@@ -485,35 +374,10 @@ app.get('/getCamarillaData', async (req, res) => {
 	const timeframe = req.query.timeframe || 'weekly'; // 'daily' or 'weekly'
 	
 	try {
-		let savedData = null;
-		
-		// Try MongoDB first
-		if (db) {
-			try {
-				const collection = db.collection(COLLECTION_NAME);
-				savedData = await collection.findOne({ _id: timeframe });
-				
-				if (savedData) {
-					console.log(`📊 [MONGODB] Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
-					return res.json({
-						success: true,
-						data: savedData.data,
-						timestamp: savedData.timestamp,
-						timeframe: timeframe,
-						savedBy: savedData.savedBy || 'unknown',
-						source: 'mongodb'
-					});
-				}
-			} catch (mongoError) {
-				console.error('❌ [MONGODB] Read error, trying file system:', mongoError.message);
-			}
-		}
-		
-		// Fallback to file system
 		const file = timeframe === 'weekly' ? WEEKLY_DATA_FILE : DAILY_DATA_FILE;
 		
 		// If file doesn't exist, check if we should save it now
-		if (!fs.existsSync(file) && !savedData) {
+		if (!fs.existsSync(file)) {
 			console.log(`⚠️ No ${timeframe} data found. Checking if we should save now...`);
 			
 			// Calculate IST time
@@ -522,7 +386,7 @@ app.get('/getCamarillaData', async (req, res) => {
 			const istTime = new Date(now.getTime() + istOffset);
 			const istHour = istTime.getUTCHours(); // Use UTC methods after adding offset
 			const istMinutes = istHour * 60 + istTime.getUTCMinutes();
-			const currentDay = istTime.getUTCDay(); // Get IST day of week
+			const currentDay = now.getDay();
 			
 			const isWeekday = currentDay >= 1 && currentDay <= 5;
 			const isFriday = currentDay === 5;
@@ -530,21 +394,15 @@ app.get('/getCamarillaData', async (req, res) => {
 			const isAfter330PM_IST = istMinutes >= 930; // After 3:30 PM IST
 			const isBeforeMarketOpen_IST = istMinutes < 555; // Before 9:15 AM IST
 			
-			const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-			console.log(`🕐 [API] Current IST: ${dayNames[currentDay]}, ${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')}`);
-			
 			let shouldSave = false;
 			
 			if (timeframe === 'daily') {
-				// IMPORTANT: 
-				// - Mon-Fri: Save ONLY after 3:30 PM IST OR before 9:15 AM IST
-				// - Sat-Sun: Save ANYTIME (Friday's close already available for Monday's Camarilla)
-				if (isWeekend || (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST))) {
-					console.log(`💾 [API] Saving DAILY data (${isWeekend ? 'Weekend - anytime OK' : isAfter330PM_IST ? 'After 3:30 PM - market close' : 'Before 9:15 AM - pre-market'})`);
+				// Save daily data if:
+				// 1. It's a weekday AND (after 3:30 PM OR before market open next day)
+				if (isWeekday && (isAfter330PM_IST || isBeforeMarketOpen_IST)) {
+					console.log(`💾 [API] Saving DAILY data (weekday, IST time: ${istHour}:${istTime.getUTCMinutes()})`);
 					shouldSave = true;
-					await autoSaveDailyData('api-request');
-				} else {
-					console.log(`⏸️  [API] NOT saving DAILY data: Waiting for 3:30 PM IST market close (need final prices for Camarilla)`);
+					await autoSaveDailyData();
 				}
 			} else if (timeframe === 'weekly') {
 				// Save weekly data if:
@@ -553,41 +411,21 @@ app.get('/getCamarillaData', async (req, res) => {
 				if ((isFriday && isAfter330PM_IST) || isWeekend) {
 					console.log(`💾 [API] Saving WEEKLY data (${isWeekend ? 'weekend catchup' : 'Friday after 3:30 PM'})`);
 					shouldSave = true;
-					await autoSaveWeeklyData('api-request');
-				} else {
-					console.log(`⏸️  [API] NOT saving WEEKLY data: Waiting for Friday 3:30 PM or weekend`);
+					await autoSaveWeeklyData();
 				}
 			}
 			
-			// If we saved, try to read from MongoDB or file
-			if (shouldSave) {
-				if (db) {
-					const collection = db.collection(COLLECTION_NAME);
-					savedData = await collection.findOne({ _id: timeframe });
-				}
-				
-				if (savedData) {
-					console.log(`📊 Serving freshly saved ${timeframe} Camarilla data from MongoDB (${savedData.data.length} stocks)`);
-					return res.json({
-						success: true,
-						data: savedData.data,
-						timestamp: savedData.timestamp,
-						timeframe: timeframe,
-						savedBy: savedData.savedBy || 'api-triggered',
-						source: 'mongodb'
-					});
-				} else if (fs.existsSync(file)) {
-					savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
-					console.log(`📊 Serving freshly saved ${timeframe} Camarilla data from file (${savedData.data.length} stocks)`);
-					return res.json({
-						success: true,
-						data: savedData.data,
-						timestamp: savedData.timestamp,
-						timeframe: timeframe,
-						savedBy: savedData.savedBy || 'api-triggered',
-						source: 'file'
-					});
-				}
+			// If we saved, try to read the file again
+			if (shouldSave && fs.existsSync(file)) {
+				const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+				console.log(`📊 Serving freshly saved ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+				return res.json({
+					success: true,
+					data: savedData.data,
+					timestamp: savedData.timestamp,
+					timeframe: timeframe,
+					savedBy: savedData.savedBy || 'api-triggered'
+				});
 			}
 			
 			// Still no data - return 404
@@ -599,27 +437,17 @@ app.get('/getCamarillaData', async (req, res) => {
 		}
 		
 		// File exists - serve it
-		if (!savedData && fs.existsSync(file)) {
-			savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
-			console.log(`📊 [FILE] Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
-		}
+		const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
 		
-		if (savedData) {
-			res.json({
-				success: true,
-				data: savedData.data,
-				timestamp: savedData.timestamp,
-				timeframe: timeframe,
-				savedBy: savedData.savedBy || 'unknown',
-				source: 'file'
-			});
-		} else {
-			return res.status(404).json({
-				success: false,
-				message: `No ${timeframe} data found`,
-				timeframe: timeframe
-			});
-		}
+		console.log(`📊 Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+		
+		res.json({
+			success: true,
+			data: savedData.data,
+			timestamp: savedData.timestamp,
+			timeframe: timeframe,
+			savedBy: savedData.savedBy || 'unknown'
+		});
 	} catch (error) {
 		console.error('Error reading Camarilla data:', error);
 		res.status(500).json({
@@ -640,9 +468,9 @@ app.post('/saveCamarillaData', async (req, res) => {
 	
 	try {
 		if (timeframe === 'weekly') {
-			await autoSaveWeeklyData('manual-trigger');
+			await autoSaveWeeklyData();
 		} else {
-			await autoSaveDailyData('manual-trigger');
+			await autoSaveDailyData();
 		}
 		
 		res.json({
@@ -1302,23 +1130,7 @@ app.all('/*', async (req, res) => {
 
 	}
 })
-
-// Start server with MongoDB connection
-async function startServer() {
-	// Connect to MongoDB
-	await connectToMongoDB();
-	
-	// Start Express server
-	app.listen(port, () => {
-		console.log(`✅ Server listening on port ${port}`);
-		console.log(`🔗 MongoDB: ${db ? 'Connected' : 'Not connected (using file system fallback)'}`);
-	});
-}
-
-startServer().catch(err => {
-	console.error('Failed to start server:', err);
-	process.exit(1);
-});
+app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
  
 // Percentage Difference Calculator
 // Result: 50

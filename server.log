@@ -1,0 +1,18 @@
+[dotenv@17.2.3] injecting env (2) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+📅 Scheduled WEEKLY Camarilla auto-save: Every Friday at 3:30 PM IST
+📅 Scheduled DAILY Camarilla auto-save: Mon-Fri at 3:30 PM IST
+✅ Connected to MongoDB successfully
+✅ Server listening on port 5001
+🔗 MongoDB: Connected
+
+🔍 [STARTUP] Checking if Camarilla data needs to be saved...
+📅 Current IST time: Wednesday, 11:24
+🕐 IST Minutes from midnight: 684 (After 3:30 PM: false, Before 9:15 AM: false)
+⏸️  [STARTUP] DAILY data is old, but waiting until after 3:30 PM IST for today's market close
+⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM IST to save...
+✅ [STARTUP] Data check complete!
+
+📝 Manual save triggered for weekly data
+🕒 [CRON] Auto-saving WEEKLY Camarilla data...
+✅ [MONGODB] Weekly data saved! 4676 stocks processed.
+📊 [MONGODB] Serving weekly Camarilla data (4676 stocks)
