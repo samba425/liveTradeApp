@@ -1,9 +1,13 @@
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const request = require('request-promise').defaults({ strictSSL: false });
 var cors = require('cors');
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
+const { MongoClient } = require('mongodb');
 
 var app = express()
 app.use(cors());
@@ -13,7 +17,31 @@ app.use(bodyParser.json());
 
 const port = process.env.PORT || 5001;
 
-// Create data directory if it doesn't exist
+// MongoDB Configuration
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const DB_NAME = 'tradeApp';
+const COLLECTION_NAME = 'camarillaData';
+
+let db;
+let mongoClient;
+
+// Connect to MongoDB
+async function connectToMongoDB() {
+	try {
+		mongoClient = new MongoClient(MONGODB_URI);
+		await mongoClient.connect();
+		db = mongoClient.db(DB_NAME);
+		console.log('✅ Connected to MongoDB successfully');
+		return db;
+	} catch (error) {
+		console.error('❌ MongoDB connection error:', error);
+		// Fallback to file system if MongoDB fails
+		console.log('⚠️  Falling back to file system storage');
+		return null;
+	}
+}
+
+// Create data directory if it doesn't exist (fallback)
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) {
 	fs.mkdirSync(DATA_DIR);
@@ -205,14 +233,33 @@ async function autoSaveWeeklyData(triggeredBy = 'auto-cron') {
 		const weeklyData = processWeeklyData(data);
 		
 		const saveData = {
+			_id: 'weekly',
 			data: weeklyData,
 			timestamp: new Date().toISOString(),
 			timeframe: 'weekly',
 			savedBy: triggeredBy
 		};
 		
-		fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
-		console.log(`✅ [CRON] Weekly data saved! ${weeklyData.length} stocks processed.`);
+		// Save to MongoDB (with file system fallback)
+		if (db) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				await collection.replaceOne(
+					{ _id: 'weekly' },
+					saveData,
+					{ upsert: true }
+				);
+				console.log(`✅ [MONGODB] Weekly data saved! ${weeklyData.length} stocks processed.`);
+			} catch (mongoError) {
+				console.error('❌ [MONGODB] Error, falling back to file system:', mongoError.message);
+				fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
+				console.log(`✅ [FILE] Weekly data saved to file! ${weeklyData.length} stocks processed.`);
+			}
+		} else {
+			// Fallback to file system if MongoDB not connected
+			fs.writeFileSync(WEEKLY_DATA_FILE, JSON.stringify(saveData, null, 2));
+			console.log(`✅ [FILE] Weekly data saved to file! ${weeklyData.length} stocks processed.`);
+		}
 	} catch (error) {
 		console.error('❌ [CRON] Error saving weekly data:', error.message);
 	}
@@ -251,14 +298,33 @@ async function autoSaveDailyData(triggeredBy = 'auto-cron') {
 		const dailyData = processDailyData(data);
 		
 		const saveData = {
+			_id: 'daily',
 			data: dailyData,
 			timestamp: new Date().toISOString(),
 			timeframe: 'daily',
 			savedBy: triggeredBy
 		};
 		
-		fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
-		console.log(`✅ [SAVE] Daily data saved! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
+		// Save to MongoDB (with file system fallback)
+		if (db) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				await collection.replaceOne(
+					{ _id: 'daily' },
+					saveData,
+					{ upsert: true }
+				);
+				console.log(`✅ [MONGODB] Daily data saved! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
+			} catch (mongoError) {
+				console.error('❌ [MONGODB] Error, falling back to file system:', mongoError.message);
+				fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
+				console.log(`✅ [FILE] Daily data saved to file! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
+			}
+		} else {
+			// Fallback to file system if MongoDB not connected
+			fs.writeFileSync(DAILY_DATA_FILE, JSON.stringify(saveData, null, 2));
+			console.log(`✅ [FILE] Daily data saved to file! ${dailyData.length} stocks processed. (triggered by: ${triggeredBy})`);
+		}
 	} catch (error) {
 		console.error('❌ [SAVE] Error saving daily data:', error.message);
 	}
@@ -419,10 +485,35 @@ app.get('/getCamarillaData', async (req, res) => {
 	const timeframe = req.query.timeframe || 'weekly'; // 'daily' or 'weekly'
 	
 	try {
+		let savedData = null;
+		
+		// Try MongoDB first
+		if (db) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				savedData = await collection.findOne({ _id: timeframe });
+				
+				if (savedData) {
+					console.log(`📊 [MONGODB] Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+					return res.json({
+						success: true,
+						data: savedData.data,
+						timestamp: savedData.timestamp,
+						timeframe: timeframe,
+						savedBy: savedData.savedBy || 'unknown',
+						source: 'mongodb'
+					});
+				}
+			} catch (mongoError) {
+				console.error('❌ [MONGODB] Read error, trying file system:', mongoError.message);
+			}
+		}
+		
+		// Fallback to file system
 		const file = timeframe === 'weekly' ? WEEKLY_DATA_FILE : DAILY_DATA_FILE;
 		
 		// If file doesn't exist, check if we should save it now
-		if (!fs.existsSync(file)) {
+		if (!fs.existsSync(file) && !savedData) {
 			console.log(`⚠️ No ${timeframe} data found. Checking if we should save now...`);
 			
 			// Calculate IST time
@@ -468,17 +559,35 @@ app.get('/getCamarillaData', async (req, res) => {
 				}
 			}
 			
-			// If we saved, try to read the file again
-			if (shouldSave && fs.existsSync(file)) {
-				const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
-				console.log(`📊 Serving freshly saved ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
-				return res.json({
-					success: true,
-					data: savedData.data,
-					timestamp: savedData.timestamp,
-					timeframe: timeframe,
-					savedBy: savedData.savedBy || 'api-triggered'
-				});
+			// If we saved, try to read from MongoDB or file
+			if (shouldSave) {
+				if (db) {
+					const collection = db.collection(COLLECTION_NAME);
+					savedData = await collection.findOne({ _id: timeframe });
+				}
+				
+				if (savedData) {
+					console.log(`📊 Serving freshly saved ${timeframe} Camarilla data from MongoDB (${savedData.data.length} stocks)`);
+					return res.json({
+						success: true,
+						data: savedData.data,
+						timestamp: savedData.timestamp,
+						timeframe: timeframe,
+						savedBy: savedData.savedBy || 'api-triggered',
+						source: 'mongodb'
+					});
+				} else if (fs.existsSync(file)) {
+					savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+					console.log(`📊 Serving freshly saved ${timeframe} Camarilla data from file (${savedData.data.length} stocks)`);
+					return res.json({
+						success: true,
+						data: savedData.data,
+						timestamp: savedData.timestamp,
+						timeframe: timeframe,
+						savedBy: savedData.savedBy || 'api-triggered',
+						source: 'file'
+					});
+				}
 			}
 			
 			// Still no data - return 404
@@ -490,17 +599,27 @@ app.get('/getCamarillaData', async (req, res) => {
 		}
 		
 		// File exists - serve it
-		const savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+		if (!savedData && fs.existsSync(file)) {
+			savedData = JSON.parse(fs.readFileSync(file, 'utf8'));
+			console.log(`📊 [FILE] Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
+		}
 		
-		console.log(`📊 Serving ${timeframe} Camarilla data (${savedData.data.length} stocks)`);
-		
-		res.json({
-			success: true,
-			data: savedData.data,
-			timestamp: savedData.timestamp,
-			timeframe: timeframe,
-			savedBy: savedData.savedBy || 'unknown'
-		});
+		if (savedData) {
+			res.json({
+				success: true,
+				data: savedData.data,
+				timestamp: savedData.timestamp,
+				timeframe: timeframe,
+				savedBy: savedData.savedBy || 'unknown',
+				source: 'file'
+			});
+		} else {
+			return res.status(404).json({
+				success: false,
+				message: `No ${timeframe} data found`,
+				timeframe: timeframe
+			});
+		}
 	} catch (error) {
 		console.error('Error reading Camarilla data:', error);
 		res.status(500).json({
@@ -1183,7 +1302,23 @@ app.all('/*', async (req, res) => {
 
 	}
 })
-app.listen(port, () => console.log(`Example app listening on port... ${port}!`))
+
+// Start server with MongoDB connection
+async function startServer() {
+	// Connect to MongoDB
+	await connectToMongoDB();
+	
+	// Start Express server
+	app.listen(port, () => {
+		console.log(`✅ Server listening on port ${port}`);
+		console.log(`🔗 MongoDB: ${db ? 'Connected' : 'Not connected (using file system fallback)'}`);
+	});
+}
+
+startServer().catch(err => {
+	console.error('Failed to start server:', err);
+	process.exit(1);
+});
  
 // Percentage Difference Calculator
 // Result: 50

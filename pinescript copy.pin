@@ -1,0 +1,380 @@
+
+
+// @version=6
+// samba siva grow signal
+indicator(title='Grow More', overlay=true,max_bars_back=1000)
+src = close
+showSignal = input(false, title='Signal',inline="patterns")
+per = input.int(defval=100, minval=1, title='Sampling Period',inline="patterns")
+mult = input.float(defval=3.0, minval=0.1, title='Range Multiplier',inline="patterns")
+smoothrng(x, t, m) =>
+    wper = t * 2 - 1
+    avrng = ta.ema(math.abs(x - x[1]), t)
+    smoothrng = ta.ema(avrng, wper) * m
+    smoothrng
+smrng = smoothrng(src, per, mult)
+rngfilt(x, r) =>
+    rngfilt = x
+    rngfilt := x > nz(rngfilt[1]) ? x - r < nz(rngfilt[1]) ? nz(rngfilt[1]) : x - r : x + r > nz(rngfilt[1]) ? nz(rngfilt[1]) : x + r
+    rngfilt
+filt = rngfilt(src, smrng)
+upward = 0.0
+upward := filt > filt[1] ? nz(upward[1]) + 1 : filt < filt[1] ? 0 : nz(upward[1])
+downward = 0.0
+downward := filt < filt[1] ? nz(downward[1]) + 1 : filt > filt[1] ? 0 : nz(downward[1])
+hband = filt + smrng
+lband = filt - smrng
+longCond = bool(na)
+shortCond = bool(na)
+longCond := src > filt and src > src[1] and upward > 0 or src > filt and src < src[1] and upward > 0
+shortCond := src < filt and src < src[1] and downward > 0 or src < filt and src > src[1] and downward > 0
+CondIni = 0
+CondIni := longCond ? 1 : shortCond ? -1 : CondIni[1]
+longCondition = longCond and CondIni[1] == -1
+shortCondition = shortCond and CondIni[1] == 1
+plotshape(showSignal and longCondition ? longCondition : bool(na),title='Buy Signal', text='B', textcolor=color.white, style=shape.labelup, size=size.tiny, location=location.belowbar, color=color.new(color.green, 0))
+plotshape(showSignal?shortCondition:bool(na), title='Sell Signal', text='S', textcolor=color.white, style=shape.labeldown, size=size.tiny, location=location.abovebar, color=color.new(color.red, 0))
+
+
+// flags for showing (BB,SMA's,VWAP,Pivot,Camarilla )
+show200SMA = input(false, title='200 SMA',inline="patterns")
+show50SMA = input(false, title='50 SMA',inline="patterns")
+show20SMA = input(false, title='20 SMA',inline="patterns")
+show9SMA = input(false, title='9 SMA',inline="patterns")
+show5SMMA = input(false, title='5 SMMA',inline="patterns")
+show5EMA = input(false, title='5 EMA',inline="patterns")
+show10EMA = input(false, title='10 EMA',inline="patterns")
+show14EMA = input(false, title='14 EMA',inline="patterns")
+show21EMA = input(false, title='21 EMA',inline="patterns")
+show50EMA = input(false, title='50 EMA',inline="patterns")
+showVwap = input(false, title='VWAP',inline="patterns")
+dummy = input.bool(true, title="", inline="patterns")
+showPivot = input(false, title='Pivots',inline="patterns")
+onlyPivot = input(false, title='Only Pivots',inline="patterns")
+showCamarilla = input(false, title='Camarilla',inline="patterns")
+previousHL = input(false, title='PH/PL',inline="patterns")
+// Create a dropdown menu for selecting the timeframe
+timeframeOptions = input.string(defval="D", title="Select Timeframe", options=["12M","M","W","D"])
+cprNext = input.string(defval="current", title="Select CPR", options=["current","next"])
+// SMMA function
+smma(source, length) =>
+    var float smmaValue = na
+    if (na(smmaValue))
+        smmaValue := ta.sma(source, length)
+    else
+        smmaValue := (smmaValue * (length - 1) + source) / length
+    smmaValue
+
+// Moving Averages
+sma200 = ta.sma(src, 200)
+sma50 = ta.sma(src, 50)
+sma20 = ta.sma(src, 20)
+sma9 = ta.sma(src, 9)
+ema5 = ta.ema(src, 5)
+smma5 = smma(src, 5)
+ema10 = ta.ema(src, 10)
+ema14 = ta.ema(src, 14)
+ema21 = ta.ema(src, 21)
+ema50 = ta.ema(src, 50)
+
+// VWAP (Volume Weighted Average Price)
+vwapVal = ta.vwap(hlc3)
+
+// Plotting
+plot(show200SMA?sma200: na,color=color.orange, linewidth=2, title='200 SMA')
+plot(show50SMA?sma50:na, color=color.red, linewidth=2, title='50 SMA')
+plot(show20SMA?sma20:na, color=color.green, linewidth=2, title='20 SMA')
+plot(show9SMA?sma9:na, color=#e6e200, linewidth=2, title='9 SMA')
+plot(showVwap?vwapVal:na, color=#6b6b6c, linewidth=2, title='VWAP')
+plot(show5EMA?ema5:na, color=color.orange, linewidth=2, title='5 EMA')
+plot(show5SMMA?smma5:na, color=color.fuchsia, linewidth=2, title='5 SMMA')
+plot(show10EMA?ema10:na, color=color.yellow, linewidth=2, title='10 EMA')
+plot(show14EMA?ema14:na, color=color.rgb(69, 255, 59), linewidth=2, title='14 EMA')
+plot(show21EMA?ema21:na, color=#dc1818, linewidth=2, title='21 EMA')
+plot(show50EMA?ema50:na, color=#f8b21b, linewidth=2, title='50 EMA')
+
+
+// Previous Day's High, Low, and Close
+highPrev = request.security(syminfo.tickerid, timeframeOptions, cprNext == "current" ? high[1] : high, lookahead=barmerge.lookahead_on)
+lowPrev = request.security(syminfo.tickerid, timeframeOptions, cprNext == "current" ? low[1] : low, lookahead=barmerge.lookahead_on)
+closePrev = request.security(syminfo.tickerid, timeframeOptions, cprNext == "current" ? close[1] : close, lookahead=barmerge.lookahead_on)
+
+previousDayHigh = request.security(syminfo.tickerid, timeframeOptions, cprNext == "current" ? high[1] : high, lookahead=barmerge.lookahead_on)
+previousDayLow = request.security(syminfo.tickerid, timeframeOptions,  cprNext == "current" ? low[1] : low, lookahead=barmerge.lookahead_on)
+previousDayClose = request.security(syminfo.tickerid, timeframeOptions,  cprNext == "current" ? close[1] : close, lookahead=barmerge.lookahead_on)
+
+
+// Calculate Pivot Points
+pivot = (highPrev + lowPrev + closePrev) / 3
+pivotBC = (highPrev + lowPrev) / 2
+pivotTC = pivot + (pivot - pivotBC)
+
+// Determine if the CPR range is narrow or wide
+ // Determine range type based on thresholds
+tooNarrow = 0.10
+narrow = 0.25
+wide = 0.75
+cprRange = math.abs(pivotTC - pivotBC)
+
+rangeType =  (cprRange / closePrev * 100) < tooNarrow ? "T N" :  (cprRange / closePrev * 100) < narrow ? "N" : (cprRange / closePrev * 100) < wide ? "W" : "T W"
+ 
+
+
+// ABS(TC-BC)/PC*100)<0.25
+// Create the table if it doesn't exist
+var table cprTable = table.new(position.top_right, 2, 5, border_width=1)
+
+// Update the table headers once
+if bar_index == 0
+    // table.cell(cprTable, 0, 0, "Level", bgcolor=color.gray)
+    // table.cell(cprTable, 1, 0, "Value", bgcolor=color.gray) 
+
+    table.cell(cprTable, 0, 4, "CPR", bgcolor=color.new(color.yellow,0))
+    table.cell(cprTable, 1, 4, rangeType, bgcolor=color.new(color.yellow,0))
+
+    
+r1 = 2 * pivot - lowPrev
+s1 = 2 * pivot - highPrev
+r2 = pivot + (highPrev - lowPrev)
+s2 = pivot - (highPrev - lowPrev)
+r3 = highPrev + 2 * (pivot - lowPrev)
+s3 = lowPrev -2 * (highPrev - pivot)
+// Calculate Pivot Point (P)
+// Calculate Bottom Central Pivot (BC)
+bc = (highPrev + lowPrev) / 2
+// Calculate Top Central Pivot (TC)
+tc = pivot + (pivot - bc)
+// Calculate Extended Resistance (R4) and Support (S4)
+ 
+
+// Calculate Extended Resistance (R4) and Support (S4)
+// r4 = tc + (tc - bc)
+// s4 = bc - (tc - bc)
+// Calculate Extended Resistance (R4) and Support (S4)
+// r4 = highPrev + 3 * (pivot - lowPrev)
+// s4 = lowPrev - 3 * (highPrev - pivot)
+
+
+ 
+// Plot Pivot Points
+plot(showPivot ? pivot : na, style=plot.style_circles, color=color.blue, title="P",linewidth = 1)
+plot(showPivot ? pivotBC : na, style=plot.style_circles, color=color.blue, title="BC",linewidth = 1)
+plot(showPivot ? pivotTC : na, style=plot.style_circles, color=color.blue, title="TC",linewidth = 1)
+
+plot(onlyPivot ? pivot : na, style=plot.style_circles, color=color.blue, title="P")
+plot(onlyPivot ? pivotBC : na, style=plot.style_circles, color=color.blue, title="BC")
+plot(onlyPivot ? pivotTC : na, style=plot.style_circles, color=color.blue, title="TC")
+
+plot(showPivot ? r1 : na, style=plot.style_circles, color=color.green, title="R1")
+plot(showPivot ? r2 : na, style=plot.style_circles, color=color.green, title="R2")
+plot(showPivot ? r3 : na, style=plot.style_circles, color=color.green, title="R3")
+// plot(showPivot ? r4 : na, style=plot.style_circles, color=color.red, title="R4")
+plot(showPivot ? s1 : na, style=plot.style_circles, color=color.red, title="S1")
+plot(showPivot ? s2 : na, style=plot.style_circles, color=color.red, title="S2")
+plot(showPivot ? s3 : na, style=plot.style_circles, color=color.red, title="S3")
+// plot(showPivot ? s4: na, style=plot.style_circles, color=color.green, title="S4")
+// plotshape(showPivot?r1:na, title='R1', text='R1', textcolor=color.white, style=shape.labelup, size=size.tiny,location=location, color=color.new(color.green, 0))
+ 
+
+// Plot PH and PL
+plot(previousHL?highPrev:na, style=plot.style_circles,color=#ffeb3bbb, title='PH',linewidth = 1)
+plot(previousHL?lowPrev:na, style=plot.style_circles,color=#ffeb3bbb, title='PL',linewidth = 1)
+
+
+// // Calculate Camarilla Pivot Points// Calculate Camarilla Pivot Points
+// previousDayHigh = request.security(syminfo.tickerid, timeframeOptions, cprNext == "current" ? high[1] : high, lookahead=barmerge.lookahead_on)
+// previousDayLow = request.security(syminfo.tickerid, timeframeOptions,  cprNext == "current" ? low[1] : low, lookahead=barmerge.lookahead_on)
+// previousDayClose = request.security(syminfo.tickerid, timeframeOptions,  cprNext == "current" ? close[1] : close, lookahead=barmerge.lookahead_on)
+
+H = highPrev
+L = lowPrev
+C = closePrev
+
+PP = (H + L + C) / 3.0
+H1 = C + (H - L) * 1.1 / 12.0
+H2 = C + (H - L) * 1.1 / 6.0
+H3 = C + (H - L) * 1.1 / 4.0
+H4 = C + (H - L) * 1.1 / 2.0
+H5 = H / L * C  // Corrected formula for R5
+H6 = C + (H - L) * 1.1 / 1.0  // Additional level R5
+
+L1 = C - (H - L) * 1.1 / 12.0
+L2 = C - (H - L) * 1.1 / 6.0
+L3 = C - (H - L) * 1.1 / 4.0
+L4 = C - (H - L) * 1.1 / 2.0
+L5 = (L / H) * C   // Corrected formula for L5
+L6 = C - (H - L) * 1.1 / 1.0  // Additional level L5
+
+mid = (H3 + L3) / 2
+// Plot Camarilla Pivot Points 
+// Function to create labels next to the lines
+createLabel(price, a) =>
+    label.new(x=bar_index, y=price, text=a, color=#ffffff00, textcolor=color.white, style=label.style_label_left, size=size.normal, textalign=text.align_left)
+
+
+// Remove previous labels
+var label pivotLabel = na
+var label bcLabel = na
+var label tcLabel = na
+var label sma200Label = na
+var label sma20Label = na
+var label sma9Label = na
+var label sma50Label = na
+var label ema5Label = na
+var label ema14Label = na
+var label ema21Label = na
+var label ema50Label = na
+var label smma5Label = na
+var label ema10Label = na
+var label camP = na
+var label camH3 = na
+var label camH4 = na
+var label camH5 = na
+var label camH6 = na
+var label camL3 = na
+var label camL4 = na
+var label camL5 = na
+var label camL6 = na
+var label cammid = na
+var label prevHigh = na
+var label prevLow = na
+var label R1 = na
+var label R2 = na
+var label R3 = na
+var label S1 = na
+var label S2 = na
+var label S3 = na
+plot(showCamarilla?PP: na,style=plot.style_circles, color=color.white, title='PP',linewidth = 1)
+// plot(showCamarilla?H1: na,style=plot.style_circles, color=color.green, title='H1')
+// plot(showCamarilla?H2: na,style=plot.style_circles, color=color.green, title='H2')
+plot(showCamarilla?H3: na,style=plot.style_circles, color=#15ed35, title='H3',linewidth = 2)
+plot(showCamarilla?H4: na,style=plot.style_circles, color=color.green, title='H4',linewidth = 1)
+plot(showCamarilla?H5: na,style=plot.style_circles, color=color.green, title='H5',linewidth = 1)  // Plot R5
+// plot(showCamarilla?H6: na,style=plot.style_circles, color=color.orange, title='H6')  // Plot R6 extra formula for R5 only from openAI
+
+plot(showCamarilla?mid: na,style=plot.style_circles, color=color.purple, title='SL',linewidth = 1) // mid range of H3 and L3 act like SL
+
+// plot(showCamarilla?L1: na,style=plot.style_circles, color=color.red, title='L1')
+// plot(showCamarilla?L2: na,style=plot.style_circles, color=color.red, title='L2')
+plot(showCamarilla?L3: na,style=plot.style_circles, color=#d62418, title='L3',linewidth = 2)
+plot(showCamarilla?L4: na,style=plot.style_circles, color=color.red, title='L4',linewidth = 1)
+plot(showCamarilla?L5: na,style=plot.style_circles, color=color.red, title='L5',linewidth = 1)  // Plot L5
+// plot(showCamarilla?L6: na,style=plot.style_circles, color=color.orange, title='L6')  // Plot L6 extra formula for L5 only from openAI
+
+  
+if (not na(pivotLabel))
+    label.delete(pivotLabel)
+if (not na(bcLabel))
+    label.delete(bcLabel)
+if (not na(tcLabel))
+    label.delete(tcLabel)
+if (not na(sma200Label))
+    label.delete(sma200Label)
+if (not na(sma50Label))
+    label.delete(sma50Label)
+if (not na(sma20Label))
+    label.delete(sma20Label)
+if (not na(sma9Label))
+    label.delete(sma9Label)
+if (not na(ema5Label))
+    label.delete(ema5Label)
+if (not na(ema14Label))
+    label.delete(ema14Label)
+if (not na(ema21Label))
+    label.delete(ema21Label)
+if (not na(ema50Label))
+    label.delete(ema50Label)
+if (not na(smma5Label))
+    label.delete(smma5Label)
+if (not na(ema10Label))
+    label.delete(ema10Label)
+if (not na(sma9Label))
+    label.delete(sma9Label)
+if (not na(camP))
+    label.delete(camP)
+if (not na(camH3))
+    label.delete(camH3)
+if (not na(camH4))
+    label.delete(camH4)
+if (not na(camH5))
+    label.delete(camH5)
+if (not na(camH6))
+    label.delete(camH6)
+if (not na(camL3))
+    label.delete(camL3)
+if (not na(camL4))
+    label.delete(camL4)
+if (not na(camL5))
+    label.delete(camL5)
+if (not na(camL6))
+    label.delete(camL6)
+if (not na(cammid))
+    label.delete(cammid)
+if (not na(prevHigh))
+    label.delete(prevHigh)
+if (not na(prevLow))
+    label.delete(prevLow)
+if (not na(R1))
+    label.delete(R1)
+if (not na(R2))
+    label.delete(R2)
+if (not na(R3))
+    label.delete(R3)
+if (not na(S1))
+    label.delete(S1)
+if (not na(S2))
+    label.delete(S2)
+if (not na(S3))
+    label.delete(S3)
+
+
+// Create new labels
+R1 := createLabel(showPivot?r1:na, "         R1")
+R2 := createLabel(showPivot?r2:na, "         R2")
+R3 := createLabel(showPivot?r3:na, "         R3")
+S1 := createLabel(showPivot?s1:na, "         S1")
+S2 := createLabel(showPivot?s2:na, "         S2")
+S3 := createLabel(showPivot?s3:na, "         S3")
+pivotLabel := createLabel(showPivot?pivot:na, "")
+bcLabel := createLabel(showPivot?pivotBC:na, "         BC")
+tcLabel := createLabel(showPivot?pivotTC:na, "         TC")
+sma200Label := createLabel(show200SMA?sma200:na, "         200 SMA")
+sma50Label := createLabel(show50SMA?sma50:na, "         50 SMA")
+sma20Label := createLabel(show20SMA?sma20:na, "         20 SMA")
+sma9Label := createLabel(show9SMA?sma9:na, "         9 SMA (15m)") // 15min will confirm the trend if any candle close above 9sma
+ema14Label := createLabel(show5EMA?ema5:na, "         5 EMA")
+ema21Label := createLabel(show14EMA?ema14:na, "         14 EMA")
+ema50Label := createLabel(show21EMA?ema21:na, "         21 EMA")
+ema5Label := createLabel(show50EMA?ema50:na, "         50 EMA")
+smma5Label := createLabel(show5SMMA?smma5:na, "         5 SMMA")
+ema10Label := createLabel(show10EMA?ema10:na, "         10 EMA")
+camP := createLabel(showCamarilla?PP:na,  "         CP")
+camH3 := createLabel(showCamarilla?H3:na, "         CE")
+camH4 := createLabel(showCamarilla?H4:na, "         T1")
+camH5 := createLabel(showCamarilla?H5:na, "         T2")
+// camH6 := createLabel(showCamarilla?H6:na, "         H6")
+camL3 := createLabel(showCamarilla?L3:na, "         PE")
+camL4:= createLabel(showCamarilla?L4:na, "         T1")
+camL5:= createLabel(showCamarilla?L5:na, "         T2 " + ' '+ str.tostring(L5, "#.##"))
+// camL6:= createLabel(showCamarilla?L6:na, "          L6")
+cammid:= createLabel(showCamarilla?mid:na, "         SL")
+prevHigh:= createLabel(previousHL?highPrev:na, "    PH")
+prevLow:= createLabel(previousHL?lowPrev:na, "      PL")
+
+showBB = input(false, title='BB',inline="patterns")
+
+// Bollinger Bands (BB) Parameters
+length = 20
+mult1 = 2.0
+
+// Calculate Bollinger Bands
+basis = ta.sma(src, length)
+dev = mult1 * ta.stdev(src, length)
+upperBB = basis + dev
+lowerBB = basis - dev
+
+// Plot Bollinger Bands if showBB is true
+plot(showBB? basis:na, color=#2962FF,title="Basis")
+plot(showBB? upperBB: na, color=color.red, title='Upper BB')
+plot(showBB? lowerBB: na, color=color.green, title='Lower BB')
+ 
