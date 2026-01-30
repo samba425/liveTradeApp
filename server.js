@@ -380,7 +380,24 @@ async function checkAndSaveOnStartup() {
 	
 	if (isWeekday || isWeekend) {
 		try {
-			if (!fs.existsSync(DAILY_DATA_FILE)) {
+			let savedDailyData = null;
+			
+			// Check MongoDB first
+			if (db) {
+				try {
+					const collection = db.collection(COLLECTION_NAME);
+					savedDailyData = await collection.findOne({ _id: 'daily' });
+				} catch (mongoError) {
+					console.error('❌ [MONGODB] Error reading daily data:', mongoError.message);
+				}
+			}
+			
+			// Fallback to file if MongoDB didn't have data
+			if (!savedDailyData && fs.existsSync(DAILY_DATA_FILE)) {
+				savedDailyData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
+			}
+			
+			if (!savedDailyData) {
 				// Weekday: Save if after 3:30 PM IST OR before 9:15 AM IST (pre-market uses previous day close)
 				// Weekend: Save anytime (Friday's close data already available)
 				if (isWeekend || isAfter330PM_IST || isBeforeMarketOpen_IST) {
@@ -390,8 +407,7 @@ async function checkAndSaveOnStartup() {
 					console.log('⏸️  [STARTUP] No DAILY data, but waiting until after 3:30 PM IST (need today\'s market close for Camarilla)');
 				}
 			} else {
-				const savedData = JSON.parse(fs.readFileSync(DAILY_DATA_FILE, 'utf8'));
-				const savedDate = new Date(savedData.timestamp);
+				const savedDate = new Date(savedDailyData.timestamp);
 				const savedDateIST = new Date(savedDate.getTime() + istOffset);
 				const todayIST = new Date(now.getTime() + istOffset);
 				
@@ -428,7 +444,24 @@ async function checkAndSaveOnStartup() {
 	const isFriday = currentDay === 5;
 	
 	try {
-		if (!fs.existsSync(WEEKLY_DATA_FILE)) {
+		let savedWeeklyData = null;
+		
+		// Check MongoDB first
+		if (db) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				savedWeeklyData = await collection.findOne({ _id: 'weekly' });
+			} catch (mongoError) {
+				console.error('❌ [MONGODB] Error reading weekly data:', mongoError.message);
+			}
+		}
+		
+		// Fallback to file if MongoDB didn't have data
+		if (!savedWeeklyData && fs.existsSync(WEEKLY_DATA_FILE)) {
+			savedWeeklyData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
+		}
+		
+		if (!savedWeeklyData) {
 			// Save if it's Friday after 3:30 PM IST
 			if (isFriday && isAfter330PM_IST) {
 				console.log('📅 [STARTUP] No WEEKLY data found and it\'s Friday after 3:30 PM IST. Saving now...');
@@ -443,8 +476,7 @@ async function checkAndSaveOnStartup() {
 				console.log('⏳ [STARTUP] No WEEKLY data found, but waiting for Friday 3:30 PM IST to save...');
 			}
 		} else {
-			const savedData = JSON.parse(fs.readFileSync(WEEKLY_DATA_FILE, 'utf8'));
-			const savedDate = new Date(savedData.timestamp);
+			const savedDate = new Date(savedWeeklyData.timestamp);
 			const savedDateIST = new Date(savedDate.getTime() + istOffset);
 			const todayIST = new Date(now.getTime() + istOffset);
 			
@@ -452,11 +484,11 @@ async function checkAndSaveOnStartup() {
 			const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
 			
 			// Save if:
-			// 1. It's Friday after 3:30 PM IST AND data is >=7 days old (new week)
-			// 2. OR it's weekend AND data is >=7 days old (missed Friday save)
-			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 7) || 
-			    (isWeekend && daysSinceLastSave >= 7)) {
-				console.log(`📅 [STARTUP] WEEKLY data is old (${daysSinceLastSave} days). Saving fresh data...`);
+			// 1. It's Friday after 3:30 PM IST AND data is >=5 days old (new week - Friday to Friday = 7 days, but check >=5 to be safe)
+			// 2. OR it's weekend AND data is >=5 days old (missed Friday save)
+			if ((isFriday && isAfter330PM_IST && daysSinceLastSave >= 5) || 
+			    (isWeekend && daysSinceLastSave >= 5)) {
+				console.log(`📅 [STARTUP] WEEKLY data is old (${daysSinceLastSave} days ago). Saving fresh data for this week...`);
 				await autoSaveWeeklyData('startup-refresh');
 			} else {
 				console.log(`✅ [STARTUP] WEEKLY data is current (saved: ${savedDate.toLocaleString()}, ${daysSinceLastSave} days ago)`);
