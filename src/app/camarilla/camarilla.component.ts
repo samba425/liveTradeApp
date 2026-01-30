@@ -350,8 +350,30 @@ export class CamarillaComponent implements OnInit {
         console.log(`   Cutoff: 3:30 PM IST (${cutoffTimeInMinutes} min)`);
         console.log(`   Same Day: ${isSameDay}, Fresh: ${isFresh}`);
       } else {
-        // Weekly: Less than 7 days old
-        isFresh = (now.getTime() - savedDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
+        // Weekly: Check if it's from THIS week's Friday or last week's Friday
+        const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Convert to IST for day-of-week check
+        const savedIST = new Date(savedDate.getTime() + (5.5 * 60 * 60 * 1000));
+        const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+        const currentDayOfWeek = nowIST.getUTCDay(); // 0=Sunday, 5=Friday
+        const savedDayOfWeek = savedIST.getUTCDay();
+        
+        // If today is Friday or later in the week, and saved data is >= 5 days old,
+        // it's from LAST week - need fresh data
+        if (currentDayOfWeek >= 5 && daysSinceLastSave >= 5) {
+          isFresh = false; // Need new week's data
+        } else if (daysSinceLastSave < 7) {
+          isFresh = true; // Within same week
+        } else {
+          isFresh = false; // More than 7 days old
+        }
+        
+        console.log(`🕐 Freshness Check (Weekly):`);
+        console.log(`   Saved: ${savedIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${daysSinceLastSave} days ago)`);
+        console.log(`   Current Day: ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][currentDayOfWeek]}`);
+        console.log(`   Saved Day: ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][savedDayOfWeek]}`);
+        console.log(`   Fresh: ${isFresh}`);
       }
       
       if (isFresh) {
