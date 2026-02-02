@@ -335,18 +335,27 @@ export class CamarillaComponent implements OnInit {
         } else {
           // Different day - check if saved yesterday after 3:30 PM and now before 3:30 PM
           const daysDiff = Math.floor((nowIST.getTime() - savedIST.getTime()) / (24 * 60 * 60 * 1000));
+          const currentDayOfWeek = nowIST.getUTCDay(); // 0=Sunday, 1=Monday, ..., 5=Friday
+          const savedDayOfWeek = savedIST.getUTCDay();
           
-          if (daysDiff === 1 && nowTimeInMinutes < cutoffTimeInMinutes && savedTimeInMinutes >= cutoffTimeInMinutes) {
-            // Saved yesterday after 3:30 PM, and we're still before 3:30 PM today
+          // CRITICAL: On Monday, Sunday data is NOT fresh (weekend data)
+          // Only use previous day's data if both days are weekdays
+          const isCurrentDayWeekday = currentDayOfWeek >= 1 && currentDayOfWeek <= 5;
+          const isSavedDayWeekday = savedDayOfWeek >= 1 && savedDayOfWeek <= 5;
+          
+          if (daysDiff === 1 && isCurrentDayWeekday && isSavedDayWeekday && 
+              nowTimeInMinutes < cutoffTimeInMinutes && savedTimeInMinutes >= cutoffTimeInMinutes) {
+            // Saved yesterday (weekday) after 3:30 PM, and we're still before 3:30 PM today (weekday)
             isFresh = true;
           } else {
+            // Weekend data or too old - need fresh data
             isFresh = false;
           }
         }
         
         console.log(`🕐 Freshness Check (Daily):`);
-        console.log(`   Saved: ${savedIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${savedTimeInMinutes} min)`);
-        console.log(`   Now:   ${nowIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${nowTimeInMinutes} min)`);
+        console.log(`   Saved: ${savedIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${savedTimeInMinutes} min) [${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][savedIST.getUTCDay()]}]`);
+        console.log(`   Now:   ${nowIST.toLocaleString('en-IN', { timeZone: 'UTC' })} IST (${nowTimeInMinutes} min) [${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][nowIST.getUTCDay()]}]`);
         console.log(`   Cutoff: 3:30 PM IST (${cutoffTimeInMinutes} min)`);
         console.log(`   Same Day: ${isSameDay}, Fresh: ${isFresh}`);
       } else {
