@@ -179,8 +179,70 @@ async function fetchTradingViewData(indexType) {
 }
 
 // Health check endpoint for server wake-up
-app.get('/health', (req, res) => {
-	res.status(200).send('OK');
+// Health check endpoint with smart data save check
+app.get('/health', async (req, res) => {
+	const checkData = req.query.checkData === 'true';
+	
+	if (checkData) {
+		// Calculate IST time
+		const now = new Date();
+		const istOffset = 5.5 * 60 * 60 * 1000;
+		const istTime = new Date(now.getTime() + istOffset);
+		const istMinutes = istTime.getUTCHours() * 60 + istTime.getUTCMinutes();
+		const currentDay = istTime.getUTCDay();
+		
+		const isAfter330PM = istMinutes >= 930;
+		const isFriday = currentDay === 5;
+		const isWeekday = currentDay >= 1 && currentDay <= 5;
+		
+		// Check if we need to save data
+		if (db && isWeekday && isAfter330PM) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				const dailyData = await collection.findOne({ _id: 'daily' });
+				const weeklyData = await collection.findOne({ _id: 'weekly' });
+				
+				const now = new Date();
+				let needsSave = false;
+				
+				// Check daily data
+				if (dailyData) {
+					const savedDate = new Date(dailyData.timestamp);
+					const hoursSinceLastSave = (now.getTime() - savedDate.getTime()) / (1000 * 60 * 60);
+					if (hoursSinceLastSave > 20) { // More than 20 hours old
+						console.log('⚠️ [HEALTH] Daily data is stale, triggering save...');
+						await autoSaveDailyData('health-check');
+						needsSave = true;
+					}
+				}
+				
+				// Check weekly data (Friday only)
+				if (isFriday && weeklyData) {
+					const savedDate = new Date(weeklyData.timestamp);
+					const daysSinceLastSave = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
+					if (daysSinceLastSave >= 5) {
+						console.log('⚠️ [HEALTH] Weekly data is stale, triggering save...');
+						await autoSaveWeeklyData('health-check');
+						needsSave = true;
+					}
+				}
+				
+				return res.status(200).json({
+					status: 'OK',
+					mongodb: 'connected',
+					dataChecked: true,
+					savedData: needsSave
+				});
+			} catch (error) {
+				console.error('[HEALTH] Error checking data:', error.message);
+			}
+		}
+	}
+	
+	res.status(200).json({
+		status: 'OK',
+		mongodb: db ? 'connected' : 'not connected'
+	});
 });
 
 // ============ CAMARILLA AUTO-SAVE FUNCTIONS ============
@@ -341,6 +403,105 @@ cron.schedule('0 10 * * 1-5', autoSaveDailyData, {
 	timezone: "UTC"
 });
 console.log('📅 Scheduled DAILY Camarilla auto-save: Mon-Fri at 3:30 PM IST');
+
+// ============ PERIODIC DATA FRESHNESS CHECKER ============
+// This runs every 15 minutes to ensure data is saved even if cron misses
+// Solves the problem: Render restarts → cron lost → data not saved
+let periodicCheckRunning = false;
+
+async function periodicDataCheck() {
+	if (periodicCheckRunning) {
+		console.log('⏭️  [PERIODIC] Check already running, skipping...');
+		return;
+	}
+	
+	periodicCheckRunning = true;
+	
+	try {
+		const now = new Date();
+		const istOffset = 5.5 * 60 * 60 * 1000;
+		const istTime = new Date(now.getTime() + istOffset);
+		const istHour = istTime.getUTCHours();
+		const istMinutes = istHour * 60 + istTime.getUTCMinutes();
+		const currentDay = istTime.getUTCDay();
+		
+		const isWeekday = currentDay >= 1 && currentDay <= 5;
+		const isWeekend = currentDay === 0 || currentDay === 6;
+		const isFriday = currentDay === 5;
+		const isAfter330PM_IST = istMinutes >= 930;
+		const isBeforeMarketOpen_IST = istMinutes < 555;
+		
+		console.log(`\n🔄 [PERIODIC] Data freshness check... (${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][currentDay]} ${istHour}:${String(istTime.getUTCMinutes()).padStart(2, '0')} IST)`);
+		
+		// Check DAILY data
+		if (db) {
+			try {
+				const collection = db.collection(COLLECTION_NAME);
+				const savedDailyData = await collection.findOne({ _id: 'daily' });
+				
+				if (savedDailyData) {
+					const savedDate = new Date(savedDailyData.timestamp);
+					const savedDateIST = new Date(savedDate.getTime() + istOffset);
+					const daysSince = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
+					const hoursSince = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60));
+					
+					const isSameDay = savedDateIST.getUTCDate() === istTime.getUTCDate() && 
+					                  savedDateIST.getUTCMonth() === istTime.getUTCMonth() && 
+					                  savedDateIST.getUTCFullYear() === istTime.getUTCFullYear();
+					
+					// Save if data is stale AND we're after 3:30 PM
+					if (!isSameDay && (isAfter330PM_IST || isWeekend)) {
+						console.log(`📊 [PERIODIC] DAILY data is ${daysSince} days old. Saving fresh data...`);
+						await autoSaveDailyData('periodic-check');
+					} else if (isSameDay) {
+						console.log(`✅ [PERIODIC] DAILY data is current (saved today, ${hoursSince} hours ago)`);
+					} else {
+						console.log(`⏸️  [PERIODIC] DAILY data is old but waiting for 3:30 PM IST`);
+					}
+				} else if (isAfter330PM_IST || isWeekend) {
+					console.log(`⚠️  [PERIODIC] No DAILY data found. Saving now...`);
+					await autoSaveDailyData('periodic-check');
+				}
+				
+				// Check WEEKLY data
+				const savedWeeklyData = await collection.findOne({ _id: 'weekly' });
+				
+				if (savedWeeklyData) {
+					const savedDate = new Date(savedWeeklyData.timestamp);
+					const daysSince = Math.floor((now.getTime() - savedDate.getTime()) / (1000 * 60 * 60 * 24));
+					
+					// Save if it's Friday after 3:30 PM and data is 5+ days old
+					if (isFriday && isAfter330PM_IST && daysSince >= 5) {
+						console.log(`📅 [PERIODIC] WEEKLY data is ${daysSince} days old and it's Friday. Saving fresh data...`);
+						await autoSaveWeeklyData('periodic-check');
+					} else if (isWeekend && daysSince >= 5) {
+						console.log(`📅 [PERIODIC] WEEKLY data is ${daysSince} days old (weekend). Saving Friday's data...`);
+						await autoSaveWeeklyData('periodic-check');
+					} else {
+						console.log(`✅ [PERIODIC] WEEKLY data is current (${daysSince} days old)`);
+					}
+				} else if ((isFriday && isAfter330PM_IST) || isWeekend) {
+					console.log(`⚠️  [PERIODIC] No WEEKLY data found. Saving now...`);
+					await autoSaveWeeklyData('periodic-check');
+				}
+				
+			} catch (error) {
+				console.error('❌ [PERIODIC] Error checking data:', error.message);
+			}
+		}
+	} finally {
+		periodicCheckRunning = false;
+	}
+}
+
+// Run periodic check every 2 hours (7200000 ms)
+// This is enough since we only need to check after 3:30 PM IST
+setInterval(periodicDataCheck, 2 * 60 * 60 * 1000);
+console.log('⏰ Scheduled periodic data freshness check: Every 2 hours');
+
+// Run first check after 10 minutes (to let server fully initialize)
+setTimeout(periodicDataCheck, 10 * 60 * 1000);
+console.log('⏰ First periodic check will run in 10 minutes');
 
 /**
  * Check if data needs to be saved on server startup

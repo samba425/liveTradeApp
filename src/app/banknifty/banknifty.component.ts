@@ -299,3 +299,17 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     this.indexSubscription.unsubscribe();
   }
 }
+
+// cgyan videos 
+// https://www.youtube.com/watch?v=hd0RDhvnP9c
+
+
+// https://www.youtube.com/watch?v=WIc9UDALYN4
+
+
+// https://www.youtube.com/watch?v=XznIjH47yiA
+
+
+// https://www.youtube.com/watch?v=bScj54Dg5eM
+
+// https://www.youtube.com/watch?v=g6kx_0I_x6I
