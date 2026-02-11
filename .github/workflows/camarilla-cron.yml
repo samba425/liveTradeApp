@@ -1,0 +1,32 @@
+name: Camarilla Auto-Save Cron
+
+on:
+  schedule:
+    # Daily: Mon-Fri at 10:00 UTC (3:30 PM IST)
+    - cron: '0 10 * * 1-5'
+    # Weekly: Friday at 10:00 UTC (3:30 PM IST)  
+    - cron: '0 10 * * 5'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  trigger-save:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Daily Data Save
+        if: github.event.schedule == '0 10 * * 1-5'
+        run: |
+          curl -X POST https://live-trade-app.onrender.com/saveCamarillaData \
+            -H "Content-Type: application/json" \
+            -d '{"timeframe":"daily"}'
+            
+      - name: Trigger Weekly Data Save
+        if: github.event.schedule == '0 10 * * 5'
+        run: |
+          curl -X POST https://live-trade-app.onrender.com/saveCamarillaData \
+            -H "Content-Type: application/json" \
+            -d '{"timeframe":"weekly"}'
+            
+      - name: Health Check
+        run: |
+          curl https://live-trade-app.onrender.com/health
