@@ -823,5 +823,163 @@
   </div>
   <!-- End OI & IV Guide -->
 
+  <!-- Options Strategy Table (Complete Guide) -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">✅ COMPLETE OPTIONS STRATEGY TABLE (Beginner Friendly)</h5>
+      <small>Quick reference for which strategy to use based on market view</small>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0" style="font-size: 13px;">
+          <thead class="table-dark">
+            <tr style="color: #000;">
+              <th style="background-color: #343a40; color: #fff;">Market View</th>
+              <th style="background-color: #343a40; color: #fff;">Best Strategy</th>
+              <th style="background-color: #343a40; color: #fff;">What To Buy</th>
+              <th style="background-color: #343a40; color: #fff;">What To Sell</th>
+              <th style="background-color: #343a40; color: #fff;">Example (Stock = ₹1000)</th>
+              <th style="background-color: #343a40; color: #fff;">Max Loss</th>
+              <th style="background-color: #343a40; color: #fff;">Risk Level</th>
+              <th style="background-color: #343a40; color: #fff;">When It Works</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Strong Bullish -->
+            <tr style="color: #000; background-color: #d4edda;">
+              <td><strong>🔥 Strong Bullish</strong></td>
+              <td><span class="badge bg-success">Buy ITM Call</span></td>
+              <td>ITM CE<br><small class="text-muted">(Below current price)</small></td>
+              <td><span class="badge bg-secondary">None</span></td>
+              <td><strong>Buy 950 CE</strong><br><small class="text-muted">Cost: ₹60/share = ₹4,500</small></td>
+              <td><span class="badge bg-danger">Premium Paid</span><br><small>(₹4,500 max)</small></td>
+              <td><span class="badge bg-warning text-dark">High</span></td>
+              <td>📈 Big fast up move<br><small class="text-muted">+5-10% in 1-2 days</small></td>
+            </tr>
+
+            <!-- Moderate Bullish -->
+            <tr style="color: #000; background-color: #e7f3ff;">
+              <td><strong>📈 Moderate Bullish</strong></td>
+              <td><span class="badge bg-primary">Bull Call Spread</span></td>
+              <td>ATM CE<br><small class="text-muted">(At current price)</small></td>
+              <td>5-10% Higher CE<br><small class="text-muted">(Above current)</small></td>
+              <td><strong>Buy 1000 CE, Sell 1100 CE</strong><br><small class="text-muted">Net cost: ₹2,000</small></td>
+              <td><span class="badge bg-warning text-dark">Reduced Premium</span><br><small>(₹2,000 max)</small></td>
+              <td><span class="badge bg-info text-dark">Medium</span></td>
+              <td>📊 Moderate up move<br><small class="text-muted">+3-8% gradually</small></td>
+            </tr>
+
+            <!-- Slight Bullish -->
+            <tr style="color: #000; background-color: #f0fff0;">
+              <td><strong>🟢 Slight Bullish</strong></td>
+              <td><span class="badge bg-success">Bull Put Spread</span></td>
+              <td>Buy Lower PE<br><small class="text-muted">(Below current)</small></td>
+              <td>Sell ATM PE<br><small class="text-muted">(At current price)</small></td>
+              <td><strong>Sell 1000 PE, Buy 900 PE</strong><br><small class="text-muted">Credit: ₹3,000</small></td>
+              <td><span class="badge bg-warning text-dark">Spread Width - Credit</span><br><small>(₹7,000 - ₹3,000 = ₹4,000)</small></td>
+              <td><span class="badge bg-success">Low</span></td>
+              <td>➡️ Stock stays above ₹1000<br><small class="text-muted">Sideways or slight up</small></td>
+            </tr>
+
+            <!-- Strong Bearish -->
+            <tr style="color: #000; background-color: #f8d7da;">
+              <td><strong>🔥 Strong Bearish</strong></td>
+              <td><span class="badge bg-danger">Buy ITM Put</span></td>
+              <td>ITM PE<br><small class="text-muted">(Above current price)</small></td>
+              <td><span class="badge bg-secondary">None</span></td>
+              <td><strong>Buy 1050 PE</strong><br><small class="text-muted">Cost: ₹65/share = ₹4,875</small></td>
+              <td><span class="badge bg-danger">Premium Paid</span><br><small>(₹4,875 max)</small></td>
+              <td><span class="badge bg-warning text-dark">High</span></td>
+              <td>📉 Big fast down move<br><small class="text-muted">-5-10% in 1-2 days</small></td>
+            </tr>
+
+            <!-- Moderate Bearish -->
+            <tr style="color: #000; background-color: #ffe5e5;">
+              <td><strong>📉 Moderate Bearish</strong></td>
+              <td><span class="badge bg-danger">Bear Put Spread</span></td>
+              <td>ATM PE<br><small class="text-muted">(At current price)</small></td>
+              <td>5-10% Lower PE<br><small class="text-muted">(Below current)</small></td>
+              <td><strong>Buy 1000 PE, Sell 900 PE</strong><br><small class="text-muted">Net cost: ₹2,500</small></td>
+              <td><span class="badge bg-warning text-dark">Reduced Premium</span><br><small>(₹2,500 max)</small></td>
+              <td><span class="badge bg-info text-dark">Medium</span></td>
+              <td>📊 Moderate down move<br><small class="text-muted">-3-8% gradually</small></td>
+            </tr>
+
+            <!-- Slight Bearish -->
+            <tr style="color: #000; background-color: #fff0f0;">
+              <td><strong>🔴 Slight Bearish</strong></td>
+              <td><span class="badge bg-danger">Bear Call Spread</span></td>
+              <td>Buy Higher CE<br><small class="text-muted">(Above current)</small></td>
+              <td>Sell ATM CE<br><small class="text-muted">(At current price)</small></td>
+              <td><strong>Sell 1000 CE, Buy 1100 CE</strong><br><small class="text-muted">Credit: ₹2,800</small></td>
+              <td><span class="badge bg-warning text-dark">Spread Width - Credit</span><br><small>(₹7,500 - ₹2,800 = ₹4,700)</small></td>
+              <td><span class="badge bg-success">Low</span></td>
+              <td>➡️ Stock stays below ₹1000<br><small class="text-muted">Sideways or slight down</small></td>
+            </tr>
+
+            <!-- Sideways -->
+            <tr style="color: #000; background-color: #fff9e6;">
+              <td><strong>😐 Sideways</strong></td>
+              <td><span class="badge bg-warning text-dark">Iron Condor</span></td>
+              <td>Buy Wings<br><small class="text-muted">(Far OTM CE & PE)</small></td>
+              <td>Sell ATM CE & PE<br><small class="text-muted">(Both sides)</small></td>
+              <td><strong>Sell 1000 CE/PE<br>Buy 1100 CE & 900 PE</strong><br><small class="text-muted">Credit: ₹5,000</small></td>
+              <td><span class="badge bg-info text-dark">Limited</span><br><small>(₹7,500 - ₹5,000 = ₹2,500)</small></td>
+              <td><span class="badge bg-success">Low</span></td>
+              <td>➡️ Small movement<br><small class="text-muted">Stock stays 950-1050</small></td>
+            </tr>
+
+            <!-- Expiry Pinpoint -->
+            <tr style="color: #000; background-color: #f0e6ff;">
+              <td><strong>🎯 Expiry Pinpoint</strong></td>
+              <td><span class="badge" style="background-color: #6c757d;">Iron Fly</span></td>
+              <td>Buy Close Wings<br><small class="text-muted">(Near ATM CE & PE)</small></td>
+              <td>Sell ATM CE & PE<br><small class="text-muted">(Same strike)</small></td>
+              <td><strong>Sell 1000 CE/PE<br>Buy 1050 CE & 950 PE</strong><br><small class="text-muted">Credit: ₹6,000</small></td>
+              <td><span class="badge bg-info text-dark">Limited</span><br><small>(₹3,750 - ₹6,000 = -₹2,250 profit if pinned)</small></td>
+              <td><span class="badge bg-warning text-dark">Medium</span></td>
+              <td>🎯 Very tight range<br><small class="text-muted">Expires exactly at 1000</small></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Tips Section -->
+      <div class="p-3" style="background-color: #f8f9fa;">
+        <h6 class="text-dark"><strong>💡 Quick Decision Guide:</strong></h6>
+        <div class="row" style="color: #000;">
+          <div class="col-md-6">
+            <ul class="mb-0" style="font-size: 12px;">
+              <li><strong>Bullish (UP):</strong> Buy Calls or Sell Puts</li>
+              <li><strong>Bearish (DOWN):</strong> Buy Puts or Sell Calls</li>
+              <li><strong>Sideways:</strong> Sell both CE & PE (Iron Condor/Fly)</li>
+              <li><strong>High Risk = High Reward:</strong> Buy ITM options</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="mb-0" style="font-size: 12px;">
+              <li><strong>Low Risk:</strong> Use spreads (Bull/Bear spreads)</li>
+              <li><strong>ATM = At The Money</strong> (Strike = Current Price)</li>
+              <li><strong>ITM = In The Money</strong> (CE below price, PE above price)</li>
+              <li><strong>OTM = Out The Money</strong> (CE above price, PE below price)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-3 mb-0" role="alert" style="font-size: 12px; color: #000;">
+          <strong>⚠️ Important:</strong> 
+          <ul class="mb-0 mt-2">
+            <li>Start with <strong>spreads</strong> (limited risk) before buying naked options</li>
+            <li>Never risk more than <strong>2-5% of capital</strong> on one trade</li>
+            <li>Use <strong>stop-loss at 50%</strong> of premium paid</li>
+            <li><strong>Paper trade first</strong> to understand Greeks (Delta, Theta, Vega)</li>
+            <li>Avoid trading on <strong>expiry day</strong> unless experienced (high theta decay)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Options Strategy Table -->
+
 
 </div>
