@@ -823,163 +823,233 @@
   </div>
   <!-- End OI & IV Guide -->
 
-  <!-- Options Strategy Table (Complete Guide) -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header bg-success text-white">
-      <h5 class="mb-0">✅ COMPLETE OPTIONS STRATEGY TABLE (Beginner Friendly)</h5>
-      <small>Quick reference for which strategy to use based on market view</small>
+  <!-- Enhanced Options Strategy Table with Risk:Reward, Win%, Theta -->
+  <div class="card mb-4 shadow-lg">
+    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+      <h4 class="mb-0">✅ COMPLETE OPTIONS STRATEGY TABLE - With Risk:Reward & Probability</h4>
+      <small>Professional trading guide with all key metrics for informed decisions</small>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover table-bordered mb-0" style="font-size: 13px;">
+        <table class="table table-hover table-bordered mb-0" style="font-size: 11px;">
           <thead class="table-dark">
-            <tr style="color: #000;">
-              <th style="background-color: #343a40; color: #fff;">Market View</th>
-              <th style="background-color: #343a40; color: #fff;">Best Strategy</th>
-              <th style="background-color: #343a40; color: #fff;">What To Buy</th>
-              <th style="background-color: #343a40; color: #fff;">What To Sell</th>
-              <th style="background-color: #343a40; color: #fff;">Example (Stock = ₹1000)</th>
-              <th style="background-color: #343a40; color: #fff;">Max Loss</th>
-              <th style="background-color: #343a40; color: #fff;">Risk Level</th>
-              <th style="background-color: #343a40; color: #fff;">When It Works</th>
+            <tr style="color: #fff;">
+              <th style="background-color: #1f2937;">Market View</th>
+              <th style="background-color: #1f2937;">Strategy</th>
+              <th style="background-color: #1f2937;">Example<br><small>(Stock=₹1000)</small></th>
+              <th style="background-color: #1f2937;">Max Loss</th>
+              <th style="background-color: #1f2937;">Max Profit</th>
+              <th style="background-color: #dc2626;">Risk:Reward</th>
+              <th style="background-color: #059669;">Win %</th>
+              <th style="background-color: #7c3aed;">Theta</th>
+              <th style="background-color: #0284c7;">Break-Even</th>
+              <th style="background-color: #ea580c;">Best IV</th>
+              <th style="background-color: #1f2937;">When It Works</th>
             </tr>
           </thead>
           <tbody>
             <!-- Strong Bullish -->
-            <tr style="color: #000; background-color: #d4edda;">
+            <tr style="background-color: #d1fae5; color: #000;">
               <td><strong>🔥 Strong Bullish</strong></td>
               <td><span class="badge bg-success">Buy ITM Call</span></td>
-              <td>ITM CE<br><small class="text-muted">(Below current price)</small></td>
-              <td><span class="badge bg-secondary">None</span></td>
-              <td><strong>Buy 950 CE</strong><br><small class="text-muted">Cost: ₹60/share = ₹4,500</small></td>
-              <td><span class="badge bg-danger">Premium Paid</span><br><small>(₹4,500 max)</small></td>
-              <td><span class="badge bg-warning text-dark">High</span></td>
-              <td>📈 Big fast up move<br><small class="text-muted">+5-10% in 1-2 days</small></td>
+              <td><strong>Buy 950 CE &#64; ₹60</strong><br><small class="text-muted">Cost: ₹4,500 (75 qty)</small></td>
+              <td><span class="badge bg-danger">₹4,500</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">Unlimited</span></td>
+              <td><strong style="color: #059669;">1:5+</strong><br><small class="text-muted">₹4.5k : ₹22k+</small></td>
+              <td><span class="badge bg-warning text-dark">35-40%</span></td>
+              <td><span class="badge bg-danger">-ve</span><br><small>-₹15/day</small></td>
+              <td><strong>₹1010</strong><br><small>950+60</small></td>
+              <td><span class="badge bg-success">Low IV</span><br><small>10-15%</small></td>
+              <td>📈 +5-10% in 1-2 days<br><small class="text-muted">Breakout</small></td>
             </tr>
 
             <!-- Moderate Bullish -->
-            <tr style="color: #000; background-color: #e7f3ff;">
+            <tr style="background-color: #dbeafe; color: #000;">
               <td><strong>📈 Moderate Bullish</strong></td>
               <td><span class="badge bg-primary">Bull Call Spread</span></td>
-              <td>ATM CE<br><small class="text-muted">(At current price)</small></td>
-              <td>5-10% Higher CE<br><small class="text-muted">(Above current)</small></td>
-              <td><strong>Buy 1000 CE, Sell 1100 CE</strong><br><small class="text-muted">Net cost: ₹2,000</small></td>
-              <td><span class="badge bg-warning text-dark">Reduced Premium</span><br><small>(₹2,000 max)</small></td>
-              <td><span class="badge bg-info text-dark">Medium</span></td>
-              <td>📊 Moderate up move<br><small class="text-muted">+3-8% gradually</small></td>
+              <td><strong>Buy 1000 CE &#64; ₹40<br>Sell 1100 CE &#64; ₹15</strong><br><small class="text-muted">Net: ₹1,875</small></td>
+              <td><span class="badge bg-danger">₹1,875</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹5,625</span><br><small>(100pt-cost)</small></td>
+              <td><strong style="color: #059669;">1:3</strong><br><small class="text-muted">₹1.8k : ₹5.6k</small></td>
+              <td><span class="badge bg-success">50-55%</span></td>
+              <td><span class="badge bg-warning text-dark">Neutral</span><br><small>Offset</small></td>
+              <td><strong>₹1025</strong><br><small>1000+25</small></td>
+              <td><span class="badge bg-info">Med IV</span><br><small>15-20%</small></td>
+              <td>📊 +3-8% gradual<br><small class="text-muted">Trend</small></td>
             </tr>
 
             <!-- Slight Bullish -->
-            <tr style="color: #000; background-color: #f0fff0;">
+            <tr style="background-color: #d1fae5; color: #000;">
               <td><strong>🟢 Slight Bullish</strong></td>
               <td><span class="badge bg-success">Bull Put Spread</span></td>
-              <td>Buy Lower PE<br><small class="text-muted">(Below current)</small></td>
-              <td>Sell ATM PE<br><small class="text-muted">(At current price)</small></td>
-              <td><strong>Sell 1000 PE, Buy 900 PE</strong><br><small class="text-muted">Credit: ₹3,000</small></td>
-              <td><span class="badge bg-warning text-dark">Spread Width - Credit</span><br><small>(₹7,000 - ₹3,000 = ₹4,000)</small></td>
-              <td><span class="badge bg-success">Low</span></td>
-              <td>➡️ Stock stays above ₹1000<br><small class="text-muted">Sideways or slight up</small></td>
+              <td><strong>Sell 1000 PE &#64; ₹45<br>Buy 900 PE &#64; ₹12</strong><br><small class="text-muted">Credit: ₹2,475</small></td>
+              <td><span class="badge bg-danger">₹5,025</span><br><small>(100-credit)</small></td>
+              <td><span class="badge bg-success">₹2,475</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #059669;">2:1</strong><br><small class="text-muted">₹5k : ₹2.4k</small></td>
+              <td><span class="badge bg-success">60-65%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹25/day</small></td>
+              <td><strong>₹967</strong><br><small>1000-33</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>20-30%</small></td>
+              <td>➡️ Sideways/up<br><small class="text-muted">Above 1000</small></td>
             </tr>
 
             <!-- Strong Bearish -->
-            <tr style="color: #000; background-color: #f8d7da;">
+            <tr style="background-color: #fecaca; color: #000;">
               <td><strong>🔥 Strong Bearish</strong></td>
               <td><span class="badge bg-danger">Buy ITM Put</span></td>
-              <td>ITM PE<br><small class="text-muted">(Above current price)</small></td>
-              <td><span class="badge bg-secondary">None</span></td>
-              <td><strong>Buy 1050 PE</strong><br><small class="text-muted">Cost: ₹65/share = ₹4,875</small></td>
-              <td><span class="badge bg-danger">Premium Paid</span><br><small>(₹4,875 max)</small></td>
-              <td><span class="badge bg-warning text-dark">High</span></td>
-              <td>📉 Big fast down move<br><small class="text-muted">-5-10% in 1-2 days</small></td>
+              <td><strong>Buy 1050 PE &#64; ₹65</strong><br><small class="text-muted">Cost: ₹4,875 (75 qty)</small></td>
+              <td><span class="badge bg-danger">₹4,875</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹74k</span><br><small>(Stock→0)</small></td>
+              <td><strong style="color: #059669;">1:5+</strong><br><small class="text-muted">₹4.8k : ₹24k+</small></td>
+              <td><span class="badge bg-warning text-dark">35-40%</span></td>
+              <td><span class="badge bg-danger">-ve</span><br><small>-₹20/day</small></td>
+              <td><strong>₹985</strong><br><small>1050-65</small></td>
+              <td><span class="badge bg-success">Low IV</span><br><small>10-15%</small></td>
+              <td>📉 -5-10% in 1-2 days<br><small class="text-muted">Crash</small></td>
             </tr>
 
             <!-- Moderate Bearish -->
-            <tr style="color: #000; background-color: #ffe5e5;">
+            <tr style="background-color: #fee2e2; color: #000;">
               <td><strong>📉 Moderate Bearish</strong></td>
               <td><span class="badge bg-danger">Bear Put Spread</span></td>
-              <td>ATM PE<br><small class="text-muted">(At current price)</small></td>
-              <td>5-10% Lower PE<br><small class="text-muted">(Below current)</small></td>
-              <td><strong>Buy 1000 PE, Sell 900 PE</strong><br><small class="text-muted">Net cost: ₹2,500</small></td>
-              <td><span class="badge bg-warning text-dark">Reduced Premium</span><br><small>(₹2,500 max)</small></td>
-              <td><span class="badge bg-info text-dark">Medium</span></td>
-              <td>📊 Moderate down move<br><small class="text-muted">-3-8% gradually</small></td>
+              <td><strong>Buy 1000 PE &#64; ₹42<br>Sell 900 PE &#64; ₹14</strong><br><small class="text-muted">Net: ₹2,100</small></td>
+              <td><span class="badge bg-danger">₹2,100</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹5,400</span><br><small>(100pt-cost)</small></td>
+              <td><strong style="color: #059669;">1:2.5</strong><br><small class="text-muted">₹2.1k : ₹5.4k</small></td>
+              <td><span class="badge bg-success">50-55%</span></td>
+              <td><span class="badge bg-warning text-dark">Neutral</span><br><small>Offset</small></td>
+              <td><strong>₹972</strong><br><small>1000-28</small></td>
+              <td><span class="badge bg-info">Med IV</span><br><small>15-20%</small></td>
+              <td>📊 -3-8% gradual<br><small class="text-muted">Down trend</small></td>
             </tr>
 
             <!-- Slight Bearish -->
-            <tr style="color: #000; background-color: #fff0f0;">
+            <tr style="background-color: #fecaca; color: #000;">
               <td><strong>🔴 Slight Bearish</strong></td>
               <td><span class="badge bg-danger">Bear Call Spread</span></td>
-              <td>Buy Higher CE<br><small class="text-muted">(Above current)</small></td>
-              <td>Sell ATM CE<br><small class="text-muted">(At current price)</small></td>
-              <td><strong>Sell 1000 CE, Buy 1100 CE</strong><br><small class="text-muted">Credit: ₹2,800</small></td>
-              <td><span class="badge bg-warning text-dark">Spread Width - Credit</span><br><small>(₹7,500 - ₹2,800 = ₹4,700)</small></td>
-              <td><span class="badge bg-success">Low</span></td>
-              <td>➡️ Stock stays below ₹1000<br><small class="text-muted">Sideways or slight down</small></td>
+              <td><strong>Sell 1000 CE &#64; ₹40<br>Buy 1100 CE &#64; ₹12</strong><br><small class="text-muted">Credit: ₹2,100</small></td>
+              <td><span class="badge bg-danger">₹5,400</span><br><small>(100-credit)</small></td>
+              <td><span class="badge bg-success">₹2,100</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #ea580c;">2.5:1</strong><br><small class="text-muted">₹5.4k : ₹2.1k</small></td>
+              <td><span class="badge bg-success">60-65%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹23/day</small></td>
+              <td><strong>₹1028</strong><br><small>1000+28</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>20-30%</small></td>
+              <td>➡️ Sideways/down<br><small class="text-muted">Below 1000</small></td>
             </tr>
 
             <!-- Sideways -->
-            <tr style="color: #000; background-color: #fff9e6;">
+            <tr style="background-color: #fef3c7; color: #000;">
               <td><strong>😐 Sideways</strong></td>
               <td><span class="badge bg-warning text-dark">Iron Condor</span></td>
-              <td>Buy Wings<br><small class="text-muted">(Far OTM CE & PE)</small></td>
-              <td>Sell ATM CE & PE<br><small class="text-muted">(Both sides)</small></td>
-              <td><strong>Sell 1000 CE/PE<br>Buy 1100 CE & 900 PE</strong><br><small class="text-muted">Credit: ₹5,000</small></td>
-              <td><span class="badge bg-info text-dark">Limited</span><br><small>(₹7,500 - ₹5,000 = ₹2,500)</small></td>
-              <td><span class="badge bg-success">Low</span></td>
-              <td>➡️ Small movement<br><small class="text-muted">Stock stays 950-1050</small></td>
+              <td><strong>Sell 1050 CE &#64; ₹18<br>Buy 1100 CE &#64; ₹8<br>Sell 950 PE &#64; ₹20<br>Buy 900 PE &#64; ₹9</strong><br><small class="text-muted">Credit: ₹1,575</small></td>
+              <td><span class="badge bg-danger">₹2,175</span><br><small>(50-credit)</small></td>
+              <td><span class="badge bg-success">₹1,575</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #ca8a04;">1.4:1</strong><br><small class="text-muted">₹2.1k : ₹1.5k</small></td>
+              <td><span class="badge bg-success">70-75%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹40/day</small></td>
+              <td><strong>₹929-₹1071</strong><br><small>Range</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>25-35%</small></td>
+              <td>➡️ ±3% movement<br><small class="text-muted">950-1050</small></td>
             </tr>
 
             <!-- Expiry Pinpoint -->
-            <tr style="color: #000; background-color: #f0e6ff;">
+            <tr style="background-color: #e0e7ff; color: #000;">
               <td><strong>🎯 Expiry Pinpoint</strong></td>
-              <td><span class="badge" style="background-color: #6c757d;">Iron Fly</span></td>
-              <td>Buy Close Wings<br><small class="text-muted">(Near ATM CE & PE)</small></td>
-              <td>Sell ATM CE & PE<br><small class="text-muted">(Same strike)</small></td>
-              <td><strong>Sell 1000 CE/PE<br>Buy 1050 CE & 950 PE</strong><br><small class="text-muted">Credit: ₹6,000</small></td>
-              <td><span class="badge bg-info text-dark">Limited</span><br><small>(₹3,750 - ₹6,000 = -₹2,250 profit if pinned)</small></td>
-              <td><span class="badge bg-warning text-dark">Medium</span></td>
-              <td>🎯 Very tight range<br><small class="text-muted">Expires exactly at 1000</small></td>
+              <td><span class="badge" style="background-color: #7c3aed; color: white;">Iron Fly</span></td>
+              <td><strong>Sell 1000 CE &#64; ₹42<br>Sell 1000 PE &#64; ₹45<br>Buy 1050 CE &#64; ₹18<br>Buy 950 PE &#64; ₹20</strong><br><small class="text-muted">Credit: ₹3,675</small></td>
+              <td><span class="badge bg-danger">₹75</span><br><small>(50-credit)</small></td>
+              <td><span class="badge bg-success">₹3,675</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #059669;">1:50</strong><br><small class="text-muted">₹75 : ₹3.6k</small></td>
+              <td><span class="badge bg-warning text-dark">40-45%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹70/day</small></td>
+              <td><strong>₹951-₹1049</strong><br><small>Pin 1000</small></td>
+              <td><span class="badge bg-danger">V.High IV</span><br><small>30-40%</small></td>
+              <td>🎯 Expires &#64; ₹1000<br><small class="text-muted">±1% only</small></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Quick Tips Section -->
-      <div class="p-3" style="background-color: #f8f9fa;">
-        <h6 class="text-dark"><strong>💡 Quick Decision Guide:</strong></h6>
-        <div class="row" style="color: #000;">
-          <div class="col-md-6">
-            <ul class="mb-0" style="font-size: 12px;">
-              <li><strong>Bullish (UP):</strong> Buy Calls or Sell Puts</li>
-              <li><strong>Bearish (DOWN):</strong> Buy Puts or Sell Calls</li>
-              <li><strong>Sideways:</strong> Sell both CE & PE (Iron Condor/Fly)</li>
-              <li><strong>High Risk = High Reward:</strong> Buy ITM options</li>
+      <!-- Enhanced Legend -->
+      <div class="p-3" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+        <div class="row">
+          <div class="col-md-3">
+            <h6><strong>📊 Risk:Reward:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>1:3 = Good</strong> (Risk ₹1k → Make ₹3k)</li>
+              <li><strong>1:5+ = Excellent</strong> (High upside)</li>
+              <li><strong>2:1 = OK</strong> (High win% needed)</li>
+              <li>❌ Avoid 3:1+ (too risky)</li>
             </ul>
           </div>
-          <div class="col-md-6">
-            <ul class="mb-0" style="font-size: 12px;">
-              <li><strong>Low Risk:</strong> Use spreads (Bull/Bear spreads)</li>
-              <li><strong>ATM = At The Money</strong> (Strike = Current Price)</li>
-              <li><strong>ITM = In The Money</strong> (CE below price, PE above price)</li>
-              <li><strong>OTM = Out The Money</strong> (CE above price, PE below price)</li>
+          <div class="col-md-3">
+            <h6><strong>🎯 Win % Guide:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>70%+ = Very Safe</strong> (Condors)</li>
+              <li><strong>50-60% = Good</strong> (Spreads)</li>
+              <li><strong>35-45% = Risky</strong> (Buying)</li>
+              <li>1 big win = 3 small losses</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><strong>⏰ Theta:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>+ve = Friend</strong> (Earn daily)</li>
+              <li><strong>-ve = Enemy</strong> (Lose daily)</li>
+              <li>Buying = Fight theta</li>
+              <li>Selling = Collect theta</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><strong>📈 IV Strategy:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>Low IV = BUY</strong> (cheap)</li>
+              <li><strong>High IV = SELL</strong> (expensive)</li>
+              <li>Check VIX before trade</li>
+              <li>IV spike = Wait for crush</li>
             </ul>
           </div>
         </div>
 
-        <div class="alert alert-warning mt-3 mb-0" role="alert" style="font-size: 12px; color: #000;">
-          <strong>⚠️ Important:</strong> 
-          <ul class="mb-0 mt-2">
-            <li>Start with <strong>spreads</strong> (limited risk) before buying naked options</li>
-            <li>Never risk more than <strong>2-5% of capital</strong> on one trade</li>
-            <li>Use <strong>stop-loss at 50%</strong> of premium paid</li>
-            <li><strong>Paper trade first</strong> to understand Greeks (Delta, Theta, Vega)</li>
-            <li>Avoid trading on <strong>expiry day</strong> unless experienced (high theta decay)</li>
-          </ul>
+        <!-- Critical Rules -->
+        <div class="mt-3 p-2" style="background-color: rgba(239, 68, 68, 0.2); border-left: 3px solid #ef4444; border-radius: 4px;">
+          <h6><strong>⚠️ Critical Trading Rules:</strong></h6>
+          <div class="row" style="font-size: 10px;">
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>✅ Win% > 50% → Trade more often</li>
+                <li>✅ Risk:Reward > 1:2 → Minimum 2x profit</li>
+                <li>✅ Theta +ve → Time helps you</li>
+                <li>✅ Know break-even BEFORE entry</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>❌ Don't buy when IV > 30%</li>
+                <li>❌ Don't sell when IV < 12%</li>
+                <li>❌ Avoid expiry day (theta kills)</li>
+                <li>❌ Risk max 2% capital/trade</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Decision Example -->
+        <div class="mt-2 p-2" style="background-color: rgba(16, 185, 129, 0.2); border-left: 3px solid #10b981; border-radius: 4px;">
+          <h6><strong>💡 Quick Decision Process:</strong></h6>
+          <ol style="font-size: 10px; line-height: 1.8; margin-bottom: 0;">
+            <li><strong>Check VIX:</strong> 12% (Low) → BUY options | 28% (High) → SELL options</li>
+            <li><strong>Market View:</strong> Bullish + Moderate confidence → Bull Call Spread</li>
+            <li><strong>Check Table:</strong> Risk:Reward 1:3 ✅ | Win% 50-55% ✅ | Theta Neutral ✅</li>
+            <li><strong>Position Size:</strong> ₹10k capital × 2% risk = ₹200 max loss</li>
+            <li><strong>Execute:</strong> Enter with stop-loss at 30%, target at 50% profit</li>
+          </ol>
         </div>
       </div>
     </div>
   </div>
-  <!-- End Options Strategy Table -->
+  <!-- End Enhanced Options Strategy Table -->
 
 
 </div>
