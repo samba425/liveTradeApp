@@ -1051,5 +1051,496 @@
   </div>
   <!-- End Enhanced Options Strategy Table -->
 
+  <!-- Pre-Trade IV & Greeks Checklist -->
+  <div class="card mb-4 shadow-lg">
+    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+      <h4 class="mb-0">🚨 PRE-TRADE CHECKLIST - Why Your Option Doesn't Move Even When Stock Moves!</h4>
+      <small>Check ALL these BEFORE clicking "BUY" - Works for ALL stocks (Nifty, Bank Nifty, Reliance, TCS, etc.)</small>
+    </div>
+    <div class="card-body">
+      
+      <!-- VIX Check -->
+      <div class="mb-4">
+        <h5 class="text-danger"><strong>⚠️ Common Beginner Mistake:</strong></h5>
+        <div class="alert alert-warning mb-3" style="font-size: 12px;">
+          <strong>You think:</strong> "Stock is bullish, let me buy Call option!" 📈<br>
+          <strong>Reality:</strong> Stock goes up 100 points... but your Call option <strong class="text-danger">LOSES money ❌</strong><br>
+          <strong>WHY?</strong> Because you ignored <strong>IV (Implied Volatility)</strong> and <strong>Greeks</strong>!
+        </div>
+      </div>
+
+      <!-- VIX/IV Check Table -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 1: Check VIX (Fear Index) - Is IV Too High?</strong></h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>VIX Level</th>
+                <th>IV Status</th>
+                <th>What It Means</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>Below 12</strong></td>
+                <td><span class="badge bg-success">🟢 Low IV</span></td>
+                <td>Options are <strong>CHEAP</strong></td>
+                <td><strong class="text-success">✅ BEST TIME TO BUY</strong></td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>12-18</strong></td>
+                <td><span class="badge bg-warning text-dark">🟡 Normal IV</span></td>
+                <td>Fair pricing</td>
+                <td>✅ OK to buy (be selective)</td>
+              </tr>
+              <tr style="background-color: #fed7aa;">
+                <td><strong>18-25</strong></td>
+                <td><span class="badge bg-warning">🟠 High IV</span></td>
+                <td>Options are <strong>EXPENSIVE</strong></td>
+                <td><strong class="text-warning">⚠️ CAUTION</strong> - Consider selling instead</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>Above 25</strong></td>
+                <td><span class="badge bg-danger">🔴 Very High IV</span></td>
+                <td><strong>DANGER ZONE</strong></td>
+                <td><strong class="text-danger">🚫 DON'T BUY!</strong> - IV crush will kill you</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info" style="font-size: 11px;">
+          <strong>📍 How to Check VIX:</strong><br>
+          1. NSE India: <a href="https://www.nseindia.com/" target="_blank">nseindia.com</a> → Look for "India VIX" on homepage<br>
+          2. Trading App: Search "INDIA VIX" in market watch (Zerodha/Upstox/Groww)
+        </div>
+      </div>
+
+      <!-- Real IV Example -->
+      <div class="mb-4">
+        <h6><strong>💡 Real Example - Why VIX Matters:</strong></h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card" style="border: 2px solid #10b981; background-color: #d1fae5;">
+              <div class="card-body p-2" style="font-size: 10px;">
+                <h6 class="text-success"><strong>✅ Scenario 1: Low VIX (12%) - GOOD</strong></h6>
+                <ul class="mb-0">
+                  <li>Nifty at 19500, you buy 19500 CE &#64; ₹100</li>
+                  <li>Nifty moves to 19600 (+100 points)</li>
+                  <li>Your option moves to ₹150-160 <strong class="text-success">(+50-60%!)</strong> ✅</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card" style="border: 2px solid #dc2626; background-color: #fecaca;">
+              <div class="card-body p-2" style="font-size: 10px;">
+                <h6 class="text-danger"><strong>❌ Scenario 2: High VIX (28%) - BAD</strong></h6>
+                <ul class="mb-0">
+                  <li>Nifty at 19500, you buy 19500 CE &#64; ₹250 (expensive!)</li>
+                  <li>Nifty moves to 19600 (+100 points)</li>
+                  <li>VIX drops to 20% (IV crush!)</li>
+                  <li>Your option drops to ₹220-230 <strong class="text-danger">(LOSS even though Nifty went up!)</strong> ❌</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Greeks Check -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 2: Check Greeks BEFORE Entry</strong></h5>
+        
+        <!-- Delta Table -->
+        <h6 class="mt-3"><strong>A. DELTA (Δ) - Will Your Option Actually Move?</strong></h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>Option Type</th>
+                <th>Delta</th>
+                <th>Meaning</th>
+                <th>Movement Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>Deep ITM Call</strong></td>
+                <td><span class="badge bg-success">0.8-0.9</span></td>
+                <td>Moves almost like stock</td>
+                <td>Nifty +100 = Option +80-90 ✅</td>
+              </tr>
+              <tr style="background-color: #e0f2fe;">
+                <td><strong>ATM Call</strong></td>
+                <td><span class="badge bg-primary">0.5</span></td>
+                <td>Moves half of stock</td>
+                <td>Nifty +100 = Option +50 ✅</td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>OTM Call</strong></td>
+                <td><span class="badge bg-warning text-dark">0.2-0.3</span></td>
+                <td>Barely moves</td>
+                <td>Nifty +100 = Option +20-30 ⚠️</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>Far OTM Call</strong></td>
+                <td><span class="badge bg-danger">0.05-0.1</span></td>
+                <td>Almost dead</td>
+                <td>Nifty +100 = Option +5-10 ❌</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-success" style="font-size: 11px;">
+          <strong>🎯 Beginner Rule:</strong><br>
+          ✅ <strong>Buy options with Delta > 0.4</strong> (ATM or slightly ITM)<br>
+          ❌ <strong>Avoid Delta < 0.3</strong> (OTM - won't move enough)
+        </div>
+
+        <!-- Theta Table -->
+        <h6 class="mt-3"><strong>B. THETA (Θ) - How Much You Lose Daily (Time Decay)</strong></h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>Days to Expiry</th>
+                <th>Theta (Daily Loss)</th>
+                <th>Is It Safe?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>15+ days</strong></td>
+                <td>-₹10 to -₹20</td>
+                <td><span class="badge bg-success">✅ Safe</span> - Slow decay</td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>7-10 days</strong></td>
+                <td>-₹30 to -₹50</td>
+                <td><span class="badge bg-warning text-dark">⚠️ Moderate</span> - Plan exit</td>
+              </tr>
+              <tr style="background-color: #fed7aa;">
+                <td><strong>3-5 days</strong></td>
+                <td>-₹70 to -₹100</td>
+                <td><span class="badge bg-danger">🔴 High</span> - Risky</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>1-2 days (Expiry)</strong></td>
+                <td>-₹150 to -₹300</td>
+                <td><span class="badge bg-danger">🚫 EXTREME</span> - Don't buy!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-danger" style="font-size: 11px;">
+          <strong>🎯 Beginner Rule:</strong><br>
+          ✅ <strong>Only buy options with 7+ days to expiry</strong> (fresh weekly, not Thursday)<br>
+          ❌ <strong>Never buy on Wednesday/Thursday</strong> (theta decay kills overnight)
+        </div>
+      </div>
+
+      <!-- Event Calendar Check -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 3: Check Event Calendar - Will IV Spike/Crush?</strong></h5>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <h6><strong>📅 IV Spike Events (Don't Buy Before!):</strong></h6>
+            <div class="table-responsive">
+              <table class="table table-bordered" style="font-size: 10px;">
+                <thead class="table-danger">
+                  <tr>
+                    <th>Event</th>
+                    <th>IV Impact</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>RBI Policy</td>
+                    <td>VIX +20-40%</td>
+                    <td>🚫 Don't buy</td>
+                  </tr>
+                  <tr>
+                    <td>Monthly Expiry</td>
+                    <td>VIX +10-20%</td>
+                    <td>⚠️ Avoid Wed-Thu</td>
+                  </tr>
+                  <tr>
+                    <td>Election Results</td>
+                    <td>VIX +50-100%</td>
+                    <td>🚫 Stay out</td>
+                  </tr>
+                  <tr>
+                    <td>Stock Earnings</td>
+                    <td>IV +30%</td>
+                    <td>🚫 Don't buy day before</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6><strong>📅 IV Crush Events (Buy After!):</strong></h6>
+            <div class="table-responsive">
+              <table class="table table-bordered" style="font-size: 10px;">
+                <thead class="table-success">
+                  <tr>
+                    <th>Event</th>
+                    <th>IV Impact</th>
+                    <th>What Happens</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Day After RBI</td>
+                    <td>VIX -20-30%</td>
+                    <td>✅ Cheap premiums</td>
+                  </tr>
+                  <tr>
+                    <td>Day After Election</td>
+                    <td>VIX -50%</td>
+                    <td>✅ Massive drop</td>
+                  </tr>
+                  <tr>
+                    <td>Day After Earnings</td>
+                    <td>IV -40%</td>
+                    <td>✅ Best entry</td>
+                  </tr>
+                  <tr>
+                    <td>Friday (Expiry Over)</td>
+                    <td>VIX -10-15%</td>
+                    <td>✅ Fresh week</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Decision Flow -->
+      <div class="mb-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 15px; border-radius: 8px;">
+        <h5 class="text-center mb-3"><strong>🎯 VISUAL DECISION TREE - Should I Buy This Option?</strong></h5>
+        <div style="font-family: monospace; font-size: 10px; line-height: 1.8; background-color: #000; padding: 15px; border-radius: 4px; overflow-x: auto;">
+<pre style="color: #10b981; margin: 0;">
+                    START: I want to buy a Call/Put option
+                                    |
+                    ┌───────────────┴───────────────┐
+                    |                               |
+            <strong style="color: #fbbf24;">Check VIX/IV</strong>                    <strong style="color: #fbbf24;">Check Days to Expiry</strong>
+                    |                               |
+        ┌───────────┴──────────┐        ┌──────────┴──────────┐
+        |                      |        |                     |
+   <strong style="color: #10b981;">VIX &lt; 18?</strong>            <strong style="color: #ef4444;">VIX &gt; 18?</strong>   <strong style="color: #10b981;">&gt; 7 days?</strong>          <strong style="color: #ef4444;">&lt; 5 days?</strong>
+        |                      |        |                     |
+        ✅                    ❌        ✅                    ❌
+    <strong style="color: #10b981;">GOOD IV</strong>              <strong style="color: #ef4444;">TOO HIGH</strong>    <strong style="color: #10b981;">SAFE THETA</strong>        <strong style="color: #ef4444;">HIGH THETA</strong>
+        |                   <strong style="color: #ef4444;">STOP!</strong>        |                  <strong style="color: #ef4444;">STOP!</strong>
+        ↓                                ↓
+   <strong style="color: #fbbf24;">Check Delta</strong>                     <strong style="color: #fbbf24;">Check Event Calendar</strong>
+        |                                |
+  ┌─────┴─────┐                  ┌──────┴──────┐
+  |           |                  |             |
+<strong style="color: #10b981;">Δ &gt; 0.4?</strong>  <strong style="color: #ef4444;">Δ &lt; 0.3?</strong>   <strong style="color: #10b981;">No event?</strong>    <strong style="color: #ef4444;">Event tomorrow?</strong>
+  |           |                  |             |
+  ✅         ❌                  ✅           ❌
+<strong style="color: #10b981;">WILL MOVE</strong>  <strong style="color: #ef4444;">WON'T MOVE</strong>         <strong style="color: #10b981;">SAFE</strong>        <strong style="color: #ef4444;">IV CRUSH RISK</strong>
+  |          <strong style="color: #ef4444;">STOP!</strong>               |            <strong style="color: #ef4444;">STOP!</strong>
+  ↓                              ↓
+<strong style="color: #fbbf24;">Check Theta</strong>                  <strong style="color: #fbbf24;">Final: Risk Management</strong>
+  |                              |
+  |                      ┌───────┴──────┐
+<strong style="color: #10b981;">θ &lt; -₹50?</strong>           |               |
+  |                <strong style="color: #10b981;">Stop Loss?</strong>      <strong style="color: #10b981;">2% Risk?</strong>
+  ✅                     |               |
+<strong style="color: #10b981;">LOW DECAY</strong>               ✅              ✅
+  |                      |               |
+  ↓                      └───────┬───────┘
+<strong style="color: #10b981;">ALL CHECKS PASSED ✅</strong>             |
+  |                              ↓
+  └──────────────────► <strong style="color: #fbbf24;">🚀 GO AHEAD, BUY! 🚀</strong>
+</pre>
+        </div>
+      </div>
+
+      <!-- Complete Checklist -->
+      <div class="mb-4">
+        <h5 class="text-center"><strong>✅ COMPLETE PRE-TRADE CHECKLIST (Print & Keep!)</strong></h5>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card border-primary">
+              <div class="card-header bg-primary text-white">
+                <strong>1. IV/VIX Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check1">
+                  <label class="form-check-label" for="check1">VIX is below 18? (Preferably below 15)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check2">
+                  <label class="form-check-label" for="check2">ATM Call + Put premium &lt; ₹250?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check3">
+                  <label class="form-check-label" for="check3">No major event in next 2 days?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check4">
+                  <label class="form-check-label" for="check4">IV percentile &lt; 50%?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-success">
+              <div class="card-header bg-success text-white">
+                <strong>2. Greeks Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check5">
+                  <label class="form-check-label" for="check5">Delta &gt; 0.4? (Option will move)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check6">
+                  <label class="form-check-label" for="check6">Theta &lt; -₹50? (Not bleeding fast)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check7">
+                  <label class="form-check-label" for="check7">Days to expiry &gt; 7 days?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check8">
+                  <label class="form-check-label" for="check8">Vega risk acceptable?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card border-info">
+              <div class="card-header bg-info text-white">
+                <strong>3. Directional Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check9">
+                  <label class="form-check-label" for="check9">Clear trend on charts?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check10">
+                  <label class="form-check-label" for="check10">Support/Resistance identified?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check11">
+                  <label class="form-check-label" for="check11">OI data supports view?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check12">
+                  <label class="form-check-label" for="check12">Volume is good? (Liquid)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-danger">
+              <div class="card-header bg-danger text-white">
+                <strong>4. Risk Management</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check13">
+                  <label class="form-check-label" for="check13">Stop loss decided? (20-30%)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check14">
+                  <label class="form-check-label" for="check14">Target decided? (50-80%)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check15">
+                  <label class="form-check-label" for="check15">Position size &lt; 2% capital?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check16">
+                  <label class="form-check-label" for="check16">Can afford to lose this?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-danger mt-3 text-center" style="font-size: 12px;">
+          <strong>⚠️ If ANY checkbox is unchecked → DON'T TRADE!</strong>
+        </div>
+      </div>
+
+      <!-- Quick Reference Card -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="card" style="background-color: #d1fae5; border: 2px solid #10b981;">
+            <div class="card-header bg-success text-white text-center">
+              <strong>🟢 SAFE TO BUY</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px;">
+              <ul class="mb-0">
+                <li>✅ VIX below 15</li>
+                <li>✅ Fresh weekly (Mon/Tue)</li>
+                <li>✅ ATM (Delta &gt; 0.5)</li>
+                <li>✅ No events next 2 days</li>
+                <li>✅ Clear trend</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card" style="background-color: #fecaca; border: 2px solid #dc2626;">
+            <div class="card-header bg-danger text-white text-center">
+              <strong>🔴 DON'T BUY</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px;">
+              <ul class="mb-0">
+                <li>❌ VIX above 20</li>
+                <li>❌ Wed/Thu (expiry week)</li>
+                <li>❌ OTM (Delta &lt; 0.3)</li>
+                <li>❌ Before RBI/earnings</li>
+                <li>❌ Expensive premiums</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card" style="background-color: #fef3c7; border: 2px solid #f59e0b;">
+            <div class="card-header bg-warning text-dark text-center">
+              <strong>🟡 SELL OPTIONS</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px;">
+              <ul class="mb-0">
+                <li>✅ VIX above 20 (high IV)</li>
+                <li>✅ Before events (spike)</li>
+                <li>✅ Wed/Thu (theta helps)</li>
+                <li>✅ Use spreads (limit risk)</li>
+                <li>✅ Collect premium</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Warning -->
+      <div class="alert alert-warning text-center" style="font-size: 13px; border: 3px solid #f59e0b;">
+        <h5 class="text-danger"><strong>🎓 Remember:</strong></h5>
+        <p class="mb-1">📊 <strong>90% of option buyers lose money because they ignore IV and Greeks!</strong></p>
+        <p class="mb-1">🎯 <strong>Don't be part of the 90%. Check BEFORE you trade!</strong></p>
+        <p class="mb-0">✅ <strong>This checklist works for ALL stocks: Nifty, Bank Nifty, Reliance, TCS, Infosys, etc.</strong></p>
+      </div>
+
+    </div>
+  </div>
+  <!-- End Pre-Trade Checklist -->
+
 
 </div>
