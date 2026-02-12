@@ -1,0 +1,113 @@
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Floating Back to Top Button */
+.back-to-top-float {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  display: none;
+}
+
+.back-to-top-float.show {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Navigation buttons hover effect */
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover {
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Card hover effects */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Table responsive improvements */
+.table-responsive {
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Badge spacing fix */
+.badge {
+  margin: 0.25rem !important;
+  display: inline-block;
+}
+
+/* List styling for better readability */
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+/* Alert improvements */
+.alert {
+  border-radius: 10px;
+}
+
+/* Smooth gap utility for older Bootstrap versions */
+.gap-2 > * {
+  margin: 0.25rem !important;
+}
+
+/* Print-friendly styles */
+@media print {
+  .back-to-top-float,
+  .btn,
+  .alert-warning {
+    display: none !important;
+  }
+  
+  .card {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .table {
+    font-size: 10px !important;
+  }
+  
+  .card-header h4 {
+    font-size: 16px !important;
+  }
+  
+  .back-to-top-float {
+    bottom: 15px;
+    right: 15px;
+  }
+}

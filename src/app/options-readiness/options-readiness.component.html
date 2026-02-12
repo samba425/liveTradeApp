@@ -1,0 +1,1557 @@
+<div class="container-fluid py-4" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); min-height: 100vh;">
+  
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-lg" style="border: none; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+        <div class="card-body text-white text-center p-4">
+          <h2 class="mb-2"><strong>🎓 Options Trading Readiness Center</strong></h2>
+          <p class="mb-0" style="font-size: 14px;">Everything you need to know before trading options - Pre-trade checklists, Strategy tables, IV & Greeks explained</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Navigation Menu -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-body p-3">
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <button (click)="scrollToSection('strategy-table')" class="btn btn-sm btn-outline-primary">📊 Strategy Table</button>
+            <button (click)="scrollToSection('pre-trade-checklist')" class="btn btn-sm btn-outline-success">✅ Pre-Trade Checklist</button>
+            <button (click)="scrollToSection('oi-iv-guide')" class="btn btn-sm btn-outline-info">📖 OI & IV Guide</button>
+            <button (click)="scrollToSection('beginner-tips')" class="btn btn-sm btn-outline-warning">💡 Beginner Tips</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-4 shadow-lg" id="strategy-table">
+    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+      <h4 class="mb-0">✅ COMPLETE OPTIONS STRATEGY TABLE - With Risk:Reward & Probability</h4>
+      <small>Professional trading guide with all key metrics for informed decisions</small>
+    </div>
+    
+    <!-- Universal Application Notice -->
+    <div class="alert alert-info m-3 mb-2" style="font-size: 12px; border: 2px solid #0284c7;">
+      <h6 class="text-center mb-2"><strong>🌍 UNIVERSAL TABLE - Works for ALL Options!</strong></h6>
+      <div class="row text-center">
+        <div class="col-md-6 mb-2">
+          <strong>📊 Index Options:</strong><br>
+          <span class="badge bg-primary m-1">Nifty</span>
+          <span class="badge bg-primary m-1">Bank Nifty</span>
+          <span class="badge bg-primary m-1">Finnifty</span>
+          <span class="badge bg-primary m-1">Sensex</span>
+        </div>
+        <div class="col-md-6 mb-2">
+          <strong>📈 Stock Options:</strong><br>
+          <span class="badge bg-success m-1">Reliance</span>
+          <span class="badge bg-success m-1">TCS</span>
+          <span class="badge bg-success m-1">HDFC Bank</span>
+          <span class="badge bg-success m-1">Infosys</span>
+          <span class="badge bg-success m-1">RVNL</span>
+          <span class="badge bg-success m-1">Any Stock</span>
+        </div>
+      </div>
+      <hr style="border-color: #0284c7; margin: 1rem 0;">
+      <p class="mb-2 text-center" style="color: #000; font-size: 13px;"><strong>📖 How to Use:</strong></p>
+      <ul class="mb-0" style="font-size: 11px; color: #000; padding-left: 20px;">
+        <li style="color: #000; margin-bottom: 5px;">✅ <strong>Strategy Selection:</strong> Same logic for all (Strong Bullish → Buy ITM Call)</li>
+        <li style="color: #000; margin-bottom: 5px;">✅ <strong>Strike Selection:</strong> Adjust to your stock price (If Reliance = ₹2800, use 2800 instead of 1000)</li>
+        <li style="color: #000; margin-bottom: 5px;">✅ <strong>Greeks & IV:</strong> Same rules apply (Delta > 0.4, VIX < 18, etc.)</li>
+        <li style="color: #000; margin-bottom: 5px;">✅ <strong>Risk:Reward Ratios:</strong> Universal (1:3 is good whether Nifty or TCS)</li>
+      </ul>
+    </div>
+    
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0" style="font-size: 11px;">
+          <thead class="table-dark">
+            <tr style="color: #fff;">
+              <th style="background-color: #1f2937;">Market View</th>
+              <th style="background-color: #1f2937;">Strategy</th>
+              <th style="background-color: #6366f1;">💰 Money Flow<br><small>(You Pay/Receive)</small></th>
+              <th style="background-color: #1f2937;">Example<br><small>(Stock=₹1000)</small></th>
+              <th style="background-color: #1f2937;">Max Loss</th>
+              <th style="background-color: #1f2937;">Max Profit</th>
+              <th style="background-color: #dc2626;">Risk:Reward</th>
+              <th style="background-color: #059669;">Win %</th>
+              <th style="background-color: #7c3aed;">Theta</th>
+              <th style="background-color: #0284c7;">Break-Even</th>
+              <th style="background-color: #ea580c;">Best IV</th>
+              <th style="background-color: #1f2937;">When It Works</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Strong Bullish -->
+            <tr style="background-color: #d1fae5; color: #000;">
+              <td><strong>🔥 Strong Bullish</strong></td>
+              <td><span class="badge bg-success">Buy ITM Call</span></td>
+              <td><span class="badge bg-danger" style="font-size: 11px;">📤 You PAY</span><br><small class="text-muted">Debit</small></td>
+              <td><strong>Buy 950 CE &#64; ₹60</strong><br><small class="text-muted">Cost: ₹4,500 (75 qty)</small></td>
+              <td><span class="badge bg-danger">₹4,500</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">Unlimited</span></td>
+              <td><strong style="color: #059669;">1:5+</strong><br><small class="text-muted">₹4.5k : ₹22k+</small></td>
+              <td><span class="badge bg-warning text-dark">35-40%</span></td>
+              <td><span class="badge bg-danger">-ve</span><br><small>-₹15/day</small></td>
+              <td><strong>₹1010</strong><br><small>950+60</small></td>
+              <td><span class="badge bg-success">Low IV</span><br><small>10-15%</small></td>
+              <td>📈 +5-10% in 1-2 days<br><small class="text-muted">Breakout</small></td>
+            </tr>
+
+            <!-- Moderate Bullish -->
+            <tr style="background-color: #dbeafe; color: #000;">
+              <td><strong>📈 Moderate Bullish</strong></td>
+              <td><span class="badge bg-primary">Bull Call Spread</span></td>
+              <td><span class="badge bg-danger" style="font-size: 11px;">📤 You PAY</span><br><small class="text-muted">Debit</small></td>
+              <td><strong>Buy 1000 CE &#64; ₹40<br>Sell 1100 CE &#64; ₹15</strong><br><small class="text-muted">Net: ₹1,875</small></td>
+              <td><span class="badge bg-danger">₹1,875</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹5,625</span><br><small>(100pt-cost)</small></td>
+              <td><strong style="color: #059669;">1:3</strong><br><small class="text-muted">₹1.8k : ₹5.6k</small></td>
+              <td><span class="badge bg-success">50-55%</span></td>
+              <td><span class="badge bg-warning text-dark">Neutral</span><br><small>Offset</small></td>
+              <td><strong>₹1025</strong><br><small>1000+25</small></td>
+              <td><span class="badge bg-info">Med IV</span><br><small>15-20%</small></td>
+              <td>📊 +3-8% gradual<br><small class="text-muted">Trend</small></td>
+            </tr>
+
+            <!-- Slight Bullish -->
+            <tr style="background-color: #d1fae5; color: #000;">
+              <td><strong>🟢 Slight Bullish</strong></td>
+              <td><span class="badge bg-success">Bull Put Spread</span></td>
+              <td><span class="badge bg-success" style="font-size: 11px;">📥 You RECEIVE</span><br><small class="text-muted">Credit</small></td>
+              <td><strong>Sell 1000 PE &#64; ₹45<br>Buy 900 PE &#64; ₹12</strong><br><small class="text-muted">Credit: ₹2,475</small></td>
+              <td><span class="badge bg-danger">₹5,025</span><br><small>(100-credit)</small></td>
+              <td><span class="badge bg-success">₹2,475</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #059669;">2:1</strong><br><small class="text-muted">₹5k : ₹2.4k</small></td>
+              <td><span class="badge bg-success">60-65%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹25/day</small></td>
+              <td><strong>₹967</strong><br><small>1000-33</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>20-30%</small></td>
+              <td>➡️ Sideways/up<br><small class="text-muted">Above 1000</small></td>
+            </tr>
+
+            <!-- Strong Bearish -->
+            <tr style="background-color: #fecaca; color: #000;">
+              <td><strong>🔥 Strong Bearish</strong></td>
+              <td><span class="badge bg-danger">Buy ITM Put</span></td>
+              <td><span class="badge bg-danger" style="font-size: 11px;">📤 You PAY</span><br><small class="text-muted">Debit</small></td>
+              <td><strong>Buy 1050 PE &#64; ₹65</strong><br><small class="text-muted">Cost: ₹4,875 (75 qty)</small></td>
+              <td><span class="badge bg-danger">₹4,875</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹74k</span><br><small>(Stock→0)</small></td>
+              <td><strong style="color: #059669;">1:5+</strong><br><small class="text-muted">₹4.8k : ₹24k+</small></td>
+              <td><span class="badge bg-warning text-dark">35-40%</span></td>
+              <td><span class="badge bg-danger">-ve</span><br><small>-₹20/day</small></td>
+              <td><strong>₹985</strong><br><small>1050-65</small></td>
+              <td><span class="badge bg-success">Low IV</span><br><small>10-15%</small></td>
+              <td>📉 -5-10% in 1-2 days<br><small class="text-muted">Crash</small></td>
+            </tr>
+
+            <!-- Moderate Bearish -->
+            <tr style="background-color: #fee2e2; color: #000;">
+              <td><strong>📉 Moderate Bearish</strong></td>
+              <td><span class="badge bg-danger">Bear Put Spread</span></td>
+              <td><span class="badge bg-danger" style="font-size: 11px;">📤 You PAY</span><br><small class="text-muted">Debit</small></td>
+              <td><strong>Buy 1000 PE &#64; ₹42<br>Sell 900 PE &#64; ₹14</strong><br><small class="text-muted">Net: ₹2,100</small></td>
+              <td><span class="badge bg-danger">₹2,100</span><br><small>(100%)</small></td>
+              <td><span class="badge bg-success">₹5,400</span><br><small>(100pt-cost)</small></td>
+              <td><strong style="color: #059669;">1:2.5</strong><br><small class="text-muted">₹2.1k : ₹5.4k</small></td>
+              <td><span class="badge bg-success">50-55%</span></td>
+              <td><span class="badge bg-warning text-dark">Neutral</span><br><small>Offset</small></td>
+              <td><strong>₹972</strong><br><small>1000-28</small></td>
+              <td><span class="badge bg-info">Med IV</span><br><small>15-20%</small></td>
+              <td>📊 -3-8% gradual<br><small class="text-muted">Down trend</small></td>
+            </tr>
+
+            <!-- Slight Bearish -->
+            <tr style="background-color: #fecaca; color: #000;">
+              <td><strong>🔴 Slight Bearish</strong></td>
+              <td><span class="badge bg-danger">Bear Call Spread</span></td>
+              <td><span class="badge bg-success" style="font-size: 11px;">📥 You RECEIVE</span><br><small class="text-muted">Credit</small></td>
+              <td><strong>Sell 1000 CE &#64; ₹40<br>Buy 1100 CE &#64; ₹12</strong><br><small class="text-muted">Credit: ₹2,100</small></td>
+              <td><span class="badge bg-danger">₹5,400</span><br><small>(100-credit)</small></td>
+              <td><span class="badge bg-success">₹2,100</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #ea580c;">2.5:1</strong><br><small class="text-muted">₹5.4k : ₹2.1k</small></td>
+              <td><span class="badge bg-success">60-65%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹23/day</small></td>
+              <td><strong>₹1028</strong><br><small>1000+28</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>20-30%</small></td>
+              <td>➡️ Sideways/down<br><small class="text-muted">Below 1000</small></td>
+            </tr>
+
+            <!-- Sideways -->
+            <tr style="background-color: #fef3c7; color: #000;">
+              <td><strong>😐 Sideways</strong></td>
+              <td><span class="badge bg-warning text-dark">Iron Condor</span></td>
+              <td><span class="badge bg-success" style="font-size: 11px;">📥 You RECEIVE</span><br><small class="text-muted">Credit</small></td>
+              <td><strong>Sell 1050 CE &#64; ₹18<br>Buy 1100 CE &#64; ₹8<br>Sell 950 PE &#64; ₹20<br>Buy 900 PE &#64; ₹9</strong><br><small class="text-muted">Credit: ₹1,575</small></td>
+              <td><span class="badge bg-danger">₹2,175</span><br><small>(50-credit)</small></td>
+              <td><span class="badge bg-success">₹1,575</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #ca8a04;">1.4:1</strong><br><small class="text-muted">₹2.1k : ₹1.5k</small></td>
+              <td><span class="badge bg-success">70-75%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹40/day</small></td>
+              <td><strong>₹929-₹1071</strong><br><small>Range</small></td>
+              <td><span class="badge bg-warning text-dark">High IV</span><br><small>25-35%</small></td>
+              <td>➡️ ±3% movement<br><small class="text-muted">950-1050</small></td>
+            </tr>
+
+            <!-- Expiry Pinpoint -->
+            <tr style="background-color: #e0e7ff; color: #000;">
+              <td><strong>🎯 Expiry Pinpoint</strong></td>
+              <td><span class="badge" style="background-color: #7c3aed; color: white;">Iron Fly</span></td>
+              <td><span class="badge bg-success" style="font-size: 11px;">📥 You RECEIVE</span><br><small class="text-muted">Credit</small></td>
+              <td><strong>Sell 1000 CE &#64; ₹42<br>Sell 1000 PE &#64; ₹45<br>Buy 1050 CE &#64; ₹18<br>Buy 950 PE &#64; ₹20</strong><br><small class="text-muted">Credit: ₹3,675</small></td>
+              <td><span class="badge bg-danger">₹75</span><br><small>(50-credit)</small></td>
+              <td><span class="badge bg-success">₹3,675</span><br><small>(Credit)</small></td>
+              <td><strong style="color: #059669;">1:50</strong><br><small class="text-muted">₹75 : ₹3.6k</small></td>
+              <td><span class="badge bg-warning text-dark">40-45%</span></td>
+              <td><span class="badge bg-success">+ve</span><br><small>+₹70/day</small></td>
+              <td><strong>₹951-₹1049</strong><br><small>Pin 1000</small></td>
+              <td><span class="badge bg-danger">V.High IV</span><br><small>30-40%</small></td>
+              <td>🎯 Expires &#64; ₹1000<br><small class="text-muted">±1% only</small></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Enhanced Legend -->
+      <div class="p-3" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+        <div class="row">
+          <div class="col-md-3">
+            <h6><strong>📊 Risk:Reward:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>1:3 = Good</strong> (Risk ₹1k → Make ₹3k)</li>
+              <li><strong>1:5+ = Excellent</strong> (High upside)</li>
+              <li><strong>2:1 = OK</strong> (High win% needed)</li>
+              <li>❌ Avoid 3:1+ (too risky)</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><strong>🎯 Win % Guide:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>70%+ = Very Safe</strong> (Condors)</li>
+              <li><strong>50-60% = Good</strong> (Spreads)</li>
+              <li><strong>35-45% = Risky</strong> (Buying)</li>
+              <li>1 big win = 3 small losses</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><strong>⏰ Theta:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>+ve = Friend</strong> (Earn daily)</li>
+              <li><strong>-ve = Enemy</strong> (Lose daily)</li>
+              <li>Buying = Fight theta</li>
+              <li>Selling = Collect theta</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><strong>📈 IV Strategy:</strong></h6>
+            <ul style="font-size: 10px; line-height: 1.6;">
+              <li><strong>Low IV = BUY</strong> (cheap)</li>
+              <li><strong>High IV = SELL</strong> (expensive)</li>
+              <li>Check VIX before trade</li>
+              <li>IV spike = Wait for crush</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Critical Rules -->
+        <div class="mt-3 p-2" style="background-color: rgba(239, 68, 68, 0.2); border-left: 3px solid #ef4444; border-radius: 4px;">
+          <h6><strong>⚠️ Critical Trading Rules:</strong></h6>
+          <div class="row" style="font-size: 10px;">
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>✅ Win% > 50% → Trade more often</li>
+                <li>✅ Risk:Reward > 1:2 → Minimum 2x profit</li>
+                <li>✅ Theta +ve → Time helps you</li>
+                <li>✅ Know break-even BEFORE entry</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>❌ Don't buy when IV > 30%</li>
+                <li>❌ Don't sell when IV < 12%</li>
+                <li>❌ Avoid expiry day (theta kills)</li>
+                <li>❌ Risk max 2% capital/trade</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Decision Example -->
+        <div class="mt-2 p-2" style="background-color: rgba(16, 185, 129, 0.2); border-left: 3px solid #10b981; border-radius: 4px;">
+          <h6><strong>💡 Quick Decision Process:</strong></h6>
+          <ol style="font-size: 10px; line-height: 1.8; margin-bottom: 0;">
+            <li><strong>Check VIX:</strong> 12% (Low) → BUY options | 28% (High) → SELL options</li>
+            <li><strong>Market View:</strong> Bullish + Moderate confidence → Bull Call Spread</li>
+            <li><strong>Check Table:</strong> Risk:Reward 1:3 ✅ | Win% 50-55% ✅ | Theta Neutral ✅</li>
+            <li><strong>Position Size:</strong> ₹10k capital × 2% risk = ₹200 max loss</li>
+            <li><strong>Execute:</strong> Enter with stop-loss at 30%, target at 50% profit</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Enhanced Options Strategy Table -->
+
+  <!-- Pre-Trade IV & Greeks Checklist -->
+  <div class="card mb-4 shadow-lg" id="pre-trade-checklist">
+    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+      <h4 class="mb-0">🚨 PRE-TRADE CHECKLIST - Why Your Option Doesn't Move Even When Stock Moves!</h4>
+      <small>Check ALL these BEFORE clicking "BUY" - Works for ALL stocks (Nifty, Bank Nifty, Reliance, TCS, etc.)</small>
+    </div>
+    <div class="card-body">
+      
+      <!-- VIX Check -->
+      <div class="mb-4">
+        <h5 class="text-danger"><strong>⚠️ Common Beginner Mistake:</strong></h5>
+        <div class="alert alert-warning mb-3" style="font-size: 12px;">
+          <strong>You think:</strong> "Stock is bullish, let me buy Call option!" 📈<br>
+          <strong>Reality:</strong> Stock goes up 100 points... but your Call option <strong class="text-danger">LOSES money ❌</strong><br>
+          <strong>WHY?</strong> Because you ignored <strong>IV (Implied Volatility)</strong> and <strong>Greeks</strong>!
+        </div>
+      </div>
+
+      <!-- VIX/IV Check Table -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 1: Check VIX (Fear Index) - Is IV Too High?</strong></h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>VIX Level</th>
+                <th>IV Status</th>
+                <th>What It Means</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>Below 12</strong></td>
+                <td><span class="badge bg-success">🟢 Low IV</span></td>
+                <td>Options are <strong>CHEAP</strong></td>
+                <td><strong class="text-success">✅ BEST TIME TO BUY</strong></td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>12-18</strong></td>
+                <td><span class="badge bg-warning text-dark">🟡 Normal IV</span></td>
+                <td>Fair pricing</td>
+                <td>✅ OK to buy (be selective)</td>
+              </tr>
+              <tr style="background-color: #fed7aa;">
+                <td><strong>18-25</strong></td>
+                <td><span class="badge bg-warning">🟠 High IV</span></td>
+                <td>Options are <strong>EXPENSIVE</strong></td>
+                <td><strong class="text-warning">⚠️ CAUTION</strong> - Consider selling instead</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>Above 25</strong></td>
+                <td><span class="badge bg-danger">🔴 Very High IV</span></td>
+                <td><strong>DANGER ZONE</strong></td>
+                <td><strong class="text-danger">🚫 DON'T BUY!</strong> - IV crush will kill you</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info" style="font-size: 11px;">
+          <strong>📍 How to Check VIX:</strong><br>
+          1. NSE India: <a href="https://www.nseindia.com/" target="_blank">nseindia.com</a> → Look for "India VIX" on homepage<br>
+          2. Trading App: Search "INDIA VIX" in market watch (Zerodha/Upstox/Groww)
+        </div>
+      </div>
+
+      <!-- Real IV Example -->
+      <div class="mb-4">
+        <h6><strong>💡 Real Example - Why VIX Matters:</strong></h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card" style="border: 2px solid #10b981; background-color: #d1fae5;">
+              <div class="card-body p-2" style="font-size: 10px;">
+                <h6 class="text-success"><strong>✅ Scenario 1: Low VIX (12%) - GOOD</strong></h6>
+                <ul class="mb-0">
+                  <li>Nifty at 19500, you buy 19500 CE &#64; ₹100</li>
+                  <li>Nifty moves to 19600 (+100 points)</li>
+                  <li>Your option moves to ₹150-160 <strong class="text-success">(+50-60%!)</strong> ✅</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card" style="border: 2px solid #dc2626; background-color: #fecaca;">
+              <div class="card-body p-2" style="font-size: 10px;">
+                <h6 class="text-danger"><strong>❌ Scenario 2: High VIX (28%) - BAD</strong></h6>
+                <ul class="mb-0">
+                  <li>Nifty at 19500, you buy 19500 CE &#64; ₹250 (expensive!)</li>
+                  <li>Nifty moves to 19600 (+100 points)</li>
+                  <li>VIX drops to 20% (IV crush!)</li>
+                  <li>Your option drops to ₹220-230 <strong class="text-danger">(LOSS even though Nifty went up!)</strong> ❌</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Greeks Check -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 2: Check Greeks BEFORE Entry</strong></h5>
+        
+        <!-- Delta Table -->
+        <h6 class="mt-3"><strong>A. DELTA (Δ) - Will Your Option Actually Move?</strong></h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>Option Type</th>
+                <th>Delta</th>
+                <th>Meaning</th>
+                <th>Movement Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>Deep ITM Call</strong></td>
+                <td><span class="badge bg-success">0.8-0.9</span></td>
+                <td>Moves almost like stock</td>
+                <td>Nifty +100 = Option +80-90 ✅</td>
+              </tr>
+              <tr style="background-color: #e0f2fe;">
+                <td><strong>ATM Call</strong></td>
+                <td><span class="badge bg-primary">0.5</span></td>
+                <td>Moves half of stock</td>
+                <td>Nifty +100 = Option +50 ✅</td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>OTM Call</strong></td>
+                <td><span class="badge bg-warning text-dark">0.2-0.3</span></td>
+                <td>Barely moves</td>
+                <td>Nifty +100 = Option +20-30 ⚠️</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>Far OTM Call</strong></td>
+                <td><span class="badge bg-danger">0.05-0.1</span></td>
+                <td>Almost dead</td>
+                <td>Nifty +100 = Option +5-10 ❌</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-success" style="font-size: 11px;">
+          <strong>🎯 Beginner Rule:</strong><br>
+          ✅ <strong>Buy options with Delta > 0.4</strong> (ATM or slightly ITM)<br>
+          ❌ <strong>Avoid Delta < 0.3</strong> (OTM - won't move enough)
+        </div>
+
+        <!-- Theta Table -->
+        <h6 class="mt-3"><strong>B. THETA (Θ) - How Much You Lose Daily (Time Decay)</strong></h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" style="font-size: 11px;">
+            <thead class="table-dark">
+              <tr>
+                <th>Days to Expiry</th>
+                <th>Theta (Daily Loss)</th>
+                <th>Is It Safe?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>15+ days</strong></td>
+                <td>-₹10 to -₹20</td>
+                <td><span class="badge bg-success">✅ Safe</span> - Slow decay</td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>7-10 days</strong></td>
+                <td>-₹30 to -₹50</td>
+                <td><span class="badge bg-warning text-dark">⚠️ Moderate</span> - Plan exit</td>
+              </tr>
+              <tr style="background-color: #fed7aa;">
+                <td><strong>3-5 days</strong></td>
+                <td>-₹70 to -₹100</td>
+                <td><span class="badge bg-danger">🔴 High</span> - Risky</td>
+              </tr>
+              <tr style="background-color: #fecaca;">
+                <td><strong>1-2 days (Expiry)</strong></td>
+                <td>-₹150 to -₹300</td>
+                <td><span class="badge bg-danger">🚫 EXTREME</span> - Don't buy!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-danger" style="font-size: 11px;">
+          <strong>🎯 Beginner Rule:</strong><br>
+          ✅ <strong>Only buy options with 7+ days to expiry</strong> (fresh weekly, not Thursday)<br>
+          ❌ <strong>Never buy on Wednesday/Thursday</strong> (theta decay kills overnight)
+        </div>
+      </div>
+
+      <!-- Event Calendar Check -->
+      <div class="mb-4">
+        <h5><strong>✅ Step 3: Check Event Calendar - Will IV Spike/Crush?</strong></h5>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <h6><strong>📅 IV Spike Events (Don't Buy Before!):</strong></h6>
+            <div class="table-responsive">
+              <table class="table table-bordered" style="font-size: 10px;">
+                <thead class="table-danger">
+                  <tr>
+                    <th>Event</th>
+                    <th>IV Impact</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>RBI Policy</td>
+                    <td>VIX +20-40%</td>
+                    <td>🚫 Don't buy</td>
+                  </tr>
+                  <tr>
+                    <td>Monthly Expiry</td>
+                    <td>VIX +10-20%</td>
+                    <td>⚠️ Avoid Wed-Thu</td>
+                  </tr>
+                  <tr>
+                    <td>Election Results</td>
+                    <td>VIX +50-100%</td>
+                    <td>🚫 Stay out</td>
+                  </tr>
+                  <tr>
+                    <td>Stock Earnings</td>
+                    <td>IV +30%</td>
+                    <td>🚫 Don't buy day before</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6><strong>📅 IV Crush Events (Buy After!):</strong></h6>
+            <div class="table-responsive">
+              <table class="table table-bordered" style="font-size: 10px;">
+                <thead class="table-success">
+                  <tr>
+                    <th>Event</th>
+                    <th>IV Impact</th>
+                    <th>What Happens</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Day After RBI</td>
+                    <td>VIX -20-30%</td>
+                    <td>✅ Cheap premiums</td>
+                  </tr>
+                  <tr>
+                    <td>Day After Election</td>
+                    <td>VIX -50%</td>
+                    <td>✅ Massive drop</td>
+                  </tr>
+                  <tr>
+                    <td>Day After Earnings</td>
+                    <td>IV -40%</td>
+                    <td>✅ Best entry</td>
+                  </tr>
+                  <tr>
+                    <td>Friday (Expiry Over)</td>
+                    <td>VIX -10-15%</td>
+                    <td>✅ Fresh week</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Decision Flow -->
+      <div class="mb-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 15px; border-radius: 8px;">
+        <h5 class="text-center mb-3"><strong>🎯 VISUAL DECISION TREE - Should I Buy This Option?</strong></h5>
+        <div style="font-family: monospace; font-size: 10px; line-height: 1.8; background-color: #000; padding: 15px; border-radius: 4px; overflow-x: auto;">
+<pre style="color: #10b981; margin: 0;">
+                    START: I want to buy a Call/Put option
+                                    |
+                    ┌───────────────┴───────────────┐
+                    |                               |
+            <strong style="color: #fbbf24;">Check VIX/IV</strong>                    <strong style="color: #fbbf24;">Check Days to Expiry</strong>
+                    |                               |
+        ┌───────────┴──────────┐        ┌──────────┴──────────┐
+        |                      |        |                     |
+   <strong style="color: #10b981;">VIX &lt; 18?</strong>            <strong style="color: #ef4444;">VIX &gt; 18?</strong>   <strong style="color: #10b981;">&gt; 7 days?</strong>          <strong style="color: #ef4444;">&lt; 5 days?</strong>
+        |                      |        |                     |
+        ✅                    ❌        ✅                    ❌
+    <strong style="color: #10b981;">GOOD IV</strong>              <strong style="color: #ef4444;">TOO HIGH</strong>    <strong style="color: #10b981;">SAFE THETA</strong>        <strong style="color: #ef4444;">HIGH THETA</strong>
+        |                   <strong style="color: #ef4444;">STOP!</strong>        |                  <strong style="color: #ef4444;">STOP!</strong>
+        ↓                                ↓
+   <strong style="color: #fbbf24;">Check Delta</strong>                     <strong style="color: #fbbf24;">Check Event Calendar</strong>
+        |                                |
+  ┌─────┴─────┐                  ┌──────┴──────┐
+  |           |                  |             |
+<strong style="color: #10b981;">Δ &gt; 0.4?</strong>  <strong style="color: #ef4444;">Δ &lt; 0.3?</strong>   <strong style="color: #10b981;">No event?</strong>    <strong style="color: #ef4444;">Event tomorrow?</strong>
+  |           |                  |             |
+  ✅         ❌                  ✅           ❌
+<strong style="color: #10b981;">WILL MOVE</strong>  <strong style="color: #ef4444;">WON'T MOVE</strong>         <strong style="color: #10b981;">SAFE</strong>        <strong style="color: #ef4444;">IV CRUSH RISK</strong>
+  |          <strong style="color: #ef4444;">STOP!</strong>               |            <strong style="color: #ef4444;">STOP!</strong>
+  ↓                              ↓
+<strong style="color: #fbbf24;">Check Theta</strong>                  <strong style="color: #fbbf24;">Final: Risk Management</strong>
+  |                              |
+  |                      ┌───────┴──────┐
+<strong style="color: #10b981;">θ &lt; -₹50?</strong>           |               |
+  |                <strong style="color: #10b981;">Stop Loss?</strong>      <strong style="color: #10b981;">2% Risk?</strong>
+  ✅                     |               |
+<strong style="color: #10b981;">LOW DECAY</strong>               ✅              ✅
+  |                      |               |
+  ↓                      └───────┬───────┘
+<strong style="color: #10b981;">ALL CHECKS PASSED ✅</strong>             |
+  |                              ↓
+  └──────────────────► <strong style="color: #fbbf24;">🚀 GO AHEAD, BUY! 🚀</strong>
+</pre>
+        </div>
+      </div>
+
+      <!-- Complete Checklist -->
+      <div class="mb-4">
+        <h5 class="text-center"><strong>✅ COMPLETE PRE-TRADE CHECKLIST (Print & Keep!)</strong></h5>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card border-primary">
+              <div class="card-header bg-primary text-white">
+                <strong>1. IV/VIX Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check1">
+                  <label class="form-check-label" for="check1">VIX is below 18? (Preferably below 15)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check2">
+                  <label class="form-check-label" for="check2">ATM Call + Put premium &lt; ₹250?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check3">
+                  <label class="form-check-label" for="check3">No major event in next 2 days?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check4">
+                  <label class="form-check-label" for="check4">IV percentile &lt; 50%?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-success">
+              <div class="card-header bg-success text-white">
+                <strong>2. Greeks Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check5">
+                  <label class="form-check-label" for="check5">Delta &gt; 0.4? (Option will move)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check6">
+                  <label class="form-check-label" for="check6">Theta &lt; -₹50? (Not bleeding fast)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check7">
+                  <label class="form-check-label" for="check7">Days to expiry &gt; 7 days?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check8">
+                  <label class="form-check-label" for="check8">Vega risk acceptable?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card border-info">
+              <div class="card-header bg-info text-white">
+                <strong>3. Directional Checks</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check9">
+                  <label class="form-check-label" for="check9">Clear trend on charts?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check10">
+                  <label class="form-check-label" for="check10">Support/Resistance identified?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check11">
+                  <label class="form-check-label" for="check11">OI data supports view?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check12">
+                  <label class="form-check-label" for="check12">Volume is good? (Liquid)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-danger">
+              <div class="card-header bg-danger text-white">
+                <strong>4. Risk Management</strong>
+              </div>
+              <div class="card-body" style="font-size: 11px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check13">
+                  <label class="form-check-label" for="check13">Stop loss decided? (20-30%)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check14">
+                  <label class="form-check-label" for="check14">Target decided? (50-80%)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check15">
+                  <label class="form-check-label" for="check15">Position size &lt; 2% capital?</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="check16">
+                  <label class="form-check-label" for="check16">Can afford to lose this?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-danger mt-3 text-center" style="font-size: 12px;">
+          <strong>⚠️ If ANY checkbox is unchecked → DON'T TRADE!</strong>
+        </div>
+      </div>
+
+      <!-- Quick Reference Card -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="card" style="background-color: #d1fae5; border: 2px solid #10b981;">
+            <div class="card-header bg-success text-white text-center">
+              <strong>🟢 SAFE TO BUY</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px; color: #000;">
+              <ul class="mb-0" style="color: #000;">
+                <li style="color: #000;">✅ VIX below 15</li>
+                <li style="color: #000;">✅ Fresh weekly (Mon/Tue)</li>
+                <li style="color: #000;">✅ ATM (Delta &gt; 0.5)</li>
+                <li style="color: #000;">✅ No events next 2 days</li>
+                <li style="color: #000;">✅ Clear trend</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card" style="background-color: #fecaca; border: 2px solid #dc2626;">
+            <div class="card-header bg-danger text-white text-center">
+              <strong>🔴 DON'T BUY</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px; color: #000;">
+              <ul class="mb-0" style="color: #000;">
+                <li style="color: #000;">❌ VIX above 20</li>
+                <li style="color: #000;">❌ Wed/Thu (expiry week)</li>
+                <li style="color: #000;">❌ OTM (Delta &lt; 0.3)</li>
+                <li style="color: #000;">❌ Before RBI/earnings</li>
+                <li style="color: #000;">❌ Expensive premiums</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card" style="background-color: #fef3c7; border: 2px solid #f59e0b;">
+            <div class="card-header bg-warning text-dark text-center">
+              <strong>🟡 SELL OPTIONS</strong>
+            </div>
+            <div class="card-body" style="font-size: 10px; color: #000;">
+              <ul class="mb-0" style="color: #000;">
+                <li style="color: #000;">✅ VIX above 20 (high IV)</li>
+                <li style="color: #000;">✅ Before events (spike)</li>
+                <li style="color: #000;">✅ Wed/Thu (theta helps)</li>
+                <li style="color: #000;">✅ Use spreads (limit risk)</li>
+                <li style="color: #000;">✅ Collect premium</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Warning -->
+      <div class="alert alert-warning text-center" style="font-size: 13px; border: 3px solid #f59e0b;">
+        <h5 class="text-danger"><strong>🎓 Remember:</strong></h5>
+        <p class="mb-1">📊 <strong>90% of option buyers lose money because they ignore IV and Greeks!</strong></p>
+        <p class="mb-1">🎯 <strong>Don't be part of the 90%. Check BEFORE you trade!</strong></p>
+        <p class="mb-0">✅ <strong>This checklist works for ALL stocks: Nifty, Bank Nifty, Reliance, TCS, Infosys, RVNL, etc.</strong></p>
+      </div>
+
+      <!-- Real Examples: Index vs Stock -->
+      <div class="card mb-3" style="border: 3px solid #059669;">
+        <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+          <h5 class="mb-0"><strong>📚 REAL EXAMPLES - How to Apply This to Index & Stock Options</strong></h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            
+            <!-- Index Option Example -->
+            <div class="col-md-6">
+              <div class="card border-primary mb-3">
+                <div class="card-header bg-primary text-white">
+                  <strong>📊 INDEX OPTION - Nifty</strong>
+                </div>
+                <div class="card-body" style="font-size: 11px; background-color: #fff; color: #000 !important;">
+                  <h6 style="color: #000 !important;"><strong>Situation:</strong></h6>
+                  <ul class="mb-2" style="color: #000 !important;">
+                    <li style="color: #000 !important;">Nifty CMP: <strong>19,500</strong></li>
+                    <li style="color: #000 !important;">VIX: <strong>14%</strong> (Low ✅)</li>
+                    <li style="color: #000 !important;">View: <strong>Moderate Bullish</strong></li>
+                    <li style="color: #000 !important;">Target: 19,700 in 5 days</li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>✅ Strategy: Bull Call Spread</strong></h6>
+                  <ul class="mb-2" style="color: #000 !important;">
+                    <li style="color: #000 !important;">Buy 19500 CE &#64; ₹120</li>
+                    <li style="color: #000 !important;">Sell 19700 CE &#64; ₹45</li>
+                    <li style="color: #000 !important;">Net Cost: ₹75 × 75 = <strong>₹5,625</strong></li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>📊 Pre-Trade Checks:</strong></h6>
+                  <ul class="mb-2" style="font-size: 10px;">
+                    <li style="color: #047857 !important;"><strong>✅ VIX 14% (Low - Good to buy)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ Delta 0.52 (ATM - Will move)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ Theta -₹35/day (Manageable)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ 10 days to expiry (Safe)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ No RBI policy this week</strong></li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>🎯 Result:</strong></h6>
+                  <p class="mb-0" style="font-size: 10px;">
+                    <strong style="color: #047857 !important;">Max Profit:</strong> <span style="color: #000 !important;">₹9,375 (167%)</span><br>
+                    <strong style="color: #dc2626 !important;">Max Loss:</strong> <span style="color: #000 !important;">₹5,625 (100%)</span><br>
+                    <strong style="color: #2563eb !important;">Risk:Reward:</strong> <span style="color: #000 !important;">1:1.7 ✅</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock Option Example -->
+            <div class="col-md-6">
+              <div class="card border-success mb-3">
+                <div class="card-header bg-success text-white">
+                  <strong>📈 STOCK OPTION - RVNL</strong>
+                </div>
+                <div class="card-body" style="font-size: 11px; background-color: #fff; color: #000 !important;">
+                  <h6 style="color: #000 !important;"><strong>Situation:</strong></h6>
+                  <ul class="mb-2" style="color: #000 !important;">
+                    <li style="color: #000 !important;">RVNL CMP: <strong>₹312</strong></li>
+                    <li style="color: #000 !important;">IV: <strong>80%</strong> (Very High ❌)</li>
+                    <li style="color: #000 !important;">View: <strong>Slight Bullish</strong></li>
+                    <li style="color: #000 !important;">Expect: Stay above ₹310</li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>✅ Strategy: Bull Put Spread (SELL)</strong></h6>
+                  <ul class="mb-2" style="color: #000 !important;">
+                    <li style="color: #000 !important;">Sell 310 PE &#64; ₹20.15</li>
+                    <li style="color: #000 !important;">Buy 300 PE &#64; ₹12.05</li>
+                    <li style="color: #000 !important;">Net Credit: ₹8.10 × 2,400 = <strong>₹19,440</strong></li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>📊 Pre-Trade Checks:</strong></h6>
+                  <ul class="mb-2" style="font-size: 10px;">
+                    <li style="color: #047857 !important;"><strong>✅ IV 80% (High - SELL options!)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ Theta +₹60/day (Helps you)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ 12 days to expiry (Good)</strong></li>
+                    <li style="color: #047857 !important;"><strong>✅ No earnings this week</strong></li>
+                    <li style="color: #dc2626 !important;"><strong>❌ Don't BUY (IV too high!)</strong></li>
+                  </ul>
+                  
+                  <h6 style="color: #000 !important;"><strong>🎯 Result:</strong></h6>
+                  <p class="mb-0" style="font-size: 10px;">
+                    <strong style="color: #047857 !important;">Max Profit:</strong> <span style="color: #000 !important;">₹19,440 (if > ₹310)</span><br>
+                    <strong style="color: #dc2626 !important;">Max Loss:</strong> <span style="color: #000 !important;">₹4,560 (if < ₹300)</span><br>
+                    <strong style="color: #2563eb !important;">Risk:Reward:</strong> <span style="color: #000 !important;">1:4.3 ✅</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Key Differences -->
+          <div class="alert alert-info mb-0" style="font-size: 11px; color: #000 !important; background-color: #e0f2fe;">
+            <h6 class="text-center" style="color: #000 !important;"><strong>🔑 Key Takeaway:</strong></h6>
+            <div class="row">
+              <div class="col-md-6">
+                <strong style="color: #000 !important;">📊 Nifty (Low IV 14%):</strong>
+                <ul class="mb-0" style="color: #000 !important;">
+                  <li style="color: #000 !important;">✅ <strong>BUY</strong> Bull Call Spread</li>
+                  <li style="color: #000 !important;">Options are <strong>CHEAP</strong></li>
+                  <li style="color: #000 !important;">Pay ₹5,625 to make ₹9,375</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <strong style="color: #000 !important;">📈 RVNL (High IV 80%):</strong>
+                <ul class="mb-0" style="color: #000 !important;">
+                  <li style="color: #000 !important;">✅ <strong>SELL</strong> Bull Put Spread</li>
+                  <li style="color: #000 !important;">Options are <strong>EXPENSIVE</strong></li>
+                  <li style="color: #000 !important;">Collect ₹19,440 premium</li>
+                </ul>
+              </div>
+            </div>
+            <hr style="border-color: #000;">
+            <p class="text-center mb-0" style="color: #000 !important;"><strong>Same Strategy Logic, Different Execution Based on IV!</strong> 🎯</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- End Pre-Trade Checklist -->
+
+</div>
+  <!-- OI & IV Quick Reference Guide Section -->
+  <!-- OI & IV Quick Reference Guide -->
+  <style>
+    .table .badge {
+      color: #fff !important;
+    }
+    .table .badge-secondary {
+      background-color: #6c757d !important;
+      color: #fff !important;
+    }
+    .table .badge-success {
+      background-color: #28a745 !important;
+      color: #fff !important;
+    }
+    .table .badge-danger {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+    }
+    .table .badge-warning {
+      background-color: #ffc107 !important;
+      color: #000 !important;
+    }
+    .table .badge-info {
+      background-color: #17a2b8 !important;
+      color: #fff !important;
+    }
+  </style>
+  <div class="row mt-4 mb-4" id="oi-iv-guide">
+    <div class="col-12">
+      <div class="card shadow-lg" style="border: none; border-radius: 15px; overflow: hidden;">
+        <div class="card-header text-white text-center py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <h4 class="mb-0"><i class="fas fa-book-open"></i> OI & IV Quick Reference Guide</h4>
+          <p class="mb-0 mt-2" style="font-size: 0.9rem; opacity: 0.9;">Master Option Trading Signals - Key Indicators Explained</p>
+        </div>
+        <div class="card-body p-0">
+          
+          <!-- OI (Open Interest) Table -->
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-chart-bar"></i> OI (Open Interest) - "Smart Money Tracking"
+                  </th>
+                </tr>
+                <tr style="background: #1e40af; color: white;">
+                  <th style="width: 15%;">Scenario</th>
+                  <th style="width: 20%;">Call OI</th>
+                  <th style="width: 20%;">Put OI</th>
+                  <th style="width: 15%;">Signal</th>
+                  <th style="width: 15%;">Action</th>
+                  <th style="width: 15%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #dfffd6; color: #000;">
+                  <td><strong style="color: #000;">🔴 High Call OI</strong></td>
+                  <td><span class="badge badge-danger">Very High (>1L)</span></td>
+                  <td><span class="badge badge-secondary">Low</span></td>
+                  <td><strong style="color: #dc2626;">RESISTANCE</strong></td>
+                  <td><span class="badge badge-warning">⚠️ Don't Buy Above</span></td>
+                  <td><small style="color: #000;">Nifty 19500 has 2L Call OI</small></td>
+                </tr>
+                <tr style="background: #fff4d6; color: #000;">
+                  <td><strong style="color: #000;">🟢 High Put OI</strong></td>
+                  <td><span class="badge badge-secondary">Low</span></td>
+                  <td><span class="badge badge-success">Very High (>1L)</span></td>
+                  <td><strong style="color: #16a34a;">SUPPORT</strong></td>
+                  <td><span class="badge badge-success">✅ Buy Zone</span></td>
+                  <td><small style="color: #000;">Nifty 19000 has 1.5L Put OI</small></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">⚖️ Balanced OI</strong></td>
+                  <td><span class="badge badge-info">Medium</span></td>
+                  <td><span class="badge badge-info">Medium</span></td>
+                  <td><strong style="color: #0284c7;">NEUTRAL</strong></td>
+                  <td><span class="badge badge-info">📊 Wait & Watch</span></td>
+                  <td><small style="color: #000;">ATM strike - equal interest</small></td>
+                </tr>
+                <tr style="background: #ffe4e4; color: #000;">
+                  <td><strong style="color: #000;">📈 Call OI Increasing</strong></td>
+                  <td><span class="badge badge-danger">+50% ↑</span></td>
+                  <td><span class="badge badge-secondary">Stable</span></td>
+                  <td><strong style="color: #dc2626;">Building Resistance</strong></td>
+                  <td><span class="badge badge-warning">⚠️ Caution - Book Profit</span></td>
+                  <td><small style="color: #000;">BankNifty 44500 +870%</small></td>
+                </tr>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">📉 Put OI Increasing</strong></td>
+                  <td><span class="badge badge-secondary">Stable</span></td>
+                  <td><span class="badge badge-success">+40% ↑</span></td>
+                  <td><strong style="color: #16a34a;">Building Support</strong></td>
+                  <td><span class="badge badge-success">✅ Buying Opportunity</span></td>
+                  <td><small style="color: #000;">BankNifty 44000 +560%</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">🔄 Both OI Increasing</strong></td>
+                  <td><span class="badge badge-danger">+30% ↑</span></td>
+                  <td><span class="badge badge-success">+35% ↑</span></td>
+                  <td><strong style="color: #ca8a04;">RANGE BOUND</strong></td>
+                  <td><span class="badge badge-warning">📊 Trade Range Only</span></td>
+                  <td><small style="color: #000;">Market stuck 19000-19500</small></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">⚡ Both OI Decreasing</strong></td>
+                  <td><span class="badge badge-danger">-20% ↓</span></td>
+                  <td><span class="badge badge-success">-25% ↓</span></td>
+                  <td><strong style="color: #991b1b;">UNWINDING</strong></td>
+                  <td><span class="badge badge-danger">🚫 Exit Positions</span></td>
+                  <td><small style="color: #000;">Trend reversal likely</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- IV (Implied Volatility) Table -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-bolt"></i> IV (Implied Volatility) - "Market Panic Meter"
+                  </th>
+                </tr>
+                <tr style="background: #6d28d9; color: white;">
+                  <th style="width: 15%;">IV Level</th>
+                  <th style="width: 15%;">Range</th>
+                  <th style="width: 20%;">Market State</th>
+                  <th style="width: 20%;">Premium Cost</th>
+                  <th style="width: 15%;">Action</th>
+                  <th style="width: 15%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">😴 Very Low IV</strong></td>
+                  <td><span class="badge badge-success">< 12%</span></td>
+                  <td><strong style="color: #059669;">Calm Market</strong><br><small style="color: #000;">No panic, low movement</small></td>
+                  <td><span class="badge badge-success">💰 Very Cheap</span></td>
+                  <td><span class="badge badge-success">✅ BUY Options</span></td>
+                  <td><small style="color: #000;">VIX at 10-11</small></td>
+                </tr>
+                <tr style="background: #dfffd6; color: #000;">
+                  <td><strong style="color: #000;">😊 Low IV</strong></td>
+                  <td><span class="badge badge-success">12-18%</span></td>
+                  <td><strong style="color: #16a34a;">Stable Market</strong><br><small style="color: #000;">Normal trading</small></td>
+                  <td><span class="badge badge-success">💵 Cheap</span></td>
+                  <td><span class="badge badge-success">✅ Good to Buy</span></td>
+                  <td><small style="color: #000;">VIX at 12-15</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">😐 Medium IV</strong></td>
+                  <td><span class="badge badge-warning">18-25%</span></td>
+                  <td><strong style="color: #ca8a04;">Normal Volatility</strong><br><small style="color: #000;">Moderate swings</small></td>
+                  <td><span class="badge badge-warning">💳 Fair Price</span></td>
+                  <td><span class="badge badge-info">📊 Neutral - Cautious</span></td>
+                  <td><small style="color: #000;">VIX at 16-20</small></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">😰 High IV</strong></td>
+                  <td><span class="badge badge-warning">25-35%</span></td>
+                  <td><strong style="color: #ea580c;">Nervous Market</strong><br><small style="color: #000;">Big moves expected</small></td>
+                  <td><span class="badge badge-danger">💸 Expensive</span></td>
+                  <td><span class="badge badge-warning">⚠️ Don't Buy - Wait</span></td>
+                  <td><small style="color: #000;">VIX at 21-28</small></td>
+                </tr>
+                <tr style="background: #fecaca; color: #000;">
+                  <td><strong style="color: #000;">😱 Very High IV</strong></td>
+                  <td><span class="badge badge-danger">> 35%</span></td>
+                  <td><strong style="color: #dc2626;">Panic/Crisis</strong><br><small style="color: #000;">Extreme volatility</small></td>
+                  <td><span class="badge badge-danger">🔥 Very Expensive</span></td>
+                  <td><span class="badge badge-danger">🚫 AVOID Buying</span></td>
+                  <td><small style="color: #000;">VIX at 30+ (COVID era)</small></td>
+                </tr>
+                <tr style="background: #e0e7ff; color: #000;">
+                  <td><strong style="color: #000;">📈 IV Increasing</strong></td>
+                  <td><span class="badge badge-info">+5-10% ↑</span></td>
+                  <td><strong style="color: #4f46e5;">Fear Building</strong><br><small style="color: #000;">Uncertainty rising</small></td>
+                  <td><span class="badge badge-warning">💸 Getting Expensive</span></td>
+                  <td><span class="badge badge-warning">⚠️ Exit Long Options</span></td>
+                  <td><small style="color: #000;">Event upcoming</small></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">📉 IV Decreasing</strong></td>
+                  <td><span class="badge badge-info">-5-10% ↓</span></td>
+                  <td><strong style="color: #7c3aed;">Fear Cooling</strong><br><small style="color: #000;">Calm returning</small></td>
+                  <td><span class="badge badge-success">💰 Getting Cheaper</span></td>
+                  <td><span class="badge badge-success">✅ Good Time to Enter</span></td>
+                  <td><small style="color: #000;">After event/result</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Combined Strategy Table -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                <tr>
+                  <th colspan="5" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-lightbulb"></i> Combined OI + IV Strategy - "Pro Trading Signals"
+                  </th>
+                </tr>
+                <tr style="background: #b45309; color: white;">
+                  <th style="width: 25%;">Market Condition</th>
+                  <th style="width: 20%;">OI Signal</th>
+                  <th style="width: 20%;">IV Level</th>
+                  <th style="width: 20%;">Best Strategy</th>
+                  <th style="width: 15%;">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">🚀 Perfect Buy Setup</strong></td>
+                  <td><span class="badge badge-success">High Put OI (Support)</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #059669;">BUY ATM Calls</strong><br><small style="color: #000;">Target: High Call OI strike</small></td>
+                  <td><span class="badge badge-success">✅ Low Risk</span></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">⚠️ Risky Buy Zone</strong></td>
+                  <td><span class="badge badge-success">High Put OI (Support)</span></td>
+                  <td><span class="badge badge-danger">High IV (>25%)</span></td>
+                  <td><strong style="color: #ca8a04;">WAIT for IV to Drop</strong><br><small style="color: #000;">Premiums too expensive</small></td>
+                  <td><span class="badge badge-warning">⚠️ High Risk</span></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">🛑 Danger Zone</strong></td>
+                  <td><span class="badge badge-danger">High Call OI (Resistance)</span></td>
+                  <td><span class="badge badge-danger">High IV (>25%)</span></td>
+                  <td><strong style="color: #dc2626;">DON'T BUY - EXIT</strong><br><small style="color: #000;">Resistance + Expensive = Bad</small></td>
+                  <td><span class="badge badge-danger">🚫 Very High</span></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">📊 Range Trading</strong></td>
+                  <td><span class="badge badge-info">Both OI High</span></td>
+                  <td><span class="badge badge-info">Medium IV (18-25%)</span></td>
+                  <td><strong style="color: #0284c7;">Sell Options (Iron Condor)</strong><br><small style="color: #000;">Trade the range only</small></td>
+                  <td><span class="badge badge-info">📊 Medium</span></td>
+                </tr>
+                <tr style="background: #fce7f3; color: #000;">
+                  <td><strong style="color: #000;">🎯 Breakout Trade</strong></td>
+                  <td><span class="badge badge-danger">Call OI Break</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #ec4899;">BUY ATM Calls Aggressively</strong><br><small style="color: #000;">Resistance broken = Big move</small></td>
+                  <td><span class="badge badge-warning">⚠️ Medium</span></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">📉 Short Selling Setup</strong></td>
+                  <td><span class="badge badge-success">Put OI Break Down</span></td>
+                  <td><span class="badge badge-success">Low IV (<18%)</span></td>
+                  <td><strong style="color: #7c3aed;">BUY ATM Puts</strong><br><small style="color: #000;">Support broken = Fall likely</small></td>
+                  <td><span class="badge badge-warning">⚠️ Medium</span></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">⏰ Event Trading</strong></td>
+                  <td><span class="badge badge-info">OI Building Up</span></td>
+                  <td><span class="badge badge-danger">IV Spiking (>30%)</span></td>
+                  <td><strong style="color: #ea580c;">AVOID Trading</strong><br><small style="color: #000;">Wait for event to pass</small></td>
+                  <td><span class="badge badge-danger">🚫 Extreme</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Real Market Examples -->
+          <div class="table-responsive mt-0">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                <tr>
+                  <th colspan="6" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-chart-line"></i> Real Market Examples - "Learn from Live Data"
+                  </th>
+                </tr>
+                <tr style="background: #047857; color: white;">
+                  <th style="width: 15%;">Index/Stock</th>
+                  <th style="width: 20%;">Scenario</th>
+                  <th style="width: 20%;">OI Data</th>
+                  <th style="width: 15%;">IV Data</th>
+                  <th style="width: 15%;">Signal</th>
+                  <th style="width: 15%;">Action Taken</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Nifty 50</strong></td>
+                  <td style="color: #000;">Strike 19500 has 2.5L Call OI</td>
+                  <td><span class="badge badge-danger">Call: 2.5L</span><br><span class="badge badge-secondary">Put: 0.3L</span></td>
+                  <td><span class="badge badge-success">IV: 14%</span></td>
+                  <td><span class="badge badge-danger">⚠️ Strong Resistance</span></td>
+                  <td><small style="color: #000;">Booked profit at 19450</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">BankNifty</strong></td>
+                  <td style="color: #000;">Strike 44000 Put OI +560%</td>
+                  <td><span class="badge badge-success">Put: 1.8L (+560%)</span><br><span class="badge badge-secondary">Call: 0.5L</span></td>
+                  <td><span class="badge badge-success">IV: 16%</span></td>
+                  <td><span class="badge badge-success">✅ Strong Support</span></td>
+                  <td><small style="color: #000;">Bought Calls at 44020</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Reliance</strong></td>
+                  <td style="color: #000;">Strike 2500 balanced OI</td>
+                  <td><span class="badge badge-info">Call: 0.8L</span><br><span class="badge badge-info">Put: 0.85L</span></td>
+                  <td><span class="badge badge-warning">IV: 22%</span></td>
+                  <td><span class="badge badge-info">📊 ATM - Neutral</span></td>
+                  <td><small style="color: #000;">Waited for direction</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">TCS</strong></td>
+                  <td style="color: #000;">Pre-result IV spike</td>
+                  <td><span class="badge badge-danger">Call: 1.2L</span><br><span class="badge badge-success">Put: 1.3L</span></td>
+                  <td><span class="badge badge-danger">IV: 38%</span></td>
+                  <td><span class="badge badge-danger">🚫 Avoid - Too Expensive</span></td>
+                  <td><small style="color: #000;">Waited post-result</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">HDFC Bank</strong></td>
+                  <td style="color: #000;">Support break at 1500</td>
+                  <td><span class="badge badge-warning">Put: 0.6L (was 1.2L)</span><br><span class="badge badge-secondary">Call: 0.4L</span></td>
+                  <td><span class="badge badge-success">IV: 15%</span></td>
+                  <td><span class="badge badge-warning">⚠️ Support Broken</span></td>
+                  <td><small style="color: #000;">Bought Puts at 1498</small></td>
+                </tr>
+                <tr style="color: #000;">
+                  <td><strong style="color: #000;">Nifty IT</strong></td>
+                  <td style="color: #000;">IV crush after event</td>
+                  <td><span class="badge badge-success">Put: 0.9L</span><br><span class="badge badge-info">Call: 0.7L</span></td>
+                  <td><span class="badge badge-success">IV: 12% (was 28%)</span></td>
+                  <td><span class="badge badge-success">✅ Perfect Entry</span></td>
+                  <td><small style="color: #000;">Bought ATM Calls cheap</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Psychology & Risk Management Table -->
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white;">
+                <tr>
+                  <th colspan="5" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-brain"></i> Psychology & Risk Management - "90% of Success"
+                  </th>
+                </tr>
+                <tr style="background: #7f1d1d; color: white;">
+                  <th style="width: 20%;">Emotion</th>
+                  <th style="width: 25%;">Wrong Action ❌</th>
+                  <th style="width: 25%;">Right Action ✅</th>
+                  <th style="width: 15%;">Impact</th>
+                  <th style="width: 15%;">Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">😤 GREED</strong></td>
+                  <td style="color: #000;">"Let me wait for more profit" (₹5k → ₹3k → ₹0)</td>
+                  <td><strong style="color: #16a34a;">Take profit at 50-80% target</strong></td>
+                  <td><span class="badge badge-danger">💸 Big Losses</span></td>
+                  <td><small style="color: #000;">Set target alerts</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">😰 FEAR</strong></td>
+                  <td style="color: #000;">Exit at ₹500 profit (was heading to ₹5000)</td>
+                  <td><strong style="color: #0284c7;">Follow your plan, not emotions</strong></td>
+                  <td><span class="badge badge-warning">📉 Small Wins</span></td>
+                  <td><small style="color: #000;">Trust your analysis</small></td>
+                </tr>
+                <tr style="background: #fecaca; color: #000;">
+                  <td><strong style="color: #000;">😡 REVENGE</strong></td>
+                  <td style="color: #000;">"I lost ₹10k, let me recover NOW!" (Lost ₹30k more)</td>
+                  <td><strong style="color: #dc2626;">STOP! Take 1 day break</strong></td>
+                  <td><span class="badge badge-danger">🔥 Account Blown</span></td>
+                  <td><small style="color: #000;">Close app immediately</small></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">🤑 OVERCONFIDENCE</strong></td>
+                  <td style="color: #000;">"I won 5 trades, let me go ALL-IN!"</td>
+                  <td><strong style="color: #7c3aed;">Stick to 2% position sizing</strong></td>
+                  <td><span class="badge badge-danger">⚠️ One Loss = Wipeout</span></td>
+                  <td><small style="color: #000;">Review risk rules daily</small></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">😱 FOMO</strong></td>
+                  <td style="color: #000;">"Market is running, let me jump in!" (Bought at top)</td>
+                  <td><strong style="color: #0284c7;">Wait for your setup/pullback</strong></td>
+                  <td><span class="badge badge-warning">📊 Late Entry</span></td>
+                  <td><small style="color: #000;">Patience pays more</small></td>
+                </tr>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">😔 HOPE</strong></td>
+                  <td style="color: #000;">"It will recover" (₹10k loss → ₹50k loss)</td>
+                  <td><strong style="color: #dc2626;">Cut loss at 20-30% (₹2-3k)</strong></td>
+                  <td><span class="badge badge-danger">🚫 Biggest Killer</span></td>
+                  <td><small style="color: #000;">Stop loss = AUTO</small></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">🎰 GAMBLING</strong></td>
+                  <td style="color: #000;">Random trades, no plan, "tip" based</td>
+                  <td><strong style="color: #059669;">Written plan before every trade</strong></td>
+                  <td><span class="badge badge-danger">💥 90% Fail Rate</span></td>
+                  <td><small style="color: #000;">Journal every trade</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Support & Resistance Table -->
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: white;">
+                <tr>
+                  <th colspan="5" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-layer-group"></i> Support & Resistance - "Where Price Will Turn"
+                  </th>
+                </tr>
+                <tr style="background: #6d28d9; color: white;">
+                  <th style="width: 20%;">Level Type</th>
+                  <th style="width: 25%;">How to Find</th>
+                  <th style="width: 25%;">Trading Signal</th>
+                  <th style="width: 15%;">Strength</th>
+                  <th style="width: 15%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">📊 Previous Day High/Low</strong></td>
+                  <td style="color: #000;">Yesterday's highest & lowest price</td>
+                  <td><strong style="color: #059669;">Strong Support/Resistance</strong><br><small style="color: #000;">Often acts as barrier</small></td>
+                  <td><span class="badge badge-success">⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">Nifty: 19450/19550</small></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">🕐 Opening Range</strong></td>
+                  <td style="color: #000;">First 15 min high/low (9:15-9:30 AM)</td>
+                  <td><strong style="color: #0284c7;">Breakout above = BUY</strong><br><small style="color: #000;">Breakdown below = SELL</small></td>
+                  <td><span class="badge badge-info">⭐⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">Opening: 19480-19520</small></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">🔢 Round Numbers</strong></td>
+                  <td style="color: #000;">19500, 20000, 44000, etc.</td>
+                  <td><strong style="color: #7c3aed;">Psychological Barrier</strong><br><small style="color: #000;">Market hesitates here</small></td>
+                  <td><span class="badge badge-info">⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">BankNifty 44000</small></td>
+                </tr>
+                <tr style="background: #fce7f3; color: #000;">
+                  <td><strong style="color: #000;">💰 High OI Strikes</strong></td>
+                  <td style="color: #000;">Max Call OI = Resistance<br>Max Put OI = Support</td>
+                  <td><strong style="color: #ec4899;">Market "pins" to these levels</strong><br><small style="color: #000;">Check OI data above ☝️</small></td>
+                  <td><span class="badge badge-success">⭐⭐⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">19500 Call OI: 2.5L</small></td>
+                </tr>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">📐 Camarilla Levels</strong></td>
+                  <td style="color: #000;">H3, H4 (Resistance)<br>L3, L4 (Support)</td>
+                  <td><strong style="color: #16a34a;">Your app calculates this!</strong><br><small style="color: #000;">Use Weekly/Daily toggle ✅</small></td>
+                  <td><span class="badge badge-success">⭐⭐⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">Check Camarilla tab</small></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">📈 Moving Averages</strong></td>
+                  <td style="color: #000;">20 EMA, 50 SMA on chart</td>
+                  <td><strong style="color: #ea580c;">Price bounces off MA</strong><br><small style="color: #000;">Dynamic support/resistance</small></td>
+                  <td><span class="badge badge-warning">⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">Use TradingView</small></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">⚡ VWAP</strong></td>
+                  <td style="color: #000;">Volume Weighted Average Price</td>
+                  <td><strong style="color: #dc2626;">Above VWAP = Bullish</strong><br><small style="color: #000;">Below VWAP = Bearish</small></td>
+                  <td><span class="badge badge-success">⭐⭐⭐⭐</span></td>
+                  <td><small style="color: #000;">Intraday traders use</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Risk Management Rules Table -->
+          <div class="table-responsive mb-3">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+              <thead style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white;">
+                <tr>
+                  <th colspan="4" class="text-center py-3" style="font-size: 1.1rem;">
+                    <i class="fas fa-shield-alt"></i> Golden Risk Management Rules - "Protect Your Capital"
+                  </th>
+                </tr>
+                <tr style="background: #065f46; color: white;">
+                  <th style="width: 25%;">Rule</th>
+                  <th style="width: 20%;">Amount</th>
+                  <th style="width: 35%;">Why Important</th>
+                  <th style="width: 20%;">Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #d1fae5; color: #000;">
+                  <td><strong style="color: #000;">💰 Max Risk Per Trade</strong></td>
+                  <td><span class="badge badge-success">2% of Capital</span></td>
+                  <td style="color: #000;">One bad trade won't destroy account. Can survive 50 losses!</td>
+                  <td><small style="color: #000;">₹1L capital → ₹2k risk</small></td>
+                </tr>
+                <tr style="background: #fef3c7; color: #000;">
+                  <td><strong style="color: #000;">🛑 Stop Loss</strong></td>
+                  <td><span class="badge badge-warning">20-30% of Premium</span></td>
+                  <td style="color: #000;">Exit before total loss. Small loss is better than big loss!</td>
+                  <td><small style="color: #000;">Buy at ₹200 → SL at ₹140</small></td>
+                </tr>
+                <tr style="background: #e0f2fe; color: #000;">
+                  <td><strong style="color: #000;">📊 Max Open Positions</strong></td>
+                  <td><span class="badge badge-info">3-5 Trades Max</span></td>
+                  <td style="color: #000;">Can't manage too many. Focus > Diversification for options</td>
+                  <td><small style="color: #000;">2 Nifty + 1 BankNifty</small></td>
+                </tr>
+                <tr style="background: #fce7f3; color: #000;">
+                  <td><strong style="color: #000;">🎯 Profit Target</strong></td>
+                  <td><span class="badge badge-success">50-80% of Premium</span></td>
+                  <td style="color: #000;">Book profits! Don't wait for 500%. Greed kills accounts</td>
+                  <td><small style="color: #000;">Buy ₹200 → Sell at ₹300-360</small></td>
+                </tr>
+                <tr style="background: #ddd6fe; color: #000;">
+                  <td><strong style="color: #000;">⏰ Avoid Thursday Buying</strong></td>
+                  <td><span class="badge badge-danger">Expiry Day = HIGH RISK</span></td>
+                  <td style="color: #000;">Maximum time decay. Options lose value very fast on expiry</td>
+                  <td><small style="color: #000;">Buy Mon-Wed only</small></td>
+                </tr>
+                <tr style="background: #fed7aa; color: #000;">
+                  <td><strong style="color: #000;">📉 Max Weekly Loss</strong></td>
+                  <td><span class="badge badge-danger">5% of Capital</span></td>
+                  <td style="color: #000;">STOP trading if hit. Take break, review mistakes, restart fresh</td>
+                  <td><small style="color: #000;">₹1L → Lost ₹5k? STOP!</small></td>
+                </tr>
+                <tr style="background: #fee2e2; color: #000;">
+                  <td><strong style="color: #000;">🚫 Never Average Losses</strong></td>
+                  <td><span class="badge badge-danger">DON'T Add to Losing Trade</span></td>
+                  <td style="color: #000;">"Averaging down" in options = Fastest way to blow account</td>
+                  <td><small style="color: #000;">Lost on Call? Don't buy more!</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Key Terms Legend -->
+          <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px;">
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-key"></i> Key Terms:</h6>
+                <ul style="font-size: 0.85rem; line-height: 1.8;">
+                  <li><strong>OI (Open Interest):</strong> Number of active contracts</li>
+                  <li><strong>Call OI:</strong> Indicates RESISTANCE (ceiling)</li>
+                  <li><strong>Put OI:</strong> Indicates SUPPORT (floor)</li>
+                  <li><strong>ATM:</strong> At The Money (current price strike)</li>
+                  <li><strong>VIX:</strong> India's volatility index (fear gauge)</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-graduation-cap"></i> Quick Rules:</h6>
+                <ul style="font-size: 0.85rem; line-height: 1.8;">
+                  <li>✅ <strong>Buy when:</strong> Low IV + High Put OI (Support)</li>
+                  <li>⚠️ <strong>Caution when:</strong> High IV + High Call OI (Resistance)</li>
+                  <li>🚫 <strong>Avoid when:</strong> High IV + OI Building at strike</li>
+                  <li>📊 <strong>Range trade when:</strong> Both OI high + Medium IV</li>
+                  <li>🎯 <strong>Breakout when:</strong> OI breaks + Low IV</li>
+                </ul>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12 text-center">
+                <p class="mb-0" style="font-size: 0.8rem; opacity: 0.8;">
+                  <i class="fas fa-info-circle"></i> This guide is for educational purposes. Always do your own research and manage risk properly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Beginner Tips Section -->
+  <div class="row mb-4" id="beginner-tips">
+    <div class="col-12">
+      <div class="card shadow-lg" style="border: none; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+        <div class="card-body text-white p-4">
+          <h4 class="text-center mb-4"><strong>💡 Essential Tips for Beginner Options Traders</strong></h4>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="bg-white text-dark p-3 rounded shadow-sm">
+                <h6><strong>📚 1. Learn Before You Burn</strong></h6>
+                <ul style="font-size: 12px; margin-bottom: 0;">
+                  <li>Paper trade for 2-3 months first</li>
+                  <li>Start with buying only (avoid selling/writing)</li>
+                  <li>Master 2-3 strategies, not all 8</li>
+                  <li>Understand Greeks, IV, and OI completely</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="bg-white text-dark p-3 rounded shadow-sm">
+                <h6><strong>💰 2. Capital Management Rules</strong></h6>
+                <ul style="font-size: 12px; margin-bottom: 0;">
+                  <li><strong>Start Small:</strong> ₹5,000-10,000 maximum</li>
+                  <li><strong>Per Trade:</strong> Never risk more than 2%</li>
+                  <li><strong>Max Positions:</strong> 3-5 trades at a time</li>
+                  <li><strong>Emergency Fund:</strong> Keep 6 months saved separately</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="bg-white text-dark p-3 rounded shadow-sm">
+                <h6><strong>🎯 3. Trading Psychology</strong></h6>
+                <ul style="font-size: 12px; margin-bottom: 0;">
+                  <li><strong>Don't Revenge Trade:</strong> Stop after 2 losses in a row</li>
+                  <li><strong>Book Profits:</strong> Don't wait for 500%, take 50-80%</li>
+                  <li><strong>Accept Losses:</strong> Stop loss hit = move on, no emotions</li>
+                  <li><strong>Keep Journal:</strong> Track every trade, learn from mistakes</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="bg-white text-dark p-3 rounded shadow-sm">
+                <h6><strong>⚠️ 4. Common Beginner Mistakes to Avoid</strong></h6>
+                <ul style="font-size: 12px; margin-bottom: 0;">
+                  <li><strong>Never:</strong> Buy on expiry day (Thursday/Friday)</li>
+                  <li><strong>Never:</strong> Average down losing options</li>
+                  <li><strong>Never:</strong> Trade during first 15 mins of market</li>
+                  <li><strong>Never:</strong> Trade based on tips/groups without research</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-light mt-3 mb-0" style="border-left: 4px solid #dc2626;">
+            <p class="mb-0" style="color: #000; font-size: 13px;">
+              <strong>⚠️ Reality Check:</strong> 90% of option traders lose money. The 10% who win follow ALL the rules above religiously. 
+              Your goal isn't to get rich quick—it's to survive long enough to learn and then profit consistently.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <div class="text-center mb-4">
+    <button (click)="scrollToTop()" class="btn btn-primary btn-lg shadow">
+      <i class="fas fa-arrow-up"></i> Back to Top
+    </button>
+  </div>
+
