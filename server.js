@@ -168,11 +168,21 @@ async function fetchTradingViewData(indexType) {
 	}
 
 	if (indexType && indexType['indexs']) {
-		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX"]
+		reqObj['body']['symbols']['tickers'] = ["NSE:NIFTY", "NSE:BANKNIFTY", "BSE:SENSEX", "NSE:INDIAVIX", "NSE:CNXIT"]
 	}
 	
 	if (indexType && indexType['nseTop']) {
-		reqObj['body']['symbols']['tickers'] = ["NSE:HDFCBANK","NSE:RELIANCE","NSE:ICICIBANK","NSE:INFY","NSE:ITC","NSE:TCS","NSE:LT","NSE:BHARTIARTL","NSE:AXISBANK","NSE:SBIN"] 
+		// Combined list: Nifty Top 10 + All IT stocks
+		reqObj['body']['symbols']['tickers'] = [
+			// Nifty Top 10
+			"NSE:HDFCBANK","NSE:RELIANCE","NSE:ICICIBANK","NSE:INFY","NSE:ITC","NSE:TCS","NSE:LT","NSE:BHARTIARTL","NSE:AXISBANK","NSE:SBIN",
+			// IT Stocks (avoiding duplicates INFY, TCS already in top 10)
+			"NSE:WIPRO","NSE:TECHM","NSE:HCLTECH","NSE:LTIM","NSE:PERSISTENT","NSE:COFORGE","NSE:MPHASIS","NSE:LTTS"
+		]
+	}
+	
+	if (indexType && indexType['niftyIT']) {
+		reqObj['body']['symbols']['tickers'] = ["NSE:INFY","NSE:TCS","NSE:WIPRO","NSE:TECHM","NSE:HCLTECH","NSE:LTIM","NSE:PERSISTENT","NSE:COFORGE","NSE:MPHASIS","NSE:LTTS"] 
 	}
 	let result = await request(reqObj);
 	return result
