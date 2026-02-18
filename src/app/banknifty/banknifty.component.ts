@@ -20,6 +20,9 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   public rowSelection: 'single' | 'multiple' = 'multiple';
   topBanks = ['ICICIBANK', 'KOTAKBANK', 'SBIN', 'AXISBANK']
   nifty50Top = ["HDFCBANK","RELIANCE","ICICIBANK","INFY","ITC","TCS","LT","BHARTIARTL","AXISBANK","SBIN"]
+  // IT stocks - using most commonly available ones first
+  niftyITStocks = ['INFY', 'TCS', 'WIPRO', 'TECHM', 'HCLTECH', 'LTIM', 'PERSISTENT', 'COFORGE', 'MPHASIS', 'LTTS']
+  topITStocks = ['INFY', 'TCS', 'WIPRO', 'TECHM']
   public defaultColDef: ColDef = {
     editable: false,
     filter: true,
@@ -35,6 +38,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   indexValues: any = []
   rowData = [];
   rowTopData = [];
+  rowITData = [];
   pagination = true;
   paginationPageSize = 20;
   isLoading = false;
@@ -159,10 +163,13 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   banks = []
   topCompanies = [];
+  itCompanies = [];
   hdfcTrend = 0;
   banksTrend = 0;
   allbankTrands = 0
   niftyaboveVwap = 0
+  itTrend = 0
+  topITTrend = 0
   
   // Getter methods for template
   get positiveIndicesCount(): number {
@@ -173,16 +180,43 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     return this.indexValues.length;
   }
   
+  // Sentiment based on key groups: 4 Banks, 4 IT, 10 Nifty
+  get keyGroupsAboveVWAP(): number {
+    let count = 0;
+    
+    // 1. Top 4 Banks (ICICIBANK, KOTAKBANK, SBIN, AXISBANK) - count as 1 if >= 3 are above VWAP
+    if (this.banksTrend >= 3) count++;
+    
+    // 2. Top 4 IT (INFY, TCS, WIPRO, TECHM) - count as 1 if >= 3 are above VWAP
+    if (this.topITTrend >= 3) count++;
+    
+    // 3. Nifty Top 10 - count as 1 if >= 7 are above VWAP
+    if (this.niftyaboveVwap >= 7) count++;
+    
+    return count;
+  }
+  
   get overallSentiment(): string {
-    if (this.allbankTrands >= 10 && this.niftyaboveVwap >= 7) return 'Strong';
-    if (this.allbankTrands <= 5 && this.niftyaboveVwap <= 4) return 'Weak';
-    return 'Neutral';
+    const keyGroups = this.keyGroupsAboveVWAP;
+    if (keyGroups >= 3) return 'Strong';    // All 3 groups positive
+    if (keyGroups >= 2) return 'Neutral';   // 2 out of 3 groups positive
+    return 'Weak';                           // Less than 2 groups positive
   }
   
   get overallSentimentClass(): string {
-    if (this.allbankTrands >= 10 && this.niftyaboveVwap >= 7) return 'badge-success';
-    if (this.allbankTrands <= 5 && this.niftyaboveVwap <= 4) return 'badge-danger';
-    return 'badge-warning';
+    const keyGroups = this.keyGroupsAboveVWAP;
+    if (keyGroups >= 3) return 'badge-success';
+    if (keyGroups >= 2) return 'badge-warning';
+    return 'badge-danger';
+  }
+  
+  // Combined Market Health: Total stocks above VWAP across all categories
+  get totalAboveVWAP(): number {
+    return this.allbankTrands + this.niftyaboveVwap + this.itTrend;
+  }
+  
+  get totalStocks(): number {
+    return 14 + 10 + this.niftyITStocks.length; // Banks + Nifty Top 10 + IT stocks
   }
   
   // latest Volume > latest Sma ( volume,20 ) * 5 
@@ -243,6 +277,40 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     this.rowTopData = this.topCompanies
   }
   
+  fetchITCompanies() { 
+    this.itCompanies = []
+    this.itTrend = 0
+    this.topITTrend = 0
+    
+    // Only add stocks that exist in the API data
+    this.niftyITStocks.forEach(res => {
+      let getCompany = this.nseTopCompaines.find(i => i['d'][0] == res);
+      if(getCompany) {
+        const isAboveVwap = (getCompany['d'][4] - getCompany['d'][17]) > 0;
+        if (isAboveVwap) {
+          this.itTrend++
+          if (this.topITStocks.includes(getCompany['d'][0])) {
+            this.topITTrend++
+          }
+        }
+        this.itCompanies.push({
+          name: getCompany['d'][0],
+          close: getCompany['d'][4],
+          preChange: getCompany['d'][5],
+          vwapDiff: getCompany['d'][4] - getCompany['d'][17],
+          vwap: getCompany['d'][17],
+          change_from_open: getCompany['d'][9],
+          change_from_open_abs: getCompany['d'][10],
+        }); 
+      } else {
+        console.log('⚠️ IT stock not found in API data:', res);
+      }
+    });
+    
+    this.rowITData = this.itCompanies
+    console.log('✅ IT Data loaded:', this.itCompanies.length, 'stocks | Above VWAP:', this.itTrend, '| Top 4 above VWAP:', this.topITTrend);
+  }
+  
 
   fetchBankData() {
     this.bankSubscription = this.commonservice.getBankData.subscribe(data => {
@@ -254,6 +322,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     this.nifySubscription = this.commonservice.getnseTopData.subscribe(data => {
       this.nseTopCompaines = data
       this.fetchTopCompanies()
+      this.fetchITCompanies()
     });
   }
 
