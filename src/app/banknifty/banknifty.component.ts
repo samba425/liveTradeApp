@@ -42,6 +42,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   pagination = true;
   paginationPageSize = 20;
   isLoading = false;
+  lastUpdated: Date = new Date();
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
     { 
@@ -146,6 +147,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   fetchIndex() {
     this.isLoading = true;
+    this.lastUpdated = new Date();
     this.commonservice.fetchIndexsData();
     this.commonservice.fetchBankNiftyData();
     this.commonservice.fetchNiftyTopData()
