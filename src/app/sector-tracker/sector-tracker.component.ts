@@ -48,11 +48,11 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
     return 'N/A';
   }
 
-  // Sector definitions with NSE stocks
+  // Sector definitions with NSE stocks - All 20 NSE sectors
   private sectorStocks = {
     'IT': {
       name: 'Information Technology',
-      stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTIM', 'COFORGE', 'PERSISTENT']
+      stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTIM', 'COFORGE', 'PERSISTENT', 'MPHASIS', 'LTTS']
     },
     'BANKING': {
       name: 'Banking',
@@ -71,8 +71,8 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       stocks: ['HINDUNILVR', 'ITC', 'NESTLEIND', 'BRITANNIA', 'DABUR', 'MARICO', 'GODREJCP', 'TATACONSUM']
     },
     'ENERGY': {
-      name: 'Energy & Oil',
-      stocks: ['RELIANCE', 'ONGC', 'BPCL', 'IOC', 'COALINDIA', 'NTPC', 'POWERGRID', 'ADANIGREEN']
+      name: 'Energy',
+      stocks: ['RELIANCE', 'NTPC', 'POWERGRID', 'ADANIGREEN', 'ADANIPOWER', 'TATAPOWER', 'NHPC', 'SJVN']
     },
     'METAL': {
       name: 'Metals',
@@ -82,13 +82,53 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       name: 'Real Estate',
       stocks: ['DLF', 'GODREJPROP', 'OBEROIRLTY', 'PRESTIGE', 'BRIGADE', 'PHOENIXLTD', 'SUNTECK', 'SOBHA']
     },
-    'TELECOM': {
-      name: 'Telecom',
-      stocks: ['BHARTIARTL', 'INDUSINDBK', 'MTNL', 'TTML']
-    },
     'INFRA': {
       name: 'Infrastructure',
       stocks: ['LT', 'ULTRACEMCO', 'GRASIM', 'AMBUJACEM', 'ACC', 'ADANIPORTS', 'GMRINFRA', 'IRB']
+    },
+    'FINANCIAL': {
+      name: 'Financial Services',
+      stocks: ['BAJFINANCE', 'BAJAJFINSV', 'SBILIFE', 'HDFCLIFE', 'ICICIGI', 'HDFCAMC', 'MUTHOOTFIN', 'CHOLAFIN']
+    },
+    'MEDIA': {
+      name: 'Media',
+      stocks: ['ZEEL', 'PVR', 'SAREGAMA', 'NAZARA', 'Tips', 'NETWORK18', 'TVTODAY', 'DBCORP']
+    },
+    'PSU_BANK': {
+      name: 'PSU Banks',
+      stocks: ['SBIN', 'BANKBARODA', 'PNB', 'CANBK', 'UNIONBANK', 'INDIANB', 'MAHABANK', 'CENTRALBK']
+    },
+    'PVT_BANK': {
+      name: 'Private Banks',
+      stocks: ['HDFCBANK', 'ICICIBANK', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'FEDERALBNK', 'BANDHANBNK', 'IDFCFIRSTB']
+    },
+    'HEALTHCARE': {
+      name: 'Healthcare',
+      stocks: ['APOLLOHOSP', 'FORTIS', 'MAXHEALTH', 'NARAYANHEALTH', 'METROPOLIS', 'LALPATHLAB', 'THYROCARE', 'STARHEALTH']
+    },
+    'CONSUMPTION': {
+      name: 'Consumption',
+      stocks: ['TITAN', 'DMART', 'TRENT', 'JUBLFOOD', 'WESTLIFE', 'BARBEQUE', 'SAPPHIRE', 'VMART']
+    },
+    'OIL_GAS': {
+      name: 'Oil & Gas',
+      stocks: ['RELIANCE', 'ONGC', 'BPCL', 'IOC', 'GAIL', 'HINDPETRO', 'PETRONET', 'OIL']
+    },
+    'COMMODITIES': {
+      name: 'Commodities',
+      stocks: ['COALINDIA', 'VEDL', 'HINDZINC', 'NMDC', 'MOIL', 'GMDCLTD', 'NATIONALUM', 'BALRAMCHIN']
+    },
+    'SERVICES': {
+      name: 'Services',
+      stocks: ['BHARTIARTL', 'IDEA', 'IRCTC', 'INDHOTEL', 'LEMONTREE', 'CHALET', 'THOMASCOOK', 'YATRA']
+    },
+    'MIDCAP': {
+      name: 'Midcap',
+      stocks: ['PAGEIND', 'PIIND', 'ABBOTINDIA', 'SIEMENS', 'BOSCHLTD', 'BERGEPAINT', 'PIDILITIND', 'ASTRAL']
+    },
+    'SMALLCAP': {
+      name: 'Smallcap',
+      stocks: ['IRFC', 'RVNL', 'RAILTEL', 'HUDCO', 'GICRE', 'IREDA', 'SJVN', 'NMDC']
     }
   };
 
