@@ -1,4 +1,4 @@
-<div class="container-fluid mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 2rem;">
+<div class="container-fluid mt-4" style="padding: 1.5rem;">
   
   <!-- Header Card -->
   <div class="row mb-4">
@@ -179,6 +179,13 @@
                 style="font-weight: 600;">
                 <i class="fas fa-list"></i> Show All ({{filteredallData.length}})
               </button>
+              <button 
+                *ngIf="filteredallData.length > 0"
+                class="btn btn-sm btn-warning"
+                (click)="showAboveAvgFundamentals()"
+                style="font-weight: 600;">
+                <i class="fas fa-trophy"></i> Buy Zone 12+
+              </button>
               <span class="badge badge-light">{{rowData.length}} stocks</span>
             </div>
           </div>
@@ -205,32 +212,49 @@
 
   <!-- Information Cards -->
   <div class="row mt-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #ef4444;">
+        <div class="card-body">
+          <h6><i class="fas fa-exclamation-triangle"></i> Entry Risk (Distance from SMA200)</h6>
+          <p class="mb-0"><strong>🎯 Ideal (0-3%):</strong> Best entry. Tight stop loss at SMA200</p>
+          <p class="mb-0"><strong>✅ Good (3-8%):</strong> Acceptable entry. Reasonable risk</p>
+          <p class="mb-0"><strong>⚠️ Wait (8-15%):</strong> Extended. Wait for pullback to enter</p>
+          <p class="mb-0"><strong>🚫 Far (15%+):</strong> Overextended. Add to watchlist, don't buy</p>
+          <p class="mb-0 mt-1"><small><strong>Rule:</strong> Fund Score = WHAT to buy. Entry Risk = WHEN to buy. High Fund Score + Far from SMA200 = Great company, bad timing. Wait!</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
       <div class="card" style="border-left: 5px solid #10b981;">
         <div class="card-body">
           <h6><i class="fas fa-crosshairs"></i> SMA200 Position</h6>
           <p class="mb-0"><strong>🟢 Bouncing Above:</strong> Bullish bounce off SMA200</p>
           <p class="mb-0"><strong>🔴 Testing Below:</strong> Bearish rejection at SMA200</p>
-          <p class="mb-0"><strong>� On SMA200:</strong> Price at support level</p>
+          <p class="mb-0"><strong>🟡 On SMA200:</strong> Price at support level</p>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card" style="border-left: 5px solid #f59e0b;">
-        <div class="card-body">
-          <h6><i class="fas fa-fire"></i> Pattern Strength</h6>
-          <p class="mb-0"><strong>� Strong Cross:</strong> 85 (Best!)</p>
-          <p class="mb-0"><strong>💚 Hammer:</strong> 75 (Strong)</p>
-          <p class="mb-0"><strong>� Shooting Star:</strong> 60 (Bearish)</p>
-          <p class="mb-0"><strong>� Spinning Top:</strong> 55 (Neutral)</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="card" style="border-left: 5px solid #8b5cf6;">
         <div class="card-body">
-          <h6><i class="fas fa-lightbulb"></i> Trading Tip</h6>
-          <p class="mb-0">Best setup: <strong>Strong Cross 🟢</strong> + <strong>Bouncing Above</strong> = High probability SMA200 breakout!</p>
+          <h6><i class="fas fa-trophy"></i> Fund Score (Max 21.5) = Company Quality</h6>
+          <p class="mb-0"><strong>🏆 16+:</strong> Strong Buy (High conviction)</p>
+          <p class="mb-0"><strong>🟢 12-15:</strong> Buy (Good opportunity)</p>
+          <p class="mb-0"><strong>🟡 7-11:</strong> Hold (Proceed with caution)</p>
+          <p class="mb-0"><strong>🔴 0-6:</strong> Weak (Avoid)</p>
+          <p class="mb-0 mt-1"><small><strong>T1(2pts):</strong> ROE≥12, D/E&lt;1, PE&lt;Ind | <strong>T2(1.5pts):</strong> 1Y Rev, 1Y Profit, QoQ Rev, QoQ NI, FCF&gt;5%, Div&gt;0%, P/B&lt;3 | <strong>T3(1pt):</strong> ROCE, OPM, 5Y Rev, 5Y Profit</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #f59e0b;">
+        <div class="card-body">
+          <h6><i class="fas fa-lightbulb"></i> Best Entry Strategy</h6>
+          <p class="mb-0"><strong>Step 1:</strong> Click "SMA Filter" to find SMA200 bounces</p>
+          <p class="mb-0"><strong>Step 2:</strong> Click "Buy Zone 12+" for fundamentally strong</p>
+          <p class="mb-0"><strong>Step 3:</strong> Look for 🎯 Ideal or ✅ Good entries only</p>
+          <p class="mb-0"><strong>Step 4:</strong> Confirm with RSI &lt; 40 + Bullish pattern</p>
+          <p class="mb-0 mt-1"><small><strong>Stop Loss:</strong> Below SMA200 | <strong>Target:</strong> SMA50 or previous swing high</small></p>
         </div>
       </div>
     </div>

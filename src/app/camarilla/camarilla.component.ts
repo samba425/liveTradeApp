@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 import { environment } from '../../environments/environment';
+import { Subscription } from 'rxjs';
 
 /**
  * Camarilla H3/L3 Weekly Cross Detection Component
@@ -29,11 +30,16 @@ import { environment } from '../../environments/environment';
   templateUrl: './camarilla.component.html',
   styleUrls: ['./camarilla.component.css']
 })
-export class CamarillaComponent implements OnInit {
+export class CamarillaComponent implements OnInit, OnDestroy {
 
   private gridApi!: GridApi;
+  private dataSubscription: Subscription;
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
   }
 
   public rowSelection: 'single' | 'multiple' = 'multiple';
@@ -431,10 +437,11 @@ export class CamarillaComponent implements OnInit {
     this.commonservice.fetchLiveData(null); // null = get ALL stocks, not just NIFTY
     
     // Subscribe to the updated data
-    this.commonservice.getData.subscribe(data => {
-      this.inputValue = data;
-      // Server auto-saves data via cron jobs - no manual save needed
-      this.updateDataFreshnessStatus(); // Update status after data load
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
+    this.dataSubscription = this.commonservice.getData.subscribe(data => {
+      this.inputValue = data || [];
+      this.updateDataFreshnessStatus();
+      if (this.inputValue.length === 0) { this.isLoading = false; return; }
       this.detectCamarillaCrosses();
       this.isLoading = false;
     }, error => {
@@ -771,12 +778,12 @@ export class CamarillaComponent implements OnInit {
     const dailyData = [];
     
     this.inputValue.forEach((res) => {
-      if (res['d'] && res['d'][3] && res['d'][4] && res['d'][5]) {
+      if (res['d'] && res['d'][2] && res['d'][3] && res['d'][4]) {
         dailyData.push({
           name: res['d'][0],
-          dailyHigh: res['d'][3],
-          dailyLow: res['d'][4],
-          dailyClose: res['d'][5],
+          dailyHigh: res['d'][2],
+          dailyLow: res['d'][3],
+          dailyClose: res['d'][4],
           timestamp: new Date().toISOString()
         });
       }

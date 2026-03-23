@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   standalone: false,
@@ -9,11 +10,16 @@ import { CommonserviceService } from '../commonservice.service';
   templateUrl: './simple-moving.component.html',
   styleUrls: ['./simple-moving.component.css']
 })
-export class SimpleMovingComponent implements OnInit {
+export class SimpleMovingComponent implements OnInit, OnDestroy {
 
   private gridApi!: GridApi;
+  private dataSubscription: Subscription;
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
   }
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
@@ -83,53 +89,53 @@ export class SimpleMovingComponent implements OnInit {
         }
       }
     },
-    {
-      headerName: "📊 SMA Diff %", 
-      field: "sma2050Diff", 
-      resizable: true, 
-      sortable: true, 
-      width: 130,
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      },
-      cellStyle: params => {
-        if (params.value > 5) {
-          return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: '600' };
-        } else if (params.value < 2) {
-          return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: '600' };
-        }
-        return {};
-      }
-    },
-    {
-      headerName: "📈 SMA 20", 
-      field: "sma20", 
-      resizable: true, 
-      sortable: true, 
-      width: 110,
-      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "📈 SMA 50", 
-      field: "sma50", 
-      resizable: true, 
-      sortable: true, 
-      width: 110,
-      valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
+    // {
+    //   headerName: "📊 SMA Diff %", 
+    //   field: "sma2050Diff", 
+    //   resizable: true, 
+    //   sortable: true, 
+    //   width: 130,
+    //   valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString() + '%', 
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   },
+    //   cellStyle: params => {
+    //     if (params.value > 5) {
+    //       return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: '600' };
+    //     } else if (params.value < 2) {
+    //       return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: '600' };
+    //     }
+    //     return {};
+    //   }
+    // },
+    // {
+    //   headerName: "📈 SMA 20", 
+    //   field: "sma20", 
+    //   resizable: true, 
+    //   sortable: true, 
+    //   width: 110,
+    //   valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
+    // {
+    //   headerName: "📈 SMA 50", 
+    //   field: "sma50", 
+    //   resizable: true, 
+    //   sortable: true, 
+    //   width: 110,
+    //   valueFormatter: p => '₹' + (Math.round(p.value * 100) / 100).toLocaleString(),
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
     {
       headerName: "📈 SMA 200", 
       field: "godFather", 
@@ -243,6 +249,66 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
+      headerName: "🏆 Fund Score",
+      field: "fundScore",
+      resizable: true,
+      sortable: true,
+      width: 130,
+      filter: "agNumberColumnFilter",
+      cellRenderer: params => {
+        if (params.value == null) return '';
+        const score = params.value;
+        const rating = params.data?.fundRating || '';
+        let color = '#ef4444'; let bg = '#fee2e2'; let emoji = '🔴';
+        if (rating === 'Strong Buy') { color = '#047857'; bg = '#a7f3d0'; emoji = '🏆'; }
+        else if (rating === 'Buy') { color = '#059669'; bg = '#d1fae5'; emoji = '🟢'; }
+        else if (rating === 'Hold') { color = '#d97706'; bg = '#fef3c7'; emoji = '🟡'; }
+        return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:13px;">${emoji} ${score}/21.5</span>`;
+      }
+    },
+    {
+      headerName: "📊 Rating",
+      field: "fundRating",
+      resizable: true,
+      sortable: true,
+      width: 120,
+      filter: "agTextColumnFilter",
+      cellStyle: params => {
+        if (params.value === 'Strong Buy') return { backgroundColor: '#a7f3d0', color: '#047857', fontWeight: 'bold', fontSize: '13px' };
+        if (params.value === 'Buy') return { backgroundColor: '#d1fae5', color: '#059669', fontWeight: 'bold', fontSize: '13px' };
+        if (params.value === 'Hold') return { backgroundColor: '#fef3c7', color: '#d97706', fontWeight: 'bold', fontSize: '13px' };
+        if (params.value === 'Weak') return { backgroundColor: '#fee2e2', color: '#ef4444', fontWeight: 'bold', fontSize: '13px' };
+        return {};
+      }
+    },
+    {
+      headerName: "🎯 Entry",
+      field: "entryRisk",
+      resizable: true,
+      sortable: true,
+      width: 140,
+      filter: "agTextColumnFilter",
+      cellRenderer: params => {
+        if (!params.value) return '';
+        const dist = Math.abs(params.data?.godFatherDiffPer || 0);
+        if (params.value === 'Ideal Entry') return `<span style="background:#a7f3d0; color:#047857; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:12px;">🎯 Ideal (${dist.toFixed(0)}%)</span>`;
+        if (params.value === 'Good Entry') return `<span style="background:#d1fae5; color:#059669; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:12px;">✅ Good (${dist.toFixed(0)}%)</span>`;
+        if (params.value === 'Extended') return `<span style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:12px;">⚠️ Wait (${dist.toFixed(0)}%)</span>`;
+        if (params.value === 'Overextended') return `<span style="background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:12px;">🚫 Far (${dist.toFixed(0)}%)</span>`;
+        return params.value;
+      }
+    },
+    {
+      headerName: "📋 Fund Details",
+      field: "fundDetails",
+      resizable: true,
+      sortable: true,
+      width: 200,
+      filter: "agTextColumnFilter",
+      hide: true,
+      cellStyle: { fontSize: '12px', color: '#555' }
+    },
+    {
       headerName: "📦 Volume",
       field: "volume", 
       resizable: true, 
@@ -284,32 +350,32 @@ export class SimpleMovingComponent implements OnInit {
         defaultJoinOperator: "OR"
       }
     },
-    {
-      headerName: "📊 MACD", 
-      field: "MACD", 
-      resizable: true, 
-      sortable: true, 
-      width: 110,
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
-    {
-      headerName: "🔵 MACD Signal", 
-      field: "MACDMacd", 
-      resizable: true, 
-      sortable: true, 
-      width: 130,
-      valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
-      filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
-    },
+    // {
+    //   headerName: "📊 MACD", 
+    //   field: "MACD", 
+    //   resizable: true, 
+    //   sortable: true, 
+    //   width: 110,
+    //   valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
+    // {
+    //   headerName: "🔵 MACD Signal", 
+    //   field: "MACDMacd", 
+    //   resizable: true, 
+    //   sortable: true, 
+    //   width: 130,
+    //   valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), 
+    //   filter: "agNumberColumnFilter",
+    //   filterParams: {
+    //     numAlwaysVisibleConditions: 2,
+    //     defaultJoinOperator: "OR"
+    //   }
+    // },
     {
       headerName: "📈 52W High", 
       field: "HIGH52", 
@@ -349,17 +415,102 @@ export class SimpleMovingComponent implements OnInit {
       }
     },
     {
-      headerName: "DOE", field: "debt_to_equity", resizable: true, sortable: true, valueFormatter: p => (Math.round(p.value * 100) / 100).toLocaleString(), filter: "agNumberColumnFilter",
-      filterParams: {
-        numAlwaysVisibleConditions: 2,
-        defaultJoinOperator: "OR"
-      }
+      headerName: "D/E", field: "debt_to_equity", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100).toLocaleString() : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value < 0.2 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
     },
-    
-    
-    // onCellClicked: (event: CellClickedEvent) =>
-    //   window.open( `https://www.screener.in/company/${event.value}/`)
-    // },
+    {
+      headerName: "ROE%", field: "roe", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 15 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "ROCE%", field: "roce", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 15 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "PE", field: "pe", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100).toLocaleString() : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 0 && p.value < 25 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "1Y Rev%", field: "revenueGrowth1Y", resizable: true, sortable: true, width: 100,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 10 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "1Y Profit%", field: "profitGrowth1Y", resizable: true, sortable: true, width: 110,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 10 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "OPM%", field: "operatingMargin", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 15 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "5Y Rev%", field: "revenueGrowth5Y", resizable: true, sortable: true, width: 100,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 10 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "5Y Profit%", field: "profitGrowth5Y", resizable: true, sortable: true, width: 110,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value >= 10 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "QoQ NI%", field: "qoqNetIncomeGrowth", resizable: true, sortable: true, width: 100,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 0 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "Ind PE", field: "industryPE", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 10) / 10).toLocaleString() : '-',
+      filter: "agNumberColumnFilter",
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "FCF%", field: "fcfMargin", resizable: true, sortable: true, width: 90,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 5 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "Div%", field: "dividendYield", resizable: true, sortable: true, width: 80,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + '%' : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 0 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
+    {
+      headerName: "P/B", field: "priceToBook", resizable: true, sortable: true, width: 80,
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100).toLocaleString() : '-',
+      filter: "agNumberColumnFilter",
+      cellStyle: p => p.value != null && p.value > 0 && p.value < 3 ? { color: '#059669', fontWeight: 'bold' } : {},
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
+    },
   ];
 
   result = [];
@@ -395,9 +546,12 @@ export class SimpleMovingComponent implements OnInit {
 
   fetchLiveData() {
     this.isLoading = true;
-    this.commonservice.getData.subscribe(data => {
-      this.inputValue = data
-      this.getStocks()
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
+    this.dataSubscription = this.commonservice.getData.subscribe(data => {
+      this.inputValue = data || [];
+      if (this.inputValue.length > 0) {
+        this.getStocks();
+      }
       this.isLoading = false;
     }, error => {
       console.error('Error fetching data:', error);
@@ -415,7 +569,9 @@ export class SimpleMovingComponent implements OnInit {
     this.searchQuery = ''
     this.query = ''
     this.allData = []
+    if (!this.inputValue || !Array.isArray(this.inputValue)) return;
     this.inputValue.forEach((res) => {
+      if ((res['d'][7] || 0) < 50000) return;
       this.allData.push({
         change_from_open: res['d'][9],
         low: res['d'][3],
@@ -450,9 +606,43 @@ export class SimpleMovingComponent implements OnInit {
         "EMA50|1H": res['d'][41],
         "RSI|1H":res['d'][42],
         "exchange":res['d'][43],
-        "debt_to_equity":res['d'][44]
+        "debt_to_equity":res['d'][44],
+        roe: res['d'][45],
+        roce: res['d'][46],
+        revenueGrowth1Y: res['d'][47],
+        profitGrowth1Y: res['d'][48],
+        pe: res['d'][49],
+        qoqRevenueGrowth: res['d'][50],
+        qoqNetIncomeGrowth: res['d'][51],
+        operatingMargin: res['d'][52],
+        revenueGrowth5Y: res['d'][53],
+        afterTaxMargin: res['d'][54],
+        profitGrowth5Y: res['d'][55],
+        fcfMargin: res['d'][56],
+        dividendYield: res['d'][57],
+        priceToBook: res['d'][58]
       });
     });
+
+    this.buildIndustryPEMap();
+    this.allData = this.allData.map(stock => {
+      const fs = this.getFundamentalScore(stock);
+      const dist = Math.abs(stock.godFatherDiffPer || 0);
+      let entryRisk = 'Overextended';
+      if (dist <= 3) entryRisk = 'Ideal Entry';
+      else if (dist <= 8) entryRisk = 'Good Entry';
+      else if (dist <= 15) entryRisk = 'Extended';
+
+      return {
+        ...stock,
+        fundScore: fs.score,
+        fundMaxScore: fs.maxScore,
+        fundRating: fs.rating,
+        fundDetails: fs.details.join(', '),
+        entryRisk
+      };
+    });
+
     this.rowData = []
     setTimeout(() => {
       this.rowData = this.allData
@@ -563,19 +753,19 @@ export class SimpleMovingComponent implements OnInit {
     
     this.allData.forEach((res) => {
       if (res['low'] <= res['godFather'] && res['close'] >= res['godFather'] && res['volume'] >= 200000) {
-        // Add pattern analysis to each stock
         const patternData = this.getPatternStrength(res);
+        const industry = res.industry || res.sector;
         const enhancedStock = {
           ...res,
           pattern: patternData.pattern,
           strength: patternData.strength,
           signal: patternData.isBullish ? '🟢 Bullish' : '🔴 Bearish',
-          smaPosition: patternData.smaPosition
+          smaPosition: patternData.smaPosition,
+          industryPE: this.industryPEMap[industry] || null
         };
         
         this.filteredallData.push(enhancedStock);
         
-        // Only add high-quality patterns (strength >= 50)
         if (patternData.strength >= 50) {
           this.smaPatterns.push(enhancedStock);
         }
@@ -890,6 +1080,151 @@ export class SimpleMovingComponent implements OnInit {
     };
   }
 
+  /**
+   * Weighted Fundamental Scoring for SMA200 Trading
+   * Tier 1 (Critical, 2 pts): ROE, D/E, PE < Industry
+   * Tier 2 (Important, 1.5 pts): 1Y Rev, 1Y Profit, QoQ Rev, QoQ NI
+   * Tier 3 (Quality, 1 pt): ROCE, OPM, 5Y Rev, 5Y Profit
+   * Tier 2.5 (Long-Term, 1.5 pts): FCF Margin, Dividend, P/B
+   * Max: 21.5 pts | Strong Buy >= 16 | Buy >= 12 | Hold >= 7
+   */
+  private industryPEMap: { [industry: string]: number } = {};
+
+  buildIndustryPEMap() {
+    const industryStocks: { [ind: string]: number[] } = {};
+    this.allData.forEach((s: any) => {
+      const ind = s.industry || s.sector;
+      const pe = s.pe;
+      if (ind && pe != null && pe > 0 && pe < 500) {
+        if (!industryStocks[ind]) industryStocks[ind] = [];
+        industryStocks[ind].push(pe);
+      }
+    });
+    this.industryPEMap = {};
+    Object.keys(industryStocks).forEach(ind => {
+      const arr = industryStocks[ind].sort((a, b) => a - b);
+      const mid = Math.floor(arr.length / 2);
+      this.industryPEMap[ind] = arr.length % 2 !== 0 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
+    });
+  }
+
+  getFundamentalScore(stock: any): { score: number, maxScore: number, rating: string, details: string[] } {
+    let score = 0;
+    const details: string[] = [];
+    const maxScore = 21.5;
+
+    // === TIER 1: Critical checks (2 pts each) ===
+
+    // ROE >= 12%
+    if (stock.roe != null && stock.roe >= 12) { score += 2; details.push('ROE ✓(2)'); }
+    else if (stock.roe != null) { details.push(`ROE ${stock.roe.toFixed(0)}% ✗`); }
+    else { details.push('ROE N/A'); }
+
+    // D/E < 1.0 (sector-friendly — banks/infra won't get killed)
+    if (stock.debt_to_equity != null && stock.debt_to_equity < 1.0) {
+      score += 2;
+      details.push(stock.debt_to_equity < 0.3 ? 'D/E ✓✓(2)' : 'D/E ✓(2)');
+    } else if (stock.debt_to_equity != null) {
+      details.push(`D/E ${stock.debt_to_equity.toFixed(1)} ✗`);
+    } else { details.push('D/E N/A'); }
+
+    // PE < Industry PE
+    const industry = stock.industry || stock.sector;
+    const indPE = this.industryPEMap[industry];
+    if (stock.pe != null && stock.pe > 0 && indPE != null) {
+      if (stock.pe < indPE) { score += 2; details.push(`PE<Ind(${indPE.toFixed(0)}) ✓(2)`); }
+      else { details.push(`PE>Ind(${indPE.toFixed(0)}) ✗`); }
+    } else {
+      details.push('PE N/A');
+    }
+
+    // === TIER 2: Important checks (1.5 pts each) ===
+
+    // 1Y Sales Growth > 0%
+    if (stock.revenueGrowth1Y != null && stock.revenueGrowth1Y > 0) {
+      score += 1.5; details.push('1Y Rev ✓(1.5)');
+    } else if (stock.revenueGrowth1Y != null) {
+      details.push(`1Y Rev ${stock.revenueGrowth1Y.toFixed(0)}% ✗`);
+    } else { details.push('1Y Rev N/A'); }
+
+    // 1Y Profit Growth > 0%
+    if (stock.profitGrowth1Y != null && stock.profitGrowth1Y > 0) {
+      score += 1.5; details.push('1Y Profit ✓(1.5)');
+    } else if (stock.profitGrowth1Y != null) {
+      details.push(`1Y Profit ${stock.profitGrowth1Y.toFixed(0)}% ✗`);
+    } else { details.push('1Y Profit N/A'); }
+
+    // QoQ Revenue Rising
+    if (stock.qoqRevenueGrowth != null && stock.qoqRevenueGrowth > 0) {
+      score += 1.5; details.push('QoQ Rev ✓(1.5)');
+    } else if (stock.qoqRevenueGrowth != null) {
+      details.push('QoQ Rev ✗');
+    } else { details.push('QoQ Rev N/A'); }
+
+    // QoQ Net Income Rising
+    if (stock.qoqNetIncomeGrowth != null && stock.qoqNetIncomeGrowth > 0) {
+      score += 1.5; details.push('QoQ NI ✓(1.5)');
+    } else if (stock.qoqNetIncomeGrowth != null) {
+      details.push('QoQ NI ✗');
+    } else { details.push('QoQ NI N/A'); }
+
+    // === TIER 3: Quality checks (1 pt each) ===
+
+    // ROCE >= 12%
+    if (stock.roce != null && stock.roce >= 12) { score += 1; details.push('ROCE ✓(1)'); }
+    else if (stock.roce != null) { details.push(`ROCE ${stock.roce.toFixed(0)}% ✗`); }
+    else { details.push('ROCE N/A'); }
+
+    // OPM > 10%
+    if (stock.operatingMargin != null && stock.operatingMargin > 10) {
+      score += 1; details.push('OPM ✓(1)');
+    } else if (stock.operatingMargin != null) {
+      details.push(`OPM ${stock.operatingMargin.toFixed(0)}% ✗`);
+    } else { details.push('OPM N/A'); }
+
+    // 5Y Revenue Growth >= 10%
+    if (stock.revenueGrowth5Y != null && stock.revenueGrowth5Y >= 10) {
+      score += 1; details.push('5Y Rev ✓(1)');
+    } else if (stock.revenueGrowth5Y == null) { details.push('5Y Rev N/A'); }
+    else { details.push('5Y Rev ✗'); }
+
+    // 5Y Profit Growth >= 10%
+    if (stock.profitGrowth5Y != null && stock.profitGrowth5Y >= 10) {
+      score += 1; details.push('5Y Profit ✓(1)');
+    } else if (stock.profitGrowth5Y == null) { details.push('5Y Profit N/A'); }
+    else { details.push('5Y Profit ✗'); }
+
+    // === LONG-TERM checks (1.5 pts each) ===
+
+    // Free Cash Flow Margin > 5%
+    if (stock.fcfMargin != null && stock.fcfMargin > 5) {
+      score += 1.5; details.push('FCF ✓(1.5)');
+    } else if (stock.fcfMargin != null) {
+      details.push(`FCF ${stock.fcfMargin.toFixed(0)}% ✗`);
+    } else { details.push('FCF N/A'); }
+
+    // Dividend Yield > 0%
+    if (stock.dividendYield != null && stock.dividendYield > 0) {
+      score += 1.5; details.push(`Div ${stock.dividendYield.toFixed(1)}% ✓(1.5)`);
+    } else if (stock.dividendYield != null) {
+      details.push('Div 0% ✗');
+    } else { details.push('Div N/A'); }
+
+    // Price/Book < 3
+    if (stock.priceToBook != null && stock.priceToBook > 0 && stock.priceToBook < 3) {
+      score += 1.5; details.push(`PB ${stock.priceToBook.toFixed(1)} ✓(1.5)`);
+    } else if (stock.priceToBook != null) {
+      details.push(`PB ${stock.priceToBook.toFixed(1)} ✗`);
+    } else { details.push('PB N/A'); }
+
+    let rating = 'Weak';
+    if (score >= 16) rating = 'Strong Buy';
+    else if (score >= 12) rating = 'Buy';
+    else if (score >= 7) rating = 'Hold';
+
+    return { score, maxScore, rating, details };
+  }
+
   showAllFiltered() {
     this.showingPatterns = false;
     this.rowData = [];
@@ -914,15 +1249,31 @@ export class SimpleMovingComponent implements OnInit {
     }, 100);
   }
 
+  showAboveAvgFundamentals() {
+    const aboveAvg = this.filteredallData.filter(s => s.fundScore >= 12);
+    
+    this.showingPatterns = false;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = aboveAvg.length > 0 ? aboveAvg : this.filteredallData;
+      if (aboveAvg.length === 0) {
+        console.log('No stocks with Fund Score > 9. Showing all SMA200 crosses.');
+      }
+      setTimeout(() => this.showPatternColumns(), 200);
+    }, 100);
+  }
+
   showPatternColumns() {
     if (this.gridApi) {
-      this.gridApi.setColumnsVisible(['pattern', 'strength', 'smaPosition', 'signal'], true);
+      const fundCols = ['pattern', 'strength', 'smaPosition', 'signal', 'fundScore', 'fundRating', 'fundDetails'];
+      this.gridApi.setColumnsVisible(fundCols, true);
     }
   }
 
   hidePatternColumns() {
     if (this.gridApi) {
-      this.gridApi.setColumnsVisible(['pattern', 'strength', 'smaPosition', 'signal'], false);
+      const fundCols = ['pattern', 'strength', 'smaPosition', 'signal', 'fundScore', 'fundRating', 'fundDetails'];
+      this.gridApi.setColumnsVisible(fundCols, false);
     }
   }
 

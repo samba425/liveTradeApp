@@ -227,7 +227,7 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     this.banksTrend = 0;
     this.allbankTrands = 0
     this.banks = []
-    //  let result =  this.inputValue.filter(element => element['d'][7] > element['d'][16]*5);
+    if (!this.inputValue || !Array.isArray(this.inputValue)) return;
     this.inputValue.forEach(res => {
       if (res['d'][0] == 'HDFCBANK' && (res['d'][4] - res['d'][17]) > 0) {
         this.hdfcTrend++
@@ -256,8 +256,9 @@ export class BankniftyComponent implements OnInit, OnDestroy {
   fetchTopCompanies() { 
     this.topCompanies = []
     this.niftyaboveVwap = 0
+    if (!this.nseTopCompaines || !Array.isArray(this.nseTopCompaines) || this.nseTopCompaines.length === 0) return;
     this.nifty50Top.forEach(res => {
-      let getCompany = this.nseTopCompaines.find(i => i['d'][0] == res);
+      let getCompany = this.nseTopCompaines.find(i => i?.['d']?.[0] == res);
       if(getCompany) {
         if ((getCompany['d'][4] - getCompany['d'][17]) > 0) {
           this.niftyaboveVwap++
@@ -283,10 +284,9 @@ export class BankniftyComponent implements OnInit, OnDestroy {
     this.itCompanies = []
     this.itTrend = 0
     this.topITTrend = 0
-    
-    // Only add stocks that exist in the API data
+    if (!this.nseTopCompaines || !Array.isArray(this.nseTopCompaines) || this.nseTopCompaines.length === 0) return;
     this.niftyITStocks.forEach(res => {
-      let getCompany = this.nseTopCompaines.find(i => i['d'][0] == res);
+      let getCompany = this.nseTopCompaines.find(i => i?.['d']?.[0] == res);
       if(getCompany) {
         const isAboveVwap = (getCompany['d'][4] - getCompany['d'][17]) > 0;
         if (isAboveVwap) {
@@ -316,21 +316,24 @@ export class BankniftyComponent implements OnInit, OnDestroy {
 
   fetchBankData() {
     this.bankSubscription = this.commonservice.getBankData.subscribe(data => {
-      this.inputValue = data
-      this.fetchBank()
+      this.inputValue = data || [];
+      if (this.inputValue.length > 0) this.fetchBank();
     });
   }
   fetchnseTopData() {
     this.nifySubscription = this.commonservice.getnseTopData.subscribe(data => {
-      this.nseTopCompaines = data
-      this.fetchTopCompanies()
-      this.fetchITCompanies()
+      this.nseTopCompaines = data || [];
+      if (this.nseTopCompaines.length > 0) {
+        this.fetchTopCompanies();
+        this.fetchITCompanies();
+      }
     });
   }
 
   fetchIndexData() {
     this.indexSubscription = this.commonservice.getliveIndexsData.subscribe(data => {
       this.indexValues = []
+      if (!data || !Array.isArray(data) || data.length === 0) return;
       data.forEach(res => {
         this.indexValues.push({
           name: res['d'][0],

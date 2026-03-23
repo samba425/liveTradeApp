@@ -74,7 +74,7 @@ export class CommonserviceService {
         return of({ data: [] });
       })
     ).subscribe((res) => {
-      this.stockData.next(res['data']); 
+      this.stockData.next(res?.['data'] || []); 
       if (this.serverStatus.value !== 'ready') {
         this.serverStatus.next('ready');
       }
@@ -92,7 +92,7 @@ export class CommonserviceService {
         return of({ data: [] });
       })
     ).subscribe((res) => {
-      this.bankData.next(res['data']); 
+      this.bankData.next(res?.['data'] || []); 
     });
   }
   
@@ -106,7 +106,7 @@ export class CommonserviceService {
         return of({ data: [] });
       })
     ).subscribe((res) => {
-      this.nseTopData.next(res['data']); 
+      this.nseTopData.next(res?.['data'] || []); 
     });
   } 
 
@@ -120,7 +120,7 @@ export class CommonserviceService {
         return of({ data: [] });
       })
     ).subscribe((res) => {
-      this.liveIndexsData.next(res['data']); 
+      this.liveIndexsData.next(res?.['data'] || []); 
     });
   }
 }

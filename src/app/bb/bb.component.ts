@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   standalone: false,
@@ -9,12 +10,17 @@ import { CommonserviceService } from '../commonservice.service';
   templateUrl: './bb.component.html',
   styleUrls: ['./bb.component.css']
 })
-export class BBComponent implements OnInit {
+export class BBComponent implements OnInit, OnDestroy {
 
   private gridApi!: GridApi;
   private gridApiFiltered!: GridApi;
+  private dataSubscription: Subscription;
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
   }
   public rowSelection: 'single' | 'multiple' = 'multiple';
   public defaultColDef: ColDef = {
@@ -250,8 +256,9 @@ export class BBComponent implements OnInit {
 
   fetchLiveData() {
     this.isLoading = true;
-    this.commonservice.getData.subscribe(data => {
-      this.inputValue = data
+    this.dataSubscription = this.commonservice.getData.subscribe(data => {
+      this.inputValue = data || [];
+      if (this.inputValue.length === 0) { this.isLoading = false; return; }
       this.getHighLow()
       this.isLoading = false;
     }, error => {
@@ -320,8 +327,7 @@ export class BBComponent implements OnInit {
       let totalRange = res['d'][23] - res['d'][24]
 
 
-      // if (res['d'][2] > res['d'][21] && res['d'][1] <= res['d'][21]) {
-      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21]) {
+      if (res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && (res['d'][7] || 0) >= 100000) {
         this.allData.push({
           name: res['d'][0],
           close: res['d'][25],
@@ -351,14 +357,20 @@ export class BBComponent implements OnInit {
 // console.log('-checlk thsi...',typeof (res['d'][22] / res['d'][25]),res['d'][22] / res['d'][25])
 // (low <= bb low && hign  > bb low && high <= sma20 ) && (open / close)
 
-      if ((res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) && ((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) ||
-        (res['d'][25] - res['d'][22] <= res['d'][23] - res['d'][24] * 0.32 && res['d'][25] > res['d'][22] && res['d'][23] - res['d'][25] <= res['d'][23] - res['d'][24] * 0.1) ||
-        ((res['d'][22] - res['d'][24]) / (res['d'][23] - res['d'][22]) >= 2 && res['d'][22] < res['d'][25]) ||
-        (bodySize < lowerShadow && upperShadow < bodySize && (close > open)) || (bodySize < lowerShadow && upperShadow < bodySize && (close < open)) ||
-        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close > open) && (bodySize / totalRange < 0.3)) ||
-        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (close < open) && (bodySize / totalRange < 0.3)) ||
-        ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) || (Math.abs(res['d'][22] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.3 && Math.abs(res['d'][23] - res['d'][24]) > 0 &&
-          ((Math.abs(res['d'][23] - res['d'][22]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2 || Math.abs(res['d'][23] - res['d'][25]) <= Math.abs(res['d'][23] - res['d'][24]) * 0.2))))) {
+      const wOpen = res['d'][22];
+      const wHigh = res['d'][23];
+      const wLow = res['d'][24];
+      const wClose = res['d'][25];
+      const wRange = wHigh - wLow;
+
+      if ((wLow <= res['d'][21] && wHigh > res['d'][21] && wHigh <= res['d'][26] && (res['d'][7] || 0) >= 100000) && ((wOpen / wClose >= 0.9995 && wOpen / wClose <= 1.0005) ||
+        (wClose - wOpen <= wRange * 0.32 && wClose > wOpen && wHigh - wClose <= wRange * 0.1) ||
+        ((wOpen - wLow) / (wHigh - wOpen) >= 2 && wOpen < wClose) ||
+        (bodySize < lowerShadow && upperShadow < bodySize && (wClose > wOpen)) || (bodySize < lowerShadow && upperShadow < bodySize && (wClose < wOpen)) ||
+        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (wClose > wOpen) && (bodySize / totalRange < 0.3)) ||
+        (lowerShadow > 2 * bodySize && upperShadow < bodySize && (wClose < wOpen) && (bodySize / totalRange < 0.3)) ||
+        ((bodySize / totalRange) < 0.1 && upperShadow > bodySize && lowerShadow > bodySize) || (Math.abs(wOpen - wClose) <= wRange * 0.3 && wRange > 0 &&
+          ((Math.abs(wHigh - wOpen) <= wRange * 0.2 || Math.abs(wHigh - wClose) <= wRange * 0.2))))) {
             // if((res['d'][22] / res['d'][25] >= 0.9995 && res['d'][22] / res['d'][25] <= 1.0005) && res['d'][24] <= res['d'][21] && res['d'][23] > res['d'][21] && res['d'][23] <= res['d'][26]) {
             //   console.log('-checlk thsi..111.',res['d'][0], (res['d'][22] / res['d'][25]),res['d'][7])
                 

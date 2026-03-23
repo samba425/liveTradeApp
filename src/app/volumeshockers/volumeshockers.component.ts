@@ -1,21 +1,28 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 import { options } from './optionsStocks';
+import { Subscription } from 'rxjs';
+
 @Component({
   standalone: false,
   selector: 'app-volumeshockers',
   templateUrl: './volumeshockers.component.html',
   styleUrls: ['./volumeshockers.component.css']
 })
-export class VolumeshockersComponent implements OnInit {
+export class VolumeshockersComponent implements OnInit, OnDestroy {
 
   private gridApi!: GridApi;
   private gridStockApi!: GridApi;
+  private dataSubscription: Subscription;
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    if (this.dataSubscription) this.dataSubscription.unsubscribe();
   }
   query;
   public rowSelection: 'single' | 'multiple' = 'multiple';
@@ -153,6 +160,22 @@ export class VolumeshockersComponent implements OnInit {
         if (val >= 1000) return (val / 1000).toFixed(2) + 'K';
         return val.toLocaleString();
       }
+    },
+    {
+      headerName: "🔥 Rel Vol",
+      field: "relVol",
+      resizable: true,
+      sortable: true,
+      width: 100,
+      filter: "agNumberColumnFilter",
+      valueFormatter: p => p.value != null ? (Math.round(p.value * 100) / 100) + 'x' : '-',
+      cellStyle: params => {
+        if (params.value >= 3) return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        if (params.value >= 2) return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: 'bold' };
+        if (params.value >= 1.5) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: '600' };
+        return {};
+      },
+      filterParams: { numAlwaysVisibleConditions: 2, defaultJoinOperator: "OR" }
     }
   ];
   colStocksDefs: ColDef[] = [
@@ -306,6 +329,7 @@ export class VolumeshockersComponent implements OnInit {
         volume: res['d'][7],
         change_from_open: res['d'][9],
         change_from_open_abs: res['d'][10],
+        relVol: res['d'][33],
       });
     });
     this.inputValue.forEach((res) => {
@@ -345,7 +369,21 @@ export class VolumeshockersComponent implements OnInit {
        	"EMA21|1H": res['d'][40],
        	"EMA50|1H": res['d'][41],
 				"RSI|1H":res['d'][42],
-        "exchange":res['d'][43]
+        "exchange":res['d'][43],
+        roe: res['d'][45],
+        roce: res['d'][46],
+        revenueGrowth1Y: res['d'][47],
+        profitGrowth1Y: res['d'][48],
+        pe: res['d'][49],
+        qoqRevenueGrowth: res['d'][50],
+        qoqNetIncomeGrowth: res['d'][51],
+        operatingMargin: res['d'][52],
+        revenueGrowth5Y: res['d'][53],
+        afterTaxMargin: res['d'][54],
+        profitGrowth5Y: res['d'][55],
+        fcfMargin: res['d'][56],
+        dividendYield: res['d'][57],
+        priceToBook: res['d'][58]
       }
       if (record['close'] > 50 && res['d'][32] > 30000 && res['d'][33] >= 1.5 && res['d'][34] > 2000000000 && res['d'][34] < 2000000000000) {
         this.filteredData.push(record)
@@ -365,8 +403,9 @@ export class VolumeshockersComponent implements OnInit {
 
   fetchLiveData() {
     this.isLoading = true;
-    this.commonservice.getData.subscribe(data => {
-      this.inputValue = data
+    this.dataSubscription = this.commonservice.getData.subscribe(data => {
+      this.inputValue = data || [];
+      if (this.inputValue.length === 0) { this.isLoading = false; return; }
       setTimeout(() => {
         this.volume()
         this.isLoading = false;
