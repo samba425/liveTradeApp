@@ -144,7 +144,21 @@ async function fetchTradingViewData(indexType) {
 				"EMA50|60",
 				"RSI|60",
 				"exchange",
-				"debt_to_equity"
+				"debt_to_equity",
+				"return_on_equity",
+				"return_on_invested_capital",
+				"total_revenue_yoy_growth_fy",
+				"net_income_yoy_growth_fy",
+				"price_earnings_ttm",
+				"total_revenue_qoq_growth_fq",
+				"net_income_qoq_growth_fq",
+				"operating_margin",
+				"total_revenue_5y_growth_fy",
+				"after_tax_margin",
+				"earnings_per_share_diluted_5y_growth_fy",
+				"free_cash_flow_margin_ttm",
+				"dividend_yield_recent",
+				"price_book_fq"
 			],
 			"sort": {
 				"sortBy": "close",
