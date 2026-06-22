@@ -186,6 +186,13 @@
                 style="font-weight: 600;">
                 <i class="fas fa-trophy"></i> Buy Zone 12+
               </button>
+              <button 
+                *ngIf="filteredallData.length > 0"
+                class="btn btn-sm btn-success"
+                (click)="showTopTrades()"
+                style="font-weight: 600;">
+                <i class="fas fa-bolt"></i> Top Trades (A+)
+              </button>
               <span class="badge badge-light">{{rowData.length}} stocks</span>
             </div>
           </div>
@@ -203,8 +210,102 @@
             [paginationPageSize]="paginationPageSize"
             [domLayout]="'normal'" 
             [columnDefs]="colDefs"
-            (gridReady)="onGridReady($event)">
+            (gridReady)="onGridReady($event)"
+            (rowClicked)="onRowClicked($event)">
           </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional Trade Setup Panel -->
+  <div *ngIf="selectedStock" class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow" style="border: 2px solid #667eea;">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-crosshairs"></i> Trade Setup: {{ selectedStock.name }}</h5>
+            <div class="d-flex gap-2 align-items-center">
+              <label class="text-white mb-0" style="font-size:12px;">Account ₹</label>
+              <input type="number" [(ngModel)]="accountSize" class="form-control form-control-sm" style="width:100px; font-size:12px;" (change)="selectedStock = selectedStock">
+              <label class="text-white mb-0" style="font-size:12px;">Risk %</label>
+              <input type="number" [(ngModel)]="riskPercent" class="form-control form-control-sm" style="width:60px; font-size:12px;" min="0.5" max="5" step="0.5" (change)="selectedStock = selectedStock">
+              <button class="btn btn-sm btn-outline-light" (click)="selectedStock = null"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" style="background: #f0f4ff;" *ngIf="getTradeSetup(selectedStock) as setup">
+          <div class="row">
+            <!-- Entry & Stop Loss -->
+            <div class="col-md-3">
+              <div class="p-3 rounded" style="background:white; border-left: 4px solid #3b82f6;">
+                <h6 class="text-muted mb-2" style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Entry & Risk</h6>
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:13px;">Entry Price:</span>
+                  <strong style="color:#1e40af;">₹{{ setup.entry | number:'1.2-2' }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:13px;">Stop Loss (SMA200):</span>
+                  <strong style="color:#dc2626;">₹{{ setup.stopLoss | number:'1.2-2' }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span style="font-size:13px;">Risk per share:</span>
+                  <strong style="color:#dc2626;">₹{{ setup.risk | number:'1.2-2' }} ({{ setup.riskPct }}%)</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Targets -->
+            <div class="col-md-3">
+              <div class="p-3 rounded" style="background:white; border-left: 4px solid #10b981;">
+                <h6 class="text-muted mb-2" style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Targets & R:R</h6>
+                <div class="d-flex justify-content-between mb-1" *ngIf="setup.target1">
+                  <span style="font-size:13px;">T1 (SMA50):</span>
+                  <strong style="color:#059669;">₹{{ setup.target1 | number:'1.2-2' }} (1:{{ setup.rr1 }})</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1" *ngIf="setup.target2">
+                  <span style="font-size:13px;">T2 (52W High):</span>
+                  <strong style="color:#047857;">₹{{ setup.target2 | number:'1.2-2' }} (1:{{ setup.rr2 }})</strong>
+                </div>
+                <div *ngIf="!setup.target1 && !setup.target2" class="text-muted" style="font-size:13px;">
+                  No clear target above current price
+                </div>
+              </div>
+            </div>
+
+            <!-- Position Sizing -->
+            <div class="col-md-3">
+              <div class="p-3 rounded" style="background:white; border-left: 4px solid #8b5cf6;">
+                <h6 class="text-muted mb-2" style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Position Size</h6>
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:13px;">Shares to Buy:</span>
+                  <strong style="color:#6d28d9; font-size:16px;">{{ setup.shares }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:13px;">Position Value:</span>
+                  <strong>₹{{ setup.positionValue | number:'1.0-0' }} ({{ setup.positionPct }}%)</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span style="font-size:13px;">Max Loss:</span>
+                  <strong style="color:#dc2626;">₹{{ setup.maxLoss }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Checklist -->
+            <div class="col-md-3">
+              <div class="p-3 rounded" style="background:white; border-left: 4px solid #f59e0b;">
+                <h6 class="text-muted mb-2" style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Entry Checklist</h6>
+                <div style="font-size:12px; line-height:1.8;">
+                  <span [style.color]="selectedStock.RSI <= 40 ? '#059669' : '#dc2626'">{{ selectedStock.RSI <= 40 ? '✅' : '❌' }} RSI {{ selectedStock.RSI | number:'1.0-0' }} (need ≤40)</span><br>
+                  <span [style.color]="selectedStock.volRatio >= 1.3 ? '#059669' : '#dc2626'">{{ selectedStock.volRatio >= 1.3 ? '✅' : '❌' }} Vol {{ selectedStock.volRatio | number:'1.1-1' }}x (need ≥1.3x)</span><br>
+                  <span [style.color]="selectedStock.entryRisk === 'Ideal Entry' || selectedStock.entryRisk === 'Good Entry' ? '#059669' : '#dc2626'">{{ selectedStock.entryRisk === 'Ideal Entry' || selectedStock.entryRisk === 'Good Entry' ? '✅' : '❌' }} {{ selectedStock.entryRisk }}</span><br>
+                  <span [style.color]="selectedStock.fundScore >= 12 ? '#059669' : '#dc2626'">{{ selectedStock.fundScore >= 12 ? '✅' : '❌' }} Fund {{ selectedStock.fundScore }}/21.5</span><br>
+                  <span [style.color]="(setup.rr1 >= 2 || setup.rr2 >= 2) ? '#059669' : '#dc2626'">{{ (setup.rr1 >= 2 || setup.rr2 >= 2) ? '✅' : '❌' }} R:R ≥ 1:2</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -250,11 +351,11 @@
       <div class="card" style="border-left: 5px solid #f59e0b;">
         <div class="card-body">
           <h6><i class="fas fa-lightbulb"></i> Best Entry Strategy</h6>
-          <p class="mb-0"><strong>Step 1:</strong> Click "SMA Filter" to find SMA200 bounces</p>
-          <p class="mb-0"><strong>Step 2:</strong> Click "Buy Zone 12+" for fundamentally strong</p>
-          <p class="mb-0"><strong>Step 3:</strong> Look for 🎯 Ideal or ✅ Good entries only</p>
-          <p class="mb-0"><strong>Step 4:</strong> Confirm with RSI &lt; 40 + Bullish pattern</p>
-          <p class="mb-0 mt-1"><small><strong>Stop Loss:</strong> Below SMA200 | <strong>Target:</strong> SMA50 or previous swing high</small></p>
+          <p class="mb-0"><strong>Step 1:</strong> Click "SMA Filter" for SMA200 bounces</p>
+          <p class="mb-0"><strong>Step 2:</strong> Sort by "Trade Score" descending</p>
+          <p class="mb-0"><strong>Step 3:</strong> Click a row to see Position Size panel</p>
+          <p class="mb-0"><strong>Step 4:</strong> Verify all 5 checklist items are green</p>
+          <p class="mb-0 mt-1"><small><strong>Trade Score:</strong> Fund(25) + Entry(25) + R:R(20) + RSI(15) + Vol(15) = 100. A+ ≥80 | A ≥65 | B+ ≥50</small></p>
         </div>
       </div>
     </div>

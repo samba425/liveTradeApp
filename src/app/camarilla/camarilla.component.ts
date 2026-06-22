@@ -270,6 +270,74 @@ export class CamarillaComponent implements OnInit, OnDestroy {
       sortable: true,
       width: 150,
       filter: "agTextColumnFilter"
+    },
+    // ===== MECHANICAL TRADE DECISION COLUMNS =====
+    {
+      headerName: "📍 ENTRY",
+      field: "entry",
+      sortable: true,
+      width: 110,
+      valueFormatter: p => p.value > 0 ? '₹' + (Math.round(p.value * 100) / 100).toLocaleString() : '—',
+      cellStyle: { fontWeight: 'bold', color: '#667eea', fontSize: '13px', backgroundColor: '#f0f4ff' }
+    },
+    {
+      headerName: "🛑 SL",
+      field: "sl",
+      sortable: true,
+      width: 110,
+      valueFormatter: p => p.value > 0 ? '₹' + (Math.round(p.value * 100) / 100).toLocaleString() : '—',
+      cellStyle: { fontWeight: 'bold', color: '#ff4757', fontSize: '13px', backgroundColor: '#ffe5e5' }
+    },
+    {
+      headerName: "🎯 T1",
+      field: "t1",
+      sortable: true,
+      width: 110,
+      valueFormatter: p => p.value > 0 ? '₹' + (Math.round(p.value * 100) / 100).toLocaleString() : '—',
+      cellStyle: { fontWeight: '600', color: '#2ed573', fontSize: '13px' }
+    },
+    {
+      headerName: "🚀 T2",
+      field: "t2",
+      sortable: true,
+      width: 110,
+      valueFormatter: p => p.value > 0 ? '₹' + (Math.round(p.value * 100) / 100).toLocaleString() : '—',
+      cellStyle: { fontWeight: '600', color: '#00C853', fontSize: '13px' }
+    },
+    {
+      headerName: "📊 R:R",
+      field: "riskRewardRatio",
+      sortable: true,
+      width: 90,
+      valueFormatter: p => p.value > 0 ? '1:' + p.value.toFixed(1) : '—',
+      cellStyle: params => {
+        const val = parseFloat(params.value);
+        if (val >= 2) return { fontWeight: 'bold', color: '#00C853', fontSize: '13px' };
+        if (val >= 1.5) return { fontWeight: '600', color: '#76FF03', fontSize: '13px' };
+        if (val >= 1) return { fontWeight: '600', color: '#FFC107', fontSize: '13px' };
+        return { color: '#999', fontSize: '13px' };
+      }
+    },
+    {
+      headerName: "📈 Direction",
+      field: "tradeDirection",
+      sortable: true,
+      width: 100,
+      filter: "agTextColumnFilter",
+      cellStyle: params => {
+        if (params.value === 'LONG') return { fontWeight: 'bold', color: '#00C853', fontSize: '13px' };
+        if (params.value === 'SHORT') return { fontWeight: 'bold', color: '#ff4757', fontSize: '13px' };
+        return { color: '#999', fontSize: '13px' };
+      }
+    },
+    {
+      headerName: "💡 Trade Reason",
+      field: "tradeReason",
+      resizable: true,
+      sortable: false,
+      width: 280,
+      filter: "agTextColumnFilter",
+      cellStyle: { fontSize: '12px', color: '#555', whiteSpace: 'normal', wordWrap: 'break-word', padding: '8px' }
     }
   ];
 
@@ -1128,6 +1196,18 @@ export class CamarillaComponent implements OnInit, OnDestroy {
         
         const distanceFromLevel = ((close - levelPrice) / levelPrice * 100).toFixed(2);
         
+        // Generate mechanical trade decision
+        const tradeDecision = this.generateTradeDecision(
+          crossedLevel, 
+          close, 
+          high, 
+          low, 
+          levels.H4, 
+          levels.H3, 
+          levels.L3, 
+          levels.L4
+        );
+        
         // Boost strength
         let finalStrength = patternInfo.strength;
         if (h4Breakout) finalStrength = Math.min(100, finalStrength + 20);
@@ -1156,7 +1236,16 @@ export class CamarillaComponent implements OnInit, OnDestroy {
           L4: levels.L4,
           lastWeekHigh: periodHigh,
           lastWeekLow: periodLow,
-          lastWeekClose: periodClose
+          lastWeekClose: periodClose,
+          // Trade Decision Fields
+          entry: tradeDecision.entry,
+          sl: tradeDecision.sl,
+          t1: tradeDecision.t1,
+          t2: tradeDecision.t2,
+          tradeDirection: tradeDecision.direction,
+          riskRewardRatio: tradeDecision.rr,
+          tradeReason: tradeDecision.reason,
+          isTradable: tradeDecision.tradable
         });
       }
     });
@@ -1310,6 +1399,109 @@ export class CamarillaComponent implements OnInit, OnDestroy {
    */
   isFilterActive(signalType: string): boolean {
     return this.activeSignalFilter === signalType;
+  }
+
+  /**
+   * MECHANICAL TRADE DECISION ENGINE
+   * ================================
+   * Converts signal type into exact ENTRY, SL, T1, T2 with decision rules
+   * 
+   * Input: crossedLevel, current price, levels
+   * Output: { entry, sl, t1, t2, direction, rr, reason }
+   */
+  generateTradeDecision(crossedLevel: string, close: number, high: number, low: number, 
+                        h4: number, h3: number, l3: number, l4: number): any {
+    
+    let decision = {
+      entry: 0,
+      sl: 0,
+      t1: 0,
+      t2: 0,
+      direction: 'NEUTRAL',
+      rr: 0,
+      reason: '',
+      tradable: false
+    };
+
+    // ===== H4 BREAKOUT - STRONG MOMENTUM LONG =====
+    if (crossedLevel === 'H4 Breakout') {
+      decision.direction = 'LONG';
+      decision.entry = Math.round(h4 * 100) / 100;  // Enter at H4 or above
+      decision.sl = Math.round((h4 - (h4 - h3) * 0.5) * 100) / 100;  // SL at midpoint H4-H3
+      decision.t1 = Math.round(h3 * 100) / 100;  // First target: H3 area
+      decision.t2 = Math.round((h3 + (h3 - l3) * 0.5) * 100) / 100;  // Second target: above H3
+      
+      decision.rr = Math.round(((decision.t2 - decision.entry) / (decision.entry - decision.sl)) * 100) / 100;
+      decision.reason = 'Above H4: Strong breakout. Enter on retest or breakout. SL below midpoint. Trail stops as it rallies.';
+      decision.tradable = true;
+    }
+    
+    // ===== H3 CROSS UP - BULLISH REVERSAL/CONTINUATION =====
+    else if (crossedLevel === 'H3 Cross UP') {
+      decision.direction = 'LONG';
+      decision.entry = Math.round((h3 + (h3 - h3 * 0.001)) * 100) / 100;  // Entry above H3 on confirmation
+      decision.sl = Math.round((l3 - (l3 - l4) * 0.5) * 100) / 100;  // SL below L3 mid-point
+      decision.t1 = Math.round(((h3 + h4) / 2) * 100) / 100;  // Target: midpoint H3-H4
+      decision.t2 = Math.round(h4 * 100) / 100;  // Target 2: H4 if trend continues
+      
+      decision.rr = Math.round(((decision.t1 - decision.entry) / (decision.entry - decision.sl)) * 100) / 100;
+      decision.reason = 'H3 breakout: Enter on close above H3 + next candle confirmation. Move SL to breakeven after T1 hit.';
+      decision.tradable = true;
+    }
+    
+    // ===== L3 BOUNCE UP - REVERSAL FROM SUPPORT =====
+    else if (crossedLevel === 'L3 Bounce UP') {
+      decision.direction = 'LONG';
+      decision.entry = Math.round((l3 + (h3 - l3) * 0.05) * 100) / 100;  // Enter 5% above L3
+      decision.sl = Math.round((l3 - (l3 - l4)) * 100) / 100;  // SL below L4
+      decision.t1 = Math.round(((l3 + h3) / 2) * 100) / 100;  // Target: midpoint L3-H3
+      decision.t2 = Math.round(h3 * 100) / 100;  // Target 2: H3 area
+      
+      decision.rr = Math.round(((decision.t1 - decision.entry) / (decision.entry - decision.sl)) * 100) / 100;
+      decision.reason = 'L3 bounce: Wait for wick + bullish candle close. Entry at low + buffer. Move SL to entry after T1.';
+      decision.tradable = true;
+    }
+    
+    // ===== L3 CROSS DOWN - BEARISH REVERSAL/BREAKDOWN =====
+    else if (crossedLevel === 'L3 Cross DOWN') {
+      decision.direction = 'SHORT';
+      decision.entry = Math.round((l3 - (h3 - h3 * 0.001)) * 100) / 100;  // Entry below L3 on confirmation
+      decision.sl = Math.round((h3 + (h4 - h3) * 0.5) * 100) / 100;  // SL above H3 mid-point
+      decision.t1 = Math.round(((l3 + l4) / 2) * 100) / 100;  // Target: midpoint L3-L4
+      decision.t2 = Math.round(l4 * 100) / 100;  // Target 2: L4 if trend continues
+      
+      decision.rr = Math.round(((decision.entry - decision.t1) / (decision.sl - decision.entry)) * 100) / 100;
+      decision.reason = 'L3 breakdown: Enter on close below L3 + next candle confirmation. Move SL to breakeven after T1 hit.';
+      decision.tradable = true;
+    }
+    
+    // ===== L4 BREAKDOWN - STRONG MOMENTUM SHORT =====
+    else if (crossedLevel === 'L4 Breakdown') {
+      decision.direction = 'SHORT';
+      decision.entry = Math.round(l4 * 100) / 100;  // Enter at L4 or below
+      decision.sl = Math.round((l4 + (h3 - l3) * 0.5) * 100) / 100;  // SL at midpoint L4-L3
+      decision.t1 = Math.round(l3 * 100) / 100;  // First target: L3 area
+      decision.t2 = Math.round((l3 - (h3 - l3) * 0.5) * 100) / 100;  // Second target: below L3
+      
+      decision.rr = Math.round(((decision.entry - decision.t2) / (decision.sl - decision.entry)) * 100) / 100;
+      decision.reason = 'Below L4: Strong breakdown. Enter on retest or breakdown. SL above midpoint. Trail stops as it falls.';
+      decision.tradable = true;
+    }
+    
+    // ===== H3 REJECTION - RESISTANCE FAILURE (SHORT ON CONFIRMATION) =====
+    else if (crossedLevel === 'H3 Rejection') {
+      decision.direction = 'SHORT';
+      decision.entry = Math.round((h3 - (h3 - h3 * 0.005)) * 100) / 100;  // Entry below H3 on rejection confirmation
+      decision.sl = Math.round((h4 + (h4 - h3) * 0.2) * 100) / 100;  // SL above H4 + buffer
+      decision.t1 = Math.round(((l3 + h3) / 2) * 100) / 100;  // Target: midpoint
+      decision.t2 = Math.round(l3 * 100) / 100;  // Target 2: L3 area
+      
+      decision.rr = Math.round(((decision.entry - decision.t1) / (decision.sl - decision.entry)) * 100) / 100;
+      decision.reason = 'H3 rejection: High touched, closed below. Fade the move - enter short on 5m close below H3.';
+      decision.tradable = false;  // Low probability, use for context only
+    }
+    
+    return decision;
   }
 
   // Grid handlers

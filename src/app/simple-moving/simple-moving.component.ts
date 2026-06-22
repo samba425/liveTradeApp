@@ -299,6 +299,94 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: "⚡ Trade Score",
+      field: "tradeScore",
+      resizable: true,
+      sortable: true,
+      width: 135,
+      filter: "agNumberColumnFilter",
+      cellRenderer: params => {
+        if (params.value == null) return '';
+        const score = params.value;
+        let color = '#991b1b'; let bg = '#fee2e2'; let label = 'Avoid';
+        if (score >= 80) { color = '#047857'; bg = '#a7f3d0'; label = 'A+'; }
+        else if (score >= 65) { color = '#059669'; bg = '#d1fae5'; label = 'A'; }
+        else if (score >= 50) { color = '#1e40af'; bg = '#dbeafe'; label = 'B+'; }
+        else if (score >= 35) { color = '#d97706'; bg = '#fef3c7'; label = 'B'; }
+        else if (score >= 20) { color = '#92400e'; bg = '#fed7aa'; label = 'C'; }
+        return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:12px;">${label} ${score}/100</span>`;
+      }
+    },
+    {
+      headerName: "📐 R:R",
+      field: "riskReward",
+      resizable: true,
+      sortable: true,
+      width: 100,
+      filter: "agNumberColumnFilter",
+      valueFormatter: p => p.value != null ? '1:' + p.value.toFixed(1) : '-',
+      cellStyle: params => {
+        if (params.value >= 3) return { backgroundColor: '#a7f3d0', color: '#047857', fontWeight: 'bold' };
+        if (params.value >= 2) return { backgroundColor: '#d1fae5', color: '#059669', fontWeight: 'bold' };
+        if (params.value >= 1.5) return { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: 'bold' };
+        if (params.value >= 1) return { backgroundColor: '#fef3c7', color: '#92400e', fontWeight: '600' };
+        return { color: '#991b1b' };
+      }
+    },
+    {
+      headerName: "📊 52W Pos",
+      field: "weekRange52",
+      resizable: true,
+      sortable: true,
+      width: 110,
+      filter: "agNumberColumnFilter",
+      valueFormatter: p => p.value != null ? p.value.toFixed(0) + '%' : '-',
+      cellRenderer: params => {
+        if (params.value == null) return '-';
+        const pct = params.value;
+        const barWidth = Math.min(pct, 100);
+        let barColor = '#ef4444';
+        if (pct >= 80) barColor = '#10b981';
+        else if (pct >= 50) barColor = '#3b82f6';
+        else if (pct >= 30) barColor = '#f59e0b';
+        return `<div style="display:flex; align-items:center; gap:4px; height:100%;"><div style="width:50px; height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden;"><div style="width:${barWidth}%; height:100%; background:${barColor}; border-radius:4px;"></div></div><span style="font-size:11px; font-weight:600; color:${barColor};">${pct.toFixed(0)}%</span></div>`;
+      }
+    },
+    {
+      headerName: "🔊 Vol Str",
+      field: "volStrength",
+      resizable: true,
+      sortable: true,
+      width: 110,
+      filter: "agTextColumnFilter",
+      cellRenderer: params => {
+        if (!params.value) return '-';
+        const ratio = params.data?.volRatio || 0;
+        if (params.value === 'High') return `<span style="background:#d1fae5; color:#065f46; padding:1px 6px; border-radius:8px; font-weight:bold; font-size:11px;">🔥 ${ratio.toFixed(1)}x</span>`;
+        if (params.value === 'Above Avg') return `<span style="background:#dbeafe; color:#1e40af; padding:1px 6px; border-radius:8px; font-weight:bold; font-size:11px;">📈 ${ratio.toFixed(1)}x</span>`;
+        if (params.value === 'Normal') return `<span style="color:#6b7280; font-size:11px;">— ${ratio.toFixed(1)}x</span>`;
+        return `<span style="color:#dc2626; font-size:11px;">📉 ${ratio.toFixed(1)}x</span>`;
+      }
+    },
+    {
+      headerName: "📶 Trend",
+      field: "trendAlignment",
+      resizable: true,
+      sortable: true,
+      width: 100,
+      filter: "agTextColumnFilter",
+      cellRenderer: params => {
+        if (!params.value) return '-';
+        if (params.value === 'Strong Up') return `<span style="color:#059669; font-weight:bold;">↑↑↑</span>`;
+        if (params.value === 'Up') return `<span style="color:#10b981; font-weight:bold;">↑↑</span>`;
+        if (params.value === 'Weak Up') return `<span style="color:#6ee7b7;">↑</span>`;
+        if (params.value === 'Neutral') return `<span style="color:#9ca3af;">→</span>`;
+        if (params.value === 'Down') return `<span style="color:#ef4444; font-weight:bold;">↓↓</span>`;
+        if (params.value === 'Strong Down') return `<span style="color:#991b1b; font-weight:bold;">↓↓↓</span>`;
+        return params.value;
+      }
+    },
+    {
       headerName: "📋 Fund Details",
       field: "fundDetails",
       resizable: true,
@@ -533,6 +621,11 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
   smaPatterns = [];
   showingPatterns = true;
 
+  // Professional trade setup properties
+  selectedStock: any = null;
+  accountSize: number = 100000;
+  riskPercent: number = 1;
+
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
       // serverSideFiltering: true
@@ -620,7 +713,9 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
         profitGrowth5Y: res['d'][55],
         fcfMargin: res['d'][56],
         dividendYield: res['d'][57],
-        priceToBook: res['d'][58]
+        priceToBook: res['d'][58],
+        avgVol10d: res['d'][15],
+        avgVol30d: res['d'][16]
       });
     });
 
@@ -633,13 +728,25 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       else if (dist <= 8) entryRisk = 'Good Entry';
       else if (dist <= 15) entryRisk = 'Extended';
 
+      const weekRange52 = this.calc52WRange(stock);
+      const { volStrength, volRatio } = this.calcVolumeStrength(stock);
+      const trendAlignment = this.calcTrendAlignment(stock);
+      const riskReward = this.calcRiskReward(stock);
+      const tradeScore = this.calcTradeScore(stock, fs.score, dist, volRatio, riskReward);
+
       return {
         ...stock,
         fundScore: fs.score,
         fundMaxScore: fs.maxScore,
         fundRating: fs.rating,
         fundDetails: fs.details.join(', '),
-        entryRisk
+        entryRisk,
+        weekRange52,
+        volStrength,
+        volRatio,
+        trendAlignment,
+        riskReward,
+        tradeScore
       };
     });
 
@@ -1225,6 +1332,144 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
     return { score, maxScore, rating, details };
   }
 
+  // === PROFESSIONAL TRADING CALCULATIONS ===
+
+  calc52WRange(stock: any): number | null {
+    const { close, HIGH52, LOW52 } = stock;
+    if (HIGH52 == null || LOW52 == null || HIGH52 === LOW52) return null;
+    return ((close - LOW52) / (HIGH52 - LOW52)) * 100;
+  }
+
+  calcVolumeStrength(stock: any): { volStrength: string, volRatio: number } {
+    const { volume, avgVol10d } = stock;
+    if (!volume || !avgVol10d || avgVol10d === 0) return { volStrength: 'Normal', volRatio: 0 };
+    const ratio = volume / avgVol10d;
+    if (ratio >= 2.5) return { volStrength: 'High', volRatio: ratio };
+    if (ratio >= 1.3) return { volStrength: 'Above Avg', volRatio: ratio };
+    if (ratio >= 0.7) return { volStrength: 'Normal', volRatio: ratio };
+    return { volStrength: 'Low', volRatio: ratio };
+  }
+
+  calcTrendAlignment(stock: any): string {
+    const ema5 = stock['EMA5|5'];
+    const ema10 = stock['EMA10|5'];
+    const sma50 = stock.sma50;
+    const sma200 = stock.godFather;
+    const close = stock.close;
+    if (ema5 == null || ema10 == null || sma50 == null || sma200 == null) return 'Neutral';
+
+    let upSignals = 0;
+    let downSignals = 0;
+
+    if (close > ema5) upSignals++; else downSignals++;
+    if (ema5 > ema10) upSignals++; else downSignals++;
+    if (close > sma50) upSignals++; else downSignals++;
+    if (sma50 > sma200) upSignals++; else downSignals++;
+
+    if (upSignals === 4) return 'Strong Up';
+    if (upSignals === 3) return 'Up';
+    if (upSignals === 2 && close > sma200) return 'Weak Up';
+    if (downSignals === 4) return 'Strong Down';
+    if (downSignals === 3) return 'Down';
+    return 'Neutral';
+  }
+
+  calcRiskReward(stock: any): number | null {
+    const { close, godFather, sma50, HIGH52 } = stock;
+    if (!close || !godFather || godFather >= close) return null;
+
+    const stopLoss = godFather;
+    const risk = close - stopLoss;
+    if (risk <= 0) return null;
+
+    // Target: SMA50 if above, else 52W high. Use conservative target
+    let target = HIGH52;
+    if (sma50 && sma50 > close) {
+      target = sma50;
+    } else if (HIGH52 && HIGH52 > close) {
+      target = HIGH52;
+    } else {
+      return 0.5; // No clear upside target
+    }
+
+    const reward = target - close;
+    return reward > 0 ? reward / risk : 0;
+  }
+
+  calcTradeScore(stock: any, fundScore: number, distFromSMA: number, volRatio: number, rr: number | null): number {
+    let score = 0;
+
+    // 1. Fundamental Quality (max 25 pts)
+    score += Math.min((fundScore / 21.5) * 25, 25);
+
+    // 2. Entry Proximity to SMA200 (max 25 pts) - closer = better
+    if (distFromSMA <= 2) score += 25;
+    else if (distFromSMA <= 5) score += 20;
+    else if (distFromSMA <= 8) score += 15;
+    else if (distFromSMA <= 12) score += 8;
+    else if (distFromSMA <= 20) score += 3;
+
+    // 3. Risk:Reward (max 20 pts)
+    if (rr != null) {
+      if (rr >= 4) score += 20;
+      else if (rr >= 3) score += 17;
+      else if (rr >= 2) score += 14;
+      else if (rr >= 1.5) score += 10;
+      else if (rr >= 1) score += 5;
+    }
+
+    // 4. RSI Oversold bounce (max 15 pts)
+    const rsi = stock.RSI;
+    if (rsi != null) {
+      if (rsi >= 30 && rsi <= 40) score += 15;
+      else if (rsi >= 40 && rsi <= 50) score += 10;
+      else if (rsi >= 25 && rsi < 30) score += 8;
+      else if (rsi > 50 && rsi <= 60) score += 5;
+    }
+
+    // 5. Volume Confirmation (max 15 pts)
+    if (volRatio >= 2.5) score += 15;
+    else if (volRatio >= 1.5) score += 10;
+    else if (volRatio >= 1.0) score += 5;
+
+    return Math.round(Math.min(score, 100));
+  }
+
+  getTradeSetup(stock: any): any {
+    if (!stock) return null;
+    const entry = stock.close;
+    const stopLoss = stock.godFather;
+    const risk = entry - stopLoss;
+    if (risk <= 0) return null;
+
+    const target1 = stock.sma50 && stock.sma50 > entry ? stock.sma50 : null;
+    const target2 = stock.HIGH52 && stock.HIGH52 > entry ? stock.HIGH52 : null;
+
+    const riskAmount = this.accountSize * (this.riskPercent / 100);
+    const shares = Math.floor(riskAmount / risk);
+    const positionValue = shares * entry;
+
+    return {
+      name: stock.name,
+      entry,
+      stopLoss,
+      risk,
+      riskPct: ((risk / entry) * 100).toFixed(1),
+      target1,
+      target2,
+      rr1: target1 ? ((target1 - entry) / risk).toFixed(1) : null,
+      rr2: target2 ? ((target2 - entry) / risk).toFixed(1) : null,
+      shares,
+      positionValue,
+      positionPct: ((positionValue / this.accountSize) * 100).toFixed(1),
+      maxLoss: (shares * risk).toFixed(0)
+    };
+  }
+
+  onRowClicked(event: any) {
+    this.selectedStock = event.data;
+  }
+
   showAllFiltered() {
     this.showingPatterns = false;
     this.rowData = [];
@@ -1258,6 +1503,22 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       this.rowData = aboveAvg.length > 0 ? aboveAvg : this.filteredallData;
       if (aboveAvg.length === 0) {
         console.log('No stocks with Fund Score > 9. Showing all SMA200 crosses.');
+      }
+      setTimeout(() => this.showPatternColumns(), 200);
+    }, 100);
+  }
+
+  showTopTrades() {
+    const topTrades = this.filteredallData
+      .filter(s => s.tradeScore >= 50 && s.riskReward >= 1.5)
+      .sort((a, b) => b.tradeScore - a.tradeScore);
+    
+    this.showingPatterns = false;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = topTrades.length > 0 ? topTrades : this.filteredallData;
+      if (topTrades.length === 0) {
+        console.log('No A+ trades found. Showing all SMA200 crosses.');
       }
       setTimeout(() => this.showPatternColumns(), 200);
     }, 100);
