@@ -13,6 +13,7 @@ interface SectorData {
   decliners: number;
   strength: number;
   topStock: any;
+  stockCount?: number;
 }
 
 @Component({
@@ -214,6 +215,13 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: '📦 Stocks',
+      field: 'stockCount',
+      sortable: true,
+      width: 100,
+      valueFormatter: params => params.value != null ? params.value : (params.data?.stocks?.length || 0)
+    },
+    {
       headerName: '⭐ Top Stock',
       field: 'topStock',
       width: 280,
@@ -280,10 +288,13 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
     }
     this.errorMessage = '';
     
-    // Use optimized NSE Sector API - returns pre-calculated sector data
     this.http.get(`${environment.baseUrl}nse/sectors`).toPromise()
       .then((response: any) => {
         if (response && response.status === 'success' && response.data) {
+          const loaded = response.sectorsLoaded ?? response.data.filter((s: any) => (s.stockCount || s.stocks?.length) > 0).length;
+          if (loaded === 0) {
+            throw new Error('All sectors returned empty');
+          }
           this.updateSectorData(response.data);
           this.isLoading = false;
           this.lastUpdated = new Date();
@@ -294,8 +305,6 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       .catch(error => {
         console.error('Error loading sector data:', error);
         this.errorMessage = 'Failed to load sector data. Falling back to manual calculation...';
-        
-        // Fallback to old method if NSE API fails
         this.loadSectorDataFallback();
       });
   }
@@ -313,12 +322,11 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
   }
 
   loadSectorDataFallback() {
-    // Original method as fallback
     this.http.get(`${environment.baseUrl}getData`).toPromise()
       .then((response: any) => {
-        const allStocks = response && response.data ? response.data : [];
+        const rawRows = response && response.data ? response.data : [];
+        const allStocks = rawRows.map((row: any) => this.parseTradingViewRow(row)).filter(Boolean);
         
-        // Process each sector with the same data
         const sectorResults = Object.keys(this.sectorStocks).map(sectorKey => {
           const sector = this.sectorStocks[sectorKey];
           return this.processSectorData(sectorKey, sector.name, sector.stocks, allStocks);
@@ -335,9 +343,21 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
       });
   }
 
+  private parseTradingViewRow(row: any): any {
+    const d = row.d;
+    if (!d || !d[0]) return null;
+    const change = d[5] != null ? Number(d[5]) : (d[9] != null ? Number(d[9]) : 0);
+    return {
+      name: d[0],
+      close: d[4],
+      open: d[1],
+      volume: d[7] || 0,
+      change
+    };
+  }
+
   processSectorData(sectorKey: string, sectorName: string, stockSymbols: string[], allStocks: any[]): SectorData {
     try {
-      // Filter stocks for this sector
       const validStocks = allStocks.filter(stock => 
         stockSymbols.includes(stock.name)
       );
@@ -356,29 +376,20 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
         };
       }
 
-      // Calculate sector metrics
-      const stocksWithChange = validStocks.map(stock => ({
-        ...stock,
-        change: stock.prevClose 
-          ? ((stock.close - stock.prevClose) / stock.prevClose) * 100
-          : ((stock.close - stock.open) / stock.open) * 100
-      }));
-
-      const avgChange = stocksWithChange.reduce((sum, s) => sum + s.change, 0) / stocksWithChange.length;
-      const totalVolume = stocksWithChange.reduce((sum, s) => sum + (s.volume || 0), 0);
-      const advancers = stocksWithChange.filter(s => s.change > 0).length;
-      const decliners = stocksWithChange.filter(s => s.change < 0).length;
-      const strength = (advancers / stocksWithChange.length) * 100;
+      const avgChange = validStocks.reduce((sum, s) => sum + s.change, 0) / validStocks.length;
+      const totalVolume = validStocks.reduce((sum, s) => sum + (s.volume || 0), 0);
+      const advancers = validStocks.filter(s => s.change > 0).length;
+      const decliners = validStocks.filter(s => s.change < 0).length;
+      const strength = (advancers / validStocks.length) * 100;
       
-      // Find top performing stock
-      const topStock = stocksWithChange.reduce((max, stock) => 
-        stock.change > (max && max.change ? max.change : -Infinity) ? stock : max
-      , stocksWithChange[0]);
+      const topStock = validStocks.reduce((max, stock) => 
+        stock.change > (max && max.change != null ? max.change : -Infinity) ? stock : max
+      , validStocks[0]);
 
       return {
         name: sectorKey,
         displayName: sectorName,
-        stocks: stocksWithChange,
+        stocks: validStocks,
         avgChange,
         totalVolume,
         advancers,
