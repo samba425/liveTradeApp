@@ -237,6 +237,50 @@ ag-grid-angular {
   animation: fadeIn 0.5s ease;
 }
 
+/* Rotation tables */
+.rotation-table th,
+.rotation-table-full th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.rotation-table td,
+.rotation-table-full td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.rotation-table-full tbody tr.table-success {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+.rotation-table-full tbody tr.table-danger {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+.action-buy, .action-watch, .action-avoid, .action-weak, .action-neutral {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.action-buy { background: #d1fae5; color: #065f46; }
+.action-watch { background: #dbeafe; color: #1e40af; }
+.action-avoid { background: #fee2e2; color: #991b1b; }
+.action-weak { background: #fed7aa; color: #92400e; }
+.action-neutral { background: #f3f4f6; color: #6b7280; }
+
+.badge-leading { background: #047857; color: white; }
+.badge-improving { background: #10b981; color: white; }
+.badge-lagging { background: #991b1b; color: white; }
+.badge-weakening { background: #dc2626; color: white; }
+.badge-neutral { background: #9ca3af; color: white; }
+
 /* Sector strength indicators */
 .progress {
   height: 8px;

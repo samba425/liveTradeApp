@@ -3,6 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
 import { CommonserviceService } from '../commonservice.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Component({
   standalone: false,
@@ -318,6 +319,25 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: "📈 RS vs NIFTY",
+      field: "rsVsNifty",
+      resizable: true,
+      sortable: true,
+      width: 130,
+      filter: "agNumberColumnFilter",
+      valueFormatter: p => p.value != null ? (p.value > 0 ? '+' : '') + p.value.toFixed(2) + '%' : '-',
+      cellRenderer: params => {
+        if (params.value == null) return '-';
+        const v = params.value;
+        const rating = params.data?.rsRating || '';
+        let color = '#991b1b'; let bg = '#fee2e2';
+        if (rating === 'Leader') { color = '#047857'; bg = '#a7f3d0'; }
+        else if (rating === 'Outperform') { color = '#059669'; bg = '#d1fae5'; }
+        else if (rating === 'Inline') { color = '#6b7280'; bg = '#f3f4f6'; }
+        return `<span style="background:${bg}; color:${color}; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:12px;">${v > 0 ? '+' : ''}${v.toFixed(2)}%</span>`;
+      }
+    },
+    {
       headerName: "📐 R:R",
       field: "riskReward",
       resizable: true,
@@ -625,6 +645,9 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
   selectedStock: any = null;
   accountSize: number = 100000;
   riskPercent: number = 1;
+  marketSnapshot: any = null;
+  niftyChange = 0;
+  niftyWeeklyChange = 0;
 
   constructor(private http: HttpClient, private commonservice: CommonserviceService) {
     this.gridOptions = <GridOptions>{
@@ -640,6 +663,18 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
   fetchLiveData() {
     this.isLoading = true;
     if (this.dataSubscription) this.dataSubscription.unsubscribe();
+    this.http.get(`${environment.baseUrl}market/snapshot`).subscribe({
+      next: (snap: any) => {
+        this.marketSnapshot = snap;
+        this.niftyChange = snap?.nifty?.change ?? 0;
+        this.niftyWeeklyChange = snap?.nifty?.weeklyChange ?? 0;
+        if (this.allData.length > 0) this.applyRelativeStrength();
+      },
+      error: () => {
+        this.niftyChange = 0;
+        this.niftyWeeklyChange = 0;
+      }
+    });
     this.dataSubscription = this.commonservice.getData.subscribe(data => {
       this.inputValue = data || [];
       if (this.inputValue.length > 0) {
@@ -672,6 +707,8 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
         open: res['d'][1],
         name: res['d'][0],
         close: res['d'][4],
+        dailyChange: res['d'][5],
+        weeklyChange: res['d'][20],
         sma20: res['d'][12],
         sma20closeDiff: (100 * (Number(res['d'][4]) - Number(res['d'][11]))) /
           ((Number(res['d'][11]) + Number(res['d'][4])) / 2),
@@ -732,7 +769,12 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       const { volStrength, volRatio } = this.calcVolumeStrength(stock);
       const trendAlignment = this.calcTrendAlignment(stock);
       const riskReward = this.calcRiskReward(stock);
-      const tradeScore = this.calcTradeScore(stock, fs.score, dist, volRatio, riskReward);
+      const rsVsNifty = Math.round(((stock.dailyChange ?? stock.change_from_open ?? 0) - this.niftyChange) * 100) / 100;
+      const rsVsNiftyWeek = stock.weeklyChange != null && this.niftyWeeklyChange != null
+        ? Math.round((stock.weeklyChange - this.niftyWeeklyChange) * 100) / 100
+        : null;
+      const rsRating = this.getRsRating(rsVsNifty);
+      const tradeScore = this.calcTradeScore(stock, fs.score, dist, volRatio, riskReward, rsVsNifty);
 
       return {
         ...stock,
@@ -746,6 +788,9 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
         volRatio,
         trendAlignment,
         riskReward,
+        rsVsNifty,
+        rsVsNiftyWeek,
+        rsRating,
         tradeScore
       };
     });
@@ -1396,43 +1441,74 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
     return reward > 0 ? reward / risk : 0;
   }
 
-  calcTradeScore(stock: any, fundScore: number, distFromSMA: number, volRatio: number, rr: number | null): number {
+  calcTradeScore(stock: any, fundScore: number, distFromSMA: number, volRatio: number, rr: number | null, rsVsNifty = 0): number {
     let score = 0;
 
-    // 1. Fundamental Quality (max 25 pts)
-    score += Math.min((fundScore / 21.5) * 25, 25);
+    // 1. Fundamental Quality (max 22 pts)
+    score += Math.min((fundScore / 21.5) * 22, 22);
 
-    // 2. Entry Proximity to SMA200 (max 25 pts) - closer = better
-    if (distFromSMA <= 2) score += 25;
-    else if (distFromSMA <= 5) score += 20;
-    else if (distFromSMA <= 8) score += 15;
+    // 2. Entry Proximity to SMA200 (max 22 pts)
+    if (distFromSMA <= 2) score += 22;
+    else if (distFromSMA <= 5) score += 18;
+    else if (distFromSMA <= 8) score += 14;
     else if (distFromSMA <= 12) score += 8;
     else if (distFromSMA <= 20) score += 3;
 
-    // 3. Risk:Reward (max 20 pts)
+    // 3. Risk:Reward (max 18 pts)
     if (rr != null) {
-      if (rr >= 4) score += 20;
-      else if (rr >= 3) score += 17;
-      else if (rr >= 2) score += 14;
-      else if (rr >= 1.5) score += 10;
-      else if (rr >= 1) score += 5;
+      if (rr >= 4) score += 18;
+      else if (rr >= 3) score += 15;
+      else if (rr >= 2) score += 12;
+      else if (rr >= 1.5) score += 8;
+      else if (rr >= 1) score += 4;
     }
 
-    // 4. RSI Oversold bounce (max 15 pts)
+    // 4. RSI Oversold bounce (max 13 pts)
     const rsi = stock.RSI;
     if (rsi != null) {
-      if (rsi >= 30 && rsi <= 40) score += 15;
-      else if (rsi >= 40 && rsi <= 50) score += 10;
-      else if (rsi >= 25 && rsi < 30) score += 8;
-      else if (rsi > 50 && rsi <= 60) score += 5;
+      if (rsi >= 30 && rsi <= 40) score += 13;
+      else if (rsi >= 40 && rsi <= 50) score += 9;
+      else if (rsi >= 25 && rsi < 30) score += 7;
+      else if (rsi > 50 && rsi <= 60) score += 4;
     }
 
-    // 5. Volume Confirmation (max 15 pts)
-    if (volRatio >= 2.5) score += 15;
-    else if (volRatio >= 1.5) score += 10;
-    else if (volRatio >= 1.0) score += 5;
+    // 5. Volume Confirmation (max 10 pts)
+    if (volRatio >= 2.5) score += 10;
+    else if (volRatio >= 1.5) score += 7;
+    else if (volRatio >= 1.0) score += 3;
+
+    // 6. Relative Strength vs NIFTY (max 15 pts)
+    if (rsVsNifty >= 2) score += 15;
+    else if (rsVsNifty >= 1) score += 12;
+    else if (rsVsNifty >= 0.5) score += 9;
+    else if (rsVsNifty >= 0) score += 5;
+    else if (rsVsNifty >= -1) score += 2;
 
     return Math.round(Math.min(score, 100));
+  }
+
+  getRsRating(rsVsNifty: number): string {
+    if (rsVsNifty >= 1.5) return 'Leader';
+    if (rsVsNifty >= 0.3) return 'Outperform';
+    if (rsVsNifty >= -0.5) return 'Inline';
+    return 'Laggard';
+  }
+
+  applyRelativeStrength() {
+    if (!this.allData.length) return;
+    this.allData = this.allData.map(stock => {
+      const rsVsNifty = Math.round(((stock.dailyChange ?? stock.change_from_open ?? 0) - this.niftyChange) * 100) / 100;
+      const rsVsNiftyWeek = stock.weeklyChange != null && this.niftyWeeklyChange != null
+        ? Math.round((stock.weeklyChange - this.niftyWeeklyChange) * 100) / 100
+        : stock.rsVsNiftyWeek ?? null;
+      const dist = Math.abs(stock.godFatherDiffPer || 0);
+      const fs = { score: stock.fundScore, maxScore: stock.fundMaxScore, rating: stock.fundRating };
+      const tradeScore = this.calcTradeScore(stock, fs.score, dist, stock.volRatio || 0, stock.riskReward, rsVsNifty);
+      return { ...stock, rsVsNifty, rsVsNiftyWeek, rsRating: this.getRsRating(rsVsNifty), tradeScore };
+    });
+    if (this.rowData === this.allData || this.rowData.length === this.allData.length) {
+      this.rowData = [...this.allData];
+    }
   }
 
   getTradeSetup(stock: any): any {
@@ -1510,7 +1586,7 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
 
   showTopTrades() {
     const topTrades = this.filteredallData
-      .filter(s => s.tradeScore >= 50 && s.riskReward >= 1.5)
+      .filter(s => s.tradeScore >= 50 && s.riskReward >= 1.5 && (s.rsVsNifty ?? 0) >= 0)
       .sort((a, b) => b.tradeScore - a.tradeScore);
     
     this.showingPatterns = false;
@@ -1520,6 +1596,19 @@ export class SimpleMovingComponent implements OnInit, OnDestroy {
       if (topTrades.length === 0) {
         console.log('No A+ trades found. Showing all SMA200 crosses.');
       }
+      setTimeout(() => this.showPatternColumns(), 200);
+    }, 100);
+  }
+
+  showNiftyLeaders() {
+    const leaders = this.filteredallData
+      .filter(s => (s.rsVsNifty ?? 0) >= 0.5)
+      .sort((a, b) => (b.rsVsNifty ?? 0) - (a.rsVsNifty ?? 0));
+
+    this.showingPatterns = false;
+    this.rowData = [];
+    setTimeout(() => {
+      this.rowData = leaders.length > 0 ? leaders : this.filteredallData;
       setTimeout(() => this.showPatternColumns(), 200);
     }, 100);
   }

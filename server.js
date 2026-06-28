@@ -1126,6 +1126,7 @@ function parseTvStockRow(row) {
 	const d = row.d;
 	if (!d || !d[0]) return null;
 	const pChange = d[5] != null ? Number(d[5]) : (d[9] != null ? Number(d[9]) : 0);
+	const weeklyChange = d[20] != null ? Number(d[20]) : null;
 	return {
 		symbol: d[0],
 		name: d[0],
@@ -1136,6 +1137,7 @@ function parseTvStockRow(row) {
 		low: d[3],
 		pChange,
 		change: pChange,
+		weeklyChange,
 		totalTradedVolume: d[7] || 0,
 		volume: d[7] || 0,
 		sector: d[18] || ''
@@ -1167,6 +1169,9 @@ function buildSectorPayload(sectorKey, config, matchedStocks) {
 	const decliners = stocks.filter(s => s.pChange < 0).length;
 	const unchanged = stocks.length - advancers - decliners;
 	const avgChange = stocks.reduce((sum, s) => sum + (s.pChange || 0), 0) / stocks.length;
+	const weeklyAvgChange = stocks.filter(s => s.weeklyChange != null).length > 0
+		? stocks.filter(s => s.weeklyChange != null).reduce((sum, s) => sum + s.weeklyChange, 0) / stocks.filter(s => s.weeklyChange != null).length
+		: 0;
 	const strength = (advancers / stocks.length) * 100;
 	const topStock = stocks[0];
 
@@ -1174,6 +1179,7 @@ function buildSectorPayload(sectorKey, config, matchedStocks) {
 		name: sectorKey,
 		displayName: config.displayName,
 		avgChange: Math.round(avgChange * 100) / 100,
+		weeklyAvgChange: Math.round(weeklyAvgChange * 100) / 100,
 		advancers,
 		decliners,
 		unchanged,
@@ -1184,7 +1190,13 @@ function buildSectorPayload(sectorKey, config, matchedStocks) {
 			change: Math.round((topStock.pChange || 0) * 100) / 100,
 			price: topStock.lastPrice || 0
 		},
-		stocks: stocks.slice(0, 15),
+		stocks: stocks.slice(0, 15).map(s => ({
+			name: s.symbol,
+			change: Math.round((s.pChange || 0) * 100) / 100,
+			weeklyChange: s.weeklyChange != null ? Math.round(s.weeklyChange * 100) / 100 : null,
+			price: s.lastPrice || 0,
+			volume: s.volume || 0
+		})),
 		stockCount: stocks.length
 	};
 }
@@ -1239,10 +1251,75 @@ async function buildAllSectorData(forceRefresh = false) {
 	});
 
 	const sectors = await Promise.all(sectorPromises);
-	sectorDataCache = sectors;
+	const active = sectors.filter(s => s.stockCount > 0);
+	const marketAvg = active.length > 0
+		? active.reduce((sum, s) => sum + s.avgChange, 0) / active.length
+		: 0;
+
+	const enriched = sectors.map(s => {
+		const vsMarket = Math.round((s.avgChange - marketAvg) * 100) / 100;
+		let rotationSignal = 'Neutral';
+		if (vsMarket >= 0.3 && s.avgChange > 0.2) rotationSignal = 'Leading';
+		else if (vsMarket <= -0.3 && s.avgChange < -0.2) rotationSignal = 'Lagging';
+		else if (vsMarket >= 0.1 || s.avgChange > 0.3) rotationSignal = 'Improving';
+		else if (vsMarket <= -0.1 || s.avgChange < -0.3) rotationSignal = 'Weakening';
+		return { ...s, vsMarket, rotationSignal };
+	});
+
+	enriched.sort((a, b) => b.avgChange - a.avgChange);
+	enriched.forEach((s, i) => { s.rank = i + 1; });
+
+	sectorDataCache = enriched;
 	sectorDataCacheTime = now;
-	return sectors;
+	return enriched;
 }
+
+async function fetchMarketSnapshot() {
+	const result = await fetchTradingViewData({ indexs: true });
+	const snap = {
+		nifty: null,
+		banknifty: null,
+		vix: null,
+		timestamp: new Date().toISOString()
+	};
+
+	(result.data || []).forEach(row => {
+		const d = row.d;
+		if (!d) return;
+		const sym = (row.s || '').replace('NSE:', '').replace('BSE:', '') || d[0];
+		const item = {
+			symbol: sym,
+			close: d[4],
+			change: d[5] != null ? Number(d[5]) : 0,
+			weeklyChange: d[20] != null ? Number(d[20]) : null,
+			changeFromOpen: d[9] != null ? Number(d[9]) : null
+		};
+		if (sym === 'NIFTY') snap.nifty = item;
+		else if (sym === 'BANKNIFTY') snap.banknifty = item;
+		else if (sym === 'INDIAVIX') snap.vix = item;
+	});
+
+	return snap;
+}
+
+let marketSnapshotCache = null;
+let marketSnapshotCacheTime = 0;
+
+app.get('/market/snapshot', async (req, res) => {
+	try {
+		const now = Date.now();
+		if (!req.query.refresh && marketSnapshotCache && (now - marketSnapshotCacheTime) < SECTOR_CACHE_TTL_MS) {
+			return res.json({ status: 'success', ...marketSnapshotCache });
+		}
+		const snapshot = await fetchMarketSnapshot();
+		marketSnapshotCache = snapshot;
+		marketSnapshotCacheTime = now;
+		res.json({ status: 'success', ...snapshot });
+	} catch (err) {
+		console.error('Market snapshot error:', err.message);
+		res.status(500).json({ error: 'Failed to fetch market snapshot', message: err.message });
+	}
+});
 
 // NSE India API Integration
 app.get('/nse/option-chain/:symbol', async (req, res) => {
@@ -1354,8 +1431,15 @@ app.get('/nse/losers', async (req, res) => {
 app.get('/nse/sectors', async (req, res) => {
 	console.log('Fetching all sector data (TradingView)');
 	try {
-		const sectors = await buildAllSectorData(req.query.refresh === 'true');
+		const [sectors, snapshot] = await Promise.all([
+			buildAllSectorData(req.query.refresh === 'true'),
+			fetchMarketSnapshot().catch(() => null)
+		]);
 		const withData = sectors.filter(s => s.stockCount > 0).length;
+		const active = sectors.filter(s => s.stockCount > 0);
+		const marketAvg = active.length > 0
+			? Math.round(active.reduce((sum, s) => sum + s.avgChange, 0) / active.length * 100) / 100
+			: 0;
 
 		res.json({
 			status: 'success',
@@ -1363,7 +1447,14 @@ app.get('/nse/sectors', async (req, res) => {
 			timestamp: new Date().toISOString(),
 			sectorsLoaded: withData,
 			sectorsTotal: sectors.length,
-			data: sectors.sort((a, b) => b.avgChange - a.avgChange)
+			market: {
+				niftyChange: snapshot?.nifty?.change ?? null,
+				niftyWeeklyChange: snapshot?.nifty?.weeklyChange ?? null,
+				bankNiftyChange: snapshot?.banknifty?.change ?? null,
+				vix: snapshot?.vix?.close ?? null,
+				marketAvg
+			},
+			data: sectors
 		});
 	} catch (err) {
 		console.error('Sectors API error:', err.message);

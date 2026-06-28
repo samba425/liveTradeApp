@@ -1,3 +1,101 @@
+<!-- App Screens Guide - Sector Rotation & SMA -->
+<div class="app-screens-guide-container mb-4">
+  <div class="app-screens-guide-header">
+    <h2><i class="fas fa-map"></i> How To Use Trading Screens</h2>
+    <p class="mb-0 text-muted">Reference guide + live sector rotation data below</p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white py-2"><strong>📋 Daily Workflow</strong></div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-bordered mb-0 guide-table">
+            <thead><tr><th>Step</th><th>Screen</th><th>What To Do</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Sector Tracker</strong></td><td>Check Money Flow IN — note top 3 sectors</td></tr>
+              <tr><td>2</td><td><strong>Sector Tracker</strong></td><td>Avoid Money Flow OUT sectors</td></tr>
+              <tr><td>3</td><td><strong>SMA Scanner</strong></td><td>Click <strong>SMA Filter</strong> → SMA200 bounces</td></tr>
+              <tr><td>4</td><td><strong>SMA Scanner</strong></td><td>Click <strong>NIFTY Leaders</strong> → beats index</td></tr>
+              <tr><td>5</td><td><strong>SMA Scanner</strong></td><td>Click <strong>Top Trades (A+)</strong> → best score</td></tr>
+              <tr><td>6</td><td><strong>SMA Scanner</strong></td><td>Click row → verify 6 checklist items green → buy</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white py-2"><strong>📊 Sector Rotation — Column Guide</strong></div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-bordered mb-0 guide-table">
+            <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Today %</strong></td><td>Sector average change today</td></tr>
+              <tr><td><strong>Week %</strong></td><td>5-day momentum — trend continuing?</td></tr>
+              <tr><td><strong>vs Market</strong></td><td>Beating (+) or lagging (−) other sectors</td></tr>
+              <tr><td><strong>Rotation</strong></td><td>Leading = money in, Lagging = money out</td></tr>
+              <tr><td><strong>Strength</strong></td><td>% of stocks advancing in sector</td></tr>
+              <tr><td><strong>Action</strong></td><td>🟢 BUY / ✅ WATCH / 🔴 AVOID / 🟡 NEUTRAL</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-warning text-dark py-2"><strong>🎯 Sector Action Rules</strong></div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-bordered mb-0 guide-table">
+            <thead><tr><th>Action</th><th>When</th><th>What To Do</th></tr></thead>
+            <tbody>
+              <tr class="table-success"><td>🟢 BUY</td><td>Rank 1–5, green</td><td>Hunt for stocks in this sector</td></tr>
+              <tr><td>✅ WATCH</td><td>Rank 6–8, positive</td><td>Wait for SMA200 bounce</td></tr>
+              <tr><td>🟡 NEUTRAL</td><td>Middle rank</td><td>Skip unless special setup</td></tr>
+              <tr><td>⚠️ WEAK</td><td>Negative change</td><td>Don't buy</td></tr>
+              <tr class="table-danger"><td>🔴 AVOID</td><td>Rank 16–20, red</td><td>Do not touch today</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-info text-white py-2"><strong>⚡ SMA Scanner — Key Columns</strong></div>
+        <div class="card-body p-0">
+          <table class="table table-sm table-bordered mb-0 guide-table">
+            <thead><tr><th>Column</th><th>Good Value</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Fund Score</strong></td><td>12+ / 21.5</td><td>Company quality (WHAT to buy)</td></tr>
+              <tr><td><strong>Entry Risk</strong></td><td>Ideal / Good</td><td>Distance from SMA200 (WHEN)</td></tr>
+              <tr><td><strong>RS vs NIFTY</strong></td><td>Positive (+)</td><td>Stock beating the index</td></tr>
+              <tr><td><strong>Trade Score</strong></td><td>50+ (A/B+)</td><td>Combined conviction score</td></tr>
+              <tr><td><strong>R:R</strong></td><td>1:2 or better</td><td>Risk vs reward ratio</td></tr>
+              <tr><td><strong>Trade Setup</strong></td><td>6 greens</td><td>Click row → shares, SL, target</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-info mb-3">
+    <strong><i class="fas fa-lightbulb"></i> Golden Rule:</strong>
+    Best trade = stock in <strong>top 5 sector</strong> + <strong>SMA200 bounce</strong> + <strong>RS vs NIFTY positive</strong> + <strong>Fund Score 12+</strong> + <strong>Entry Ideal/Good</strong>.
+  </div>
+
+  <!-- Live Sector Rotation Data -->
+  <div class="live-sector-wrapper">
+    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Live Sector Rotation (updates every 30 sec)</h4>
+    <app-sector-tracker></app-sector-tracker>
+  </div>
+</div>
+
+<hr class="guide-separator">
+
 <!-- Main Container -->
 <div class="container-fluid py-4">
   <div class="row">

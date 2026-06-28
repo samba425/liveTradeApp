@@ -228,6 +228,55 @@
   }
 }
 
+/* App Screens Guide */
+.app-screens-guide-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  border: 1px solid #e9ecef;
+}
+
+.app-screens-guide-header {
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.app-screens-guide-header h2 {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.guide-table th {
+  background: #f1f5f9;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.guide-table td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.guide-separator {
+  border-top: 3px solid #667eea;
+  margin: 2rem 0;
+  opacity: 0.3;
+}
+
+.live-sector-wrapper {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.live-sector-wrapper h4 {
+  color: #1e40af;
+  font-weight: 700;
+}
+
 /* Knowledge Base Accordion Styles */
 .knowledge-base-container {
   background: #ffffff;

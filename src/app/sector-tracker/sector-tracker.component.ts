@@ -8,12 +8,24 @@ interface SectorData {
   displayName: string;
   stocks: any[];
   avgChange: number;
+  weeklyAvgChange?: number;
+  vsMarket?: number;
+  rotationSignal?: string;
+  rank?: number;
   totalVolume: number;
   advancers: number;
   decliners: number;
   strength: number;
   topStock: any;
   stockCount?: number;
+}
+
+interface MarketContext {
+  niftyChange: number | null;
+  niftyWeeklyChange: number | null;
+  bankNiftyChange: number | null;
+  vix: number | null;
+  marketAvg: number;
 }
 
 @Component({
@@ -24,6 +36,7 @@ interface SectorData {
 })
 export class SectorTrackerComponent implements OnInit, OnDestroy {
   sectors: SectorData[] = [];
+  marketContext: MarketContext | null = null;
   isLoading = true;
   errorMessage = '';
   lastUpdated: Date;
@@ -135,15 +148,43 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
 
   columnDefs = [
     {
+      headerName: '#',
+      field: 'rank',
+      sortable: true,
+      width: 60,
+      pinned: 'left',
+      cellStyle: params => {
+        const r = params.value || 0;
+        if (r === 1) return { backgroundColor: '#a7f3d0', fontWeight: 'bold', fontSize: '14px' };
+        if (r <= 3) return { backgroundColor: '#d1fae5', fontWeight: 'bold' };
+        if (r >= 18) return { backgroundColor: '#fee2e2', fontWeight: 'bold' };
+        return { fontWeight: '600' };
+      }
+    },
+    {
       headerName: '📊 Sector',
       field: 'displayName',
       sortable: true,
-      width: 220,
+      width: 200,
       pinned: 'left',
       cellStyle: { fontWeight: 'bold', fontSize: '14px', color: '#1f2937' }
     },
     {
-      headerName: '📈 Avg Change %',
+      headerName: '🔄 Rotation',
+      field: 'rotationSignal',
+      sortable: true,
+      width: 120,
+      cellRenderer: params => {
+        const v = params.value || 'Neutral';
+        if (v === 'Leading') return '<span style="color:#047857;font-weight:bold;">🟢 Leading</span>';
+        if (v === 'Improving') return '<span style="color:#059669;font-weight:600;">📈 Improving</span>';
+        if (v === 'Lagging') return '<span style="color:#991b1b;font-weight:bold;">🔴 Lagging</span>';
+        if (v === 'Weakening') return '<span style="color:#dc2626;font-weight:600;">📉 Weakening</span>';
+        return '<span style="color:#6b7280;">➖ Neutral</span>';
+      }
+    },
+    {
+      headerName: '📈 Today %',
       field: 'avgChange',
       sortable: true,
       width: 150,
@@ -162,6 +203,30 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
           fontSize: '14px'
         };
         return { fontSize: '14px' };
+      }
+    },
+    {
+      headerName: '📅 Week %',
+      field: 'weeklyAvgChange',
+      sortable: true,
+      width: 110,
+      valueFormatter: params => params.value != null ? (params.value > 0 ? '+' : '') + params.value.toFixed(2) + '%' : '-',
+      cellStyle: params => {
+        if (params.value > 0) return { color: '#065f46', fontWeight: 'bold' };
+        if (params.value < 0) return { color: '#991b1b', fontWeight: 'bold' };
+        return {};
+      }
+    },
+    {
+      headerName: '⚖️ vs Market',
+      field: 'vsMarket',
+      sortable: true,
+      width: 120,
+      valueFormatter: params => params.value != null ? (params.value > 0 ? '+' : '') + params.value.toFixed(2) + '%' : '-',
+      cellStyle: params => {
+        if (params.value >= 0.5) return { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: 'bold' };
+        if (params.value <= -0.5) return { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: 'bold' };
+        return {};
       }
     },
     {
@@ -295,6 +360,9 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
           if (loaded === 0) {
             throw new Error('All sectors returned empty');
           }
+          if (response.market) {
+            this.marketContext = response.market;
+          }
           this.updateSectorData(response.data);
           this.isLoading = false;
           this.lastUpdated = new Date();
@@ -414,11 +482,66 @@ export class SectorTrackerComponent implements OnInit, OnDestroy {
   }
 
   getSectorColor(change: number): string {
-    if (change > 1) return '#28a745';
-    if (change > 0) return '#90EE90';
-    if (change < -1) return '#dc3545';
-    if (change < 0) return '#FFB6C1';
-    return '#6c757d';
+    if (change > 2) return '#047857';
+    if (change > 1) return '#10b981';
+    if (change > 0.3) return '#6ee7b7';
+    if (change > -0.3) return '#9ca3af';
+    if (change > -1) return '#fca5a5';
+    if (change > -2) return '#ef4444';
+    return '#991b1b';
+  }
+
+  getRotationColor(signal: string): string {
+    if (signal === 'Leading') return '#047857';
+    if (signal === 'Improving') return '#10b981';
+    if (signal === 'Lagging') return '#991b1b';
+    if (signal === 'Weakening') return '#dc2626';
+    return '#6b7280';
+  }
+
+  getLeadingSectors() {
+    // Always show top performers by today's change (not only strict rotation tags)
+    return [...this.sectors]
+      .filter(s => s.stockCount > 0)
+      .sort((a, b) => b.avgChange - a.avgChange)
+      .slice(0, 5);
+  }
+
+  getLaggingSectors() {
+    return [...this.sectors]
+      .filter(s => s.stockCount > 0)
+      .sort((a, b) => a.avgChange - b.avgChange)
+      .slice(0, 5);
+  }
+
+  formatChange(value: number | null | undefined): string {
+    if (value == null || isNaN(value)) return '-';
+    return (value > 0 ? '+' : '') + value.toFixed(2) + '%';
+  }
+
+  getTradingAction(sector: SectorData): { label: string; class: string; tip: string } {
+    const rank = sector.rank || 99;
+    if (rank <= 5 && sector.avgChange > 0) {
+      return { label: '🟢 BUY', class: 'action-buy', tip: 'Money flowing in — pick stocks from this sector' };
+    }
+    if (rank <= 8 && sector.avgChange > 0 && (sector.vsMarket ?? 0) >= 0) {
+      return { label: '✅ WATCH', class: 'action-watch', tip: 'Strong sector — wait for SMA200 bounce in these stocks' };
+    }
+    if (rank >= 16 && sector.avgChange < 0) {
+      return { label: '🔴 AVOID', class: 'action-avoid', tip: 'Money flowing out — do not buy here today' };
+    }
+    if (sector.avgChange < -0.5) {
+      return { label: '⚠️ WEAK', class: 'action-weak', tip: 'Underperforming — skip unless special setup' };
+    }
+    return { label: '🟡 NEUTRAL', class: 'action-neutral', tip: 'No clear edge — focus on top 5 sectors only' };
+  }
+
+  getRotationBadgeClass(signal: string): string {
+    if (signal === 'Leading') return 'badge-leading';
+    if (signal === 'Improving') return 'badge-improving';
+    if (signal === 'Lagging') return 'badge-lagging';
+    if (signal === 'Weakening') return 'badge-weakening';
+    return 'badge-neutral';
   }
 
   getStrengthLabel(strength: number): string {
