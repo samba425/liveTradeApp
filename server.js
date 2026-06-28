@@ -1094,6 +1094,156 @@ app.get('/news/stock', async (req, res) => {
 	}
 });
 
+// --- Sector Tracker (TradingView-powered; NSE direct API needs cookies) ---
+const SECTOR_DEFINITIONS = {
+	IT: { displayName: 'Information Technology', tvIndex: 'CNXIT', stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTIM', 'COFORGE', 'PERSISTENT', 'MPHASIS', 'LTTS'] },
+	BANKING: { displayName: 'Banking', tvIndex: 'BANKNIFTY', stocks: ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'BANKBARODA', 'PNB'] },
+	AUTO: { displayName: 'Automobile', tvIndex: 'CNXAUTO', stocks: ['MARUTI', 'TATAMOTORS', 'M&M', 'BAJAJ-AUTO', 'HEROMOTOCO', 'EICHERMOT', 'ASHOKLEY', 'TVSMOTOR'] },
+	PHARMA: { displayName: 'Pharmaceuticals', tvIndex: 'CNXPHARMA', stocks: ['SUNPHARMA', 'DRREDDY', 'CIPLA', 'DIVISLAB', 'AUROPHARMA', 'LUPIN', 'TORNTPHARM', 'BIOCON'] },
+	FMCG: { displayName: 'FMCG', tvIndex: 'CNXFMCG', stocks: ['HINDUNILVR', 'ITC', 'NESTLEIND', 'BRITANNIA', 'DABUR', 'MARICO', 'GODREJCP', 'TATACONSUM'] },
+	METAL: { displayName: 'Metals', tvIndex: 'CNXMETAL', stocks: ['TATASTEEL', 'JSWSTEEL', 'HINDALCO', 'VEDL', 'SAIL', 'NMDC', 'NATIONALUM', 'JINDALSTEL'] },
+	REALTY: { displayName: 'Real Estate', tvIndex: 'CNXREALTY', stocks: ['DLF', 'GODREJPROP', 'OBEROIRLTY', 'PRESTIGE', 'BRIGADE', 'PHOENIXLTD', 'SUNTECK', 'SOBHA'] },
+	ENERGY: { displayName: 'Energy', tvIndex: 'CNXENERGY', stocks: ['RELIANCE', 'NTPC', 'POWERGRID', 'ADANIGREEN', 'ADANIPOWER', 'TATAPOWER', 'NHPC', 'SJVN'] },
+	INFRA: { displayName: 'Infrastructure', tvIndex: 'CNXINFRA', stocks: ['LT', 'ULTRACEMCO', 'GRASIM', 'AMBUJACEM', 'ACC', 'ADANIPORTS', 'GMRINFRA', 'IRB'] },
+	FINANCIAL: { displayName: 'Financial Services', tvIndex: 'CNXFINANCE', stocks: ['BAJFINANCE', 'BAJAJFINSV', 'SBILIFE', 'HDFCLIFE', 'ICICIGI', 'HDFCAMC', 'MUTHOOTFIN', 'CHOLAFIN'] },
+	MEDIA: { displayName: 'Media', tvIndex: 'CNXMEDIA', stocks: ['ZEEL', 'PVRINOX', 'SAREGAMA', 'NAZARA', 'NETWORK18', 'TVTODAY', 'DBCORP', 'SUNTV'] },
+	PSU_BANK: { displayName: 'PSU Banks', stocks: ['SBIN', 'BANKBARODA', 'PNB', 'CANBK', 'UNIONBANK', 'INDIANB', 'MAHABANK', 'CENTRALBK'] },
+	PVT_BANK: { displayName: 'Private Banks', tvIndex: 'NIFTYPVTBANK', stocks: ['HDFCBANK', 'ICICIBANK', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'FEDERALBNK', 'BANDHANBNK', 'IDFCFIRSTB'] },
+	HEALTHCARE: { displayName: 'Healthcare', stocks: ['APOLLOHOSP', 'FORTIS', 'MAXHEALTH', 'METROPOLIS', 'LALPATHLAB', 'THYROCARE', 'STARHEALTH', 'SUNPHARMA'] },
+	CONSUMPTION: { displayName: 'Consumption', stocks: ['TITAN', 'DMART', 'TRENT', 'JUBLFOOD', 'WESTLIFE', 'VBL', 'UNITDSPR', 'VMART'] },
+	OIL_GAS: { displayName: 'Oil & Gas', stocks: ['RELIANCE', 'ONGC', 'BPCL', 'IOC', 'GAIL', 'HINDPETRO', 'PETRONET', 'OIL'] },
+	COMMODITIES: { displayName: 'Commodities', stocks: ['COALINDIA', 'VEDL', 'HINDZINC', 'NMDC', 'MOIL', 'GMDCLTD', 'NATIONALUM', 'BALRAMCHIN'] },
+	SERVICES: { displayName: 'Services', stocks: ['BHARTIARTL', 'IDEA', 'IRCTC', 'INDHOTEL', 'LEMONTREE', 'CHALET', 'THOMASCOOK', 'YATRA'] },
+	MIDCAP: { displayName: 'Midcap', tvIndex: 'CNXMIDCAP', stocks: ['PAGEIND', 'PIIND', 'ABBOTINDIA', 'SIEMENS', 'BOSCHLTD', 'BERGEPAINT', 'PIDILITIND', 'ASTRAL'] },
+	SMALLCAP: { displayName: 'Smallcap', tvIndex: 'NIFTYSMLCAP250', stocks: ['IRFC', 'RVNL', 'RAILTEL', 'HUDCO', 'GICRE', 'IREDA', 'SJVN', 'NMDC'] }
+};
+
+let sectorDataCache = null;
+let sectorDataCacheTime = 0;
+const SECTOR_CACHE_TTL_MS = 30000;
+
+function parseTvStockRow(row) {
+	const d = row.d;
+	if (!d || !d[0]) return null;
+	const pChange = d[5] != null ? Number(d[5]) : (d[9] != null ? Number(d[9]) : 0);
+	return {
+		symbol: d[0],
+		name: d[0],
+		lastPrice: d[4],
+		close: d[4],
+		open: d[1],
+		high: d[2],
+		low: d[3],
+		pChange,
+		change: pChange,
+		totalTradedVolume: d[7] || 0,
+		volume: d[7] || 0,
+		sector: d[18] || ''
+	};
+}
+
+function buildSectorPayload(sectorKey, config, matchedStocks) {
+	const stocks = matchedStocks
+		.filter(Boolean)
+		.sort((a, b) => (b.pChange || 0) - (a.pChange || 0));
+
+	if (stocks.length === 0) {
+		return {
+			name: sectorKey,
+			displayName: config.displayName,
+			avgChange: 0,
+			advancers: 0,
+			decliners: 0,
+			unchanged: 0,
+			strength: 50,
+			totalVolume: 0,
+			topStock: null,
+			stocks: [],
+			stockCount: 0
+		};
+	}
+
+	const advancers = stocks.filter(s => s.pChange > 0).length;
+	const decliners = stocks.filter(s => s.pChange < 0).length;
+	const unchanged = stocks.length - advancers - decliners;
+	const avgChange = stocks.reduce((sum, s) => sum + (s.pChange || 0), 0) / stocks.length;
+	const strength = (advancers / stocks.length) * 100;
+	const topStock = stocks[0];
+
+	return {
+		name: sectorKey,
+		displayName: config.displayName,
+		avgChange: Math.round(avgChange * 100) / 100,
+		advancers,
+		decliners,
+		unchanged,
+		strength: Math.round(strength * 10) / 10,
+		totalVolume: stocks.reduce((sum, s) => sum + (s.totalTradedVolume || 0), 0),
+		topStock: {
+			name: topStock.symbol,
+			change: Math.round((topStock.pChange || 0) * 100) / 100,
+			price: topStock.lastPrice || 0
+		},
+		stocks: stocks.slice(0, 15),
+		stockCount: stocks.length
+	};
+}
+
+async function fetchTvIndexStocks(indexTicker) {
+	const result = await fetchTradingViewData({ index: indexTicker });
+	return (result.data || []).map(parseTvStockRow).filter(Boolean);
+}
+
+async function fetchAllStocksMap() {
+	const result = await fetchTradingViewData({});
+	const stockMap = new Map();
+	(result.data || []).forEach(row => {
+		const stock = parseTvStockRow(row);
+		if (stock) stockMap.set(stock.symbol, stock);
+	});
+	return stockMap;
+}
+
+async function fetchSectorStocks(sectorKey, config, stockMap) {
+	if (config.tvIndex) {
+		try {
+			const indexStocks = await fetchTvIndexStocks(config.tvIndex);
+			if (indexStocks.length > 0) return indexStocks;
+		} catch (err) {
+			console.error(`TradingView index ${config.tvIndex} failed for ${sectorKey}:`, err.message);
+		}
+	}
+
+	return config.stocks
+		.map(sym => stockMap.get(sym))
+		.filter(Boolean);
+}
+
+async function buildAllSectorData(forceRefresh = false) {
+	const now = Date.now();
+	if (!forceRefresh && sectorDataCache && (now - sectorDataCacheTime) < SECTOR_CACHE_TTL_MS) {
+		return sectorDataCache;
+	}
+
+	console.log('Building sector data from TradingView...');
+	const stockMap = await fetchAllStocksMap();
+
+	const sectorPromises = Object.entries(SECTOR_DEFINITIONS).map(async ([sectorKey, config]) => {
+		try {
+			const matchedStocks = await fetchSectorStocks(sectorKey, config, stockMap);
+			return buildSectorPayload(sectorKey, config, matchedStocks);
+		} catch (err) {
+			console.error(`Error building sector ${sectorKey}:`, err.message);
+			return buildSectorPayload(sectorKey, config, []);
+		}
+	});
+
+	const sectors = await Promise.all(sectorPromises);
+	sectorDataCache = sectors;
+	sectorDataCacheTime = now;
+	return sectors;
+}
+
 // NSE India API Integration
 app.get('/nse/option-chain/:symbol', async (req, res) => {
 	const symbol = req.params.symbol; // NIFTY or BANKNIFTY
@@ -1200,97 +1350,22 @@ app.get('/nse/losers', async (req, res) => {
 	}
 });
 
-// NSE Sector Data API - Optimized for Sector Tracker
+// NSE Sector Data API - Powered by TradingView (NSE direct API blocked without cookies)
 app.get('/nse/sectors', async (req, res) => {
-	console.log('Fetching all sector data');
+	console.log('Fetching all sector data (TradingView)');
 	try {
-		const sectorIndices = {
-			'IT': 'NIFTY%20IT',
-			'BANKING': 'NIFTY%20BANK',
-			'AUTO': 'NIFTY%20AUTO',
-			'PHARMA': 'NIFTY%20PHARMA',
-			'FMCG': 'NIFTY%20FMCG',
-			'METAL': 'NIFTY%20METAL',
-			'REALTY': 'NIFTY%20REALTY',
-			'ENERGY': 'NIFTY%20ENERGY',
-			'INFRA': 'NIFTY%20INFRASTRUCTURE',
-			'FINANCIAL': 'NIFTY%20FINANCIAL%20SERVICES',
-			'MEDIA': 'NIFTY%20MEDIA',
-			'PSU_BANK': 'NIFTY%20PSU%20BANK',
-			'PVT_BANK': 'NIFTY%20PRIVATE%20BANK',
-			'HEALTHCARE': 'NIFTY%20HEALTHCARE%20INDEX',
-			'CONSUMPTION': 'NIFTY%20INDIA%20CONSUMPTION',
-			'OIL_GAS': 'NIFTY%20OIL%20%26%20GAS',
-			'COMMODITIES': 'NIFTY%20COMMODITIES',
-			'SERVICES': 'NIFTY%20SERVICES%20SECTOR',
-			'MIDCAP': 'NIFTY%20MIDCAP%20100',
-			'SMALLCAP': 'NIFTY%20SMALLCAP%20100'
-		};
+		const sectors = await buildAllSectorData(req.query.refresh === 'true');
+		const withData = sectors.filter(s => s.stockCount > 0).length;
 
-		const sectorPromises = Object.entries(sectorIndices).map(async ([sectorKey, indexName]) => {
-			try {
-				const options = {
-					method: 'GET',
-					url: `https://www.nseindia.com/api/equity-stockIndices?index=${indexName}`,
-					headers: {
-						'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-						'Accept': '*/*'
-					}
-				};
-				
-				const response = await request(options);
-				const data = JSON.parse(response);
-				
-				// Calculate sector metrics
-				const stocks = data.data || [];
-				const advancers = stocks.filter(s => s.pChange > 0).length;
-				const decliners = stocks.filter(s => s.pChange < 0).length;
-				const avgChange = stocks.length > 0 
-					? stocks.reduce((sum, s) => sum + (s.pChange || 0), 0) / stocks.length 
-					: 0;
-				const strength = stocks.length > 0 ? (advancers / stocks.length) * 100 : 50;
-				const topStock = stocks.reduce((max, s) => 
-					(s.pChange || 0) > (max.pChange || 0) ? s : max
-				, stocks[0] || {});
-
-				return {
-					name: sectorKey,
-					displayName: indexName.replace(/%20/g, ' '),
-					avgChange,
-					advancers,
-					decliners,
-					strength,
-					totalVolume: stocks.reduce((sum, s) => sum + (s.totalTradedVolume || 0), 0),
-					topStock: topStock ? {
-						name: topStock.symbol,
-						change: topStock.pChange || 0,
-						price: topStock.lastPrice || 0
-					} : null,
-					stocks: stocks.slice(0, 10) // Top 10 stocks per sector
-				};
-			} catch (err) {
-				console.error(`Error fetching ${sectorKey}:`, err.message);
-				return {
-					name: sectorKey,
-					displayName: sectorKey,
-					avgChange: 0,
-					advancers: 0,
-					decliners: 0,
-					strength: 50,
-					totalVolume: 0,
-					topStock: null,
-					stocks: []
-				};
-			}
-		});
-
-		const sectors = await Promise.all(sectorPromises);
 		res.json({
 			status: 'success',
+			source: 'tradingview',
 			timestamp: new Date().toISOString(),
+			sectorsLoaded: withData,
+			sectorsTotal: sectors.length,
 			data: sectors.sort((a, b) => b.avgChange - a.avgChange)
 		});
-	} catch(err) {
+	} catch (err) {
 		console.error('Sectors API error:', err.message);
 		res.status(500).json({ error: 'Failed to fetch sector data', message: err.message });
 	}
@@ -1300,48 +1375,24 @@ app.get('/nse/sectors', async (req, res) => {
 app.get('/nse/sector/:sector', async (req, res) => {
 	const sector = req.params.sector.toUpperCase();
 	console.log('Fetching sector:', sector);
-	
-	const sectorMap = {
-		'IT': 'NIFTY%20IT',
-		'BANKING': 'NIFTY%20BANK',
-		'AUTO': 'NIFTY%20AUTO',
-		'PHARMA': 'NIFTY%20PHARMA',
-		'FMCG': 'NIFTY%20FMCG',
-		'METAL': 'NIFTY%20METAL',
-		'REALTY': 'NIFTY%20REALTY',
-		'ENERGY': 'NIFTY%20ENERGY',
-		'INFRA': 'NIFTY%20INFRASTRUCTURE',
-		'FINANCIAL': 'NIFTY%20FINANCIAL%20SERVICES',
-		'MEDIA': 'NIFTY%20MEDIA',
-		'PSU_BANK': 'NIFTY%20PSU%20BANK',
-		'PVT_BANK': 'NIFTY%20PRIVATE%20BANK',
-		'HEALTHCARE': 'NIFTY%20HEALTHCARE%20INDEX',
-		'CONSUMPTION': 'NIFTY%20INDIA%20CONSUMPTION',
-		'OIL_GAS': 'NIFTY%20OIL%20%26%20GAS',
-		'COMMODITIES': 'NIFTY%20COMMODITIES',
-		'SERVICES': 'NIFTY%20SERVICES%20SECTOR',
-		'MIDCAP': 'NIFTY%20MIDCAP%20100',
-		'SMALLCAP': 'NIFTY%20SMALLCAP%20100'
-	};
-	
-	const indexName = sectorMap[sector];
-	if (!indexName) {
-		return res.status(400).json({ error: 'Invalid sector name' });
+
+	const config = SECTOR_DEFINITIONS[sector];
+	if (!config) {
+		return res.status(400).json({ error: 'Invalid sector name', validSectors: Object.keys(SECTOR_DEFINITIONS) });
 	}
-	
+
 	try {
-		const options = {
-			method: 'GET',
-			url: `https://www.nseindia.com/api/equity-stockIndices?index=${indexName}`,
-			headers: {
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-				'Accept': '*/*'
-			}
-		};
-		
-		const response = await request(options);
-		res.json(JSON.parse(response));
-	} catch(err) {
+		const stockMap = await fetchAllStocksMap();
+		const matchedStocks = await fetchSectorStocks(sector, config, stockMap);
+		const payload = buildSectorPayload(sector, config, matchedStocks);
+
+		res.json({
+			status: 'success',
+			source: 'tradingview',
+			timestamp: new Date().toISOString(),
+			...payload
+		});
+	} catch (err) {
 		console.error('Sector API error:', err.message);
 		res.status(500).json({ error: 'Failed to fetch sector data', message: err.message });
 	}
