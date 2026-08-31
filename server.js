@@ -15,7 +15,7 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 // MongoDB Configuration
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
@@ -158,7 +158,26 @@ async function fetchTradingViewData(indexType) {
 				"earnings_per_share_diluted_5y_growth_fy",
 				"free_cash_flow_margin_ttm",
 				"dividend_yield_recent",
-				"price_book_fq"
+				"price_book_fq",
+				// Swing Trade Setup strategy columns (indexes 59+) — EMA not SMA
+				"EMA9",
+				"EMA100",
+				"Stoch.K",
+				"Stoch.D",
+				"Stoch.K|1W",
+				"Stoch.D|1W",
+				"EMA9|1W",
+				"EMA100|1W",
+				"EMA9|60",
+				"Stoch.K|60",
+				"Stoch.D|60",
+				"Pivot.M.Classic.R1",
+				// Intraday setup (indexes 71+) — HTF 1H + LTF 5m
+				"EMA9|5",
+				"MACD.macd|60",
+				"MACD.signal|60",
+				"close|60",
+				"high|60"
 			],
 			"sort": {
 				"sortBy": "close",

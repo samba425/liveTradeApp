@@ -1,0 +1,371 @@
+<div class="container-fluid mt-4 swing-setup-page" style="padding: 1.5rem;">
+
+  <!-- Header Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <div class="card-body">
+          <h2 class="mb-2"><i class="fas fa-chart-line"></i> Trade Setup Screener</h2>
+          <p class="mb-0" style="opacity: 0.9;" *ngIf="tradeMode === 'swing'">
+            Swing · Long only · HTF EMA100 + Stoch &lt;20 · LTF EMA9 reclaim
+          </p>
+          <p class="mb-0" style="opacity: 0.9;" *ngIf="tradeMode === 'intraday'">
+            Intraday · HTF 1H divergence · LTF 5m EMA9 · Target day high/low
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel toggle -->
+  <div class="row mb-3">
+    <div class="col-12 d-flex flex-wrap align-items-center gap-2">
+      <div class="btn-group" role="group">
+        <button type="button" (click)="setPanel('screener')"
+          [ngClass]="activePanel === 'screener' ? 'btn btn-dark' : 'btn btn-outline-dark'">
+          <i class="fas fa-table"></i> Screener
+        </button>
+        <button type="button" (click)="setPanel('watchlist')"
+          [ngClass]="activePanel === 'watchlist' ? 'btn btn-dark' : 'btn btn-outline-dark'">
+          <i class="fas fa-list-check"></i> Watchlist / Todo
+          <span class="badge bg-light text-dark ms-1">{{ todoWatchlist.length }}</span>
+        </button>
+      </div>
+      <label class="ms-2 small text-muted mb-0" *ngIf="tradeMode === 'swing'">
+        <input type="checkbox" [(ngModel)]="autoCaptureMatches" class="me-1">
+        Auto-save SMA200 + Swing matches today
+      </label>
+    </div>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="btn-group" role="group">
+        <button type="button" (click)="setTradeMode('swing')"
+          [ngClass]="tradeMode === 'swing' ? 'btn btn-primary' : 'btn btn-outline-primary'">
+          <i class="fas fa-calendar-week"></i> Swing
+        </button>
+        <button type="button" (click)="setTradeMode('intraday')"
+          [ngClass]="tradeMode === 'intraday' ? 'btn btn-primary' : 'btn btn-outline-primary'">
+          <i class="fas fa-bolt"></i> Intraday
+        </button>
+      </div>
+      <span class="ms-3 text-muted small" *ngIf="tradeMode === 'intraday'">
+        HTF = 1H · LTF = 5m · Confirm divergence on chart before entry
+      </span>
+    </div>
+  </div>
+
+  <!-- Refresh -->
+  <div class="row mb-3">
+    <div class="col-12 d-flex flex-wrap align-items-center gap-3">
+      <button class="btn btn-primary btn-lg" (click)="refreshData()" [disabled]="isLoading"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 30px; font-weight: 600;">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+        {{ isLoading ? 'Loading...' : 'Refresh Data' }}
+      </button>
+      <span *ngIf="isLoading" class="text-muted">
+        <i class="fas fa-spinner fa-spin"></i> Fetching latest data...
+      </span>
+      <span *ngIf="lastRefreshed && !isLoading" class="text-muted small">
+        Last refreshed: {{ lastRefreshed | date:'medium' }}
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="dataMessage" class="alert alert-warning mb-3" role="alert">{{ dataMessage }}</div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+    <p class="mt-3 text-muted">Loading setup data...</p>
+  </div>
+
+  <!-- Control Panel -->
+  <div class="row mb-4" *ngIf="!isLoading && activePanel === 'screener'">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <h5 class="mb-0"><i class="fas fa-sliders-h"></i> Filters</h5>
+        </div>
+        <div class="card-body" style="background: #f8f9fa;">
+          <div class="row align-items-end">
+
+            <!-- Search -->
+            <div class="col-lg-3 col-md-6 mb-3">
+              <label class="form-label fw-bold"><i class="fas fa-search"></i> Search</label>
+              <input class="form-control form-control-lg" type="text" [(ngModel)]="searchQuery"
+                (input)="onSearchInputChange()" placeholder="Stock name..."
+                style="border-radius: 10px; border: 2px solid #e0e0e0;">
+            </div>
+
+            <!-- Swing HTF -->
+            <div class="col-lg-3 col-md-6 mb-3" *ngIf="tradeMode === 'swing'">
+              <label class="form-label fw-bold"><i class="fas fa-clock"></i> Swing HTF</label>
+              <div class="btn-group w-100" role="group">
+                <button type="button" (click)="setHtf('daily')"
+                  [ngClass]="htfMode === 'daily' ? 'btn btn-primary' : 'btn btn-outline-primary'">
+                  Daily / 1H
+                </button>
+                <button type="button" (click)="setHtf('weekly')"
+                  [ngClass]="htfMode === 'weekly' ? 'btn btn-primary' : 'btn btn-outline-primary'">
+                  Weekly / Daily
+                </button>
+              </div>
+            </div>
+
+            <!-- Intraday Long/Short -->
+            <div class="col-lg-3 col-md-6 mb-3" *ngIf="tradeMode === 'intraday'">
+              <label class="form-label fw-bold"><i class="fas fa-exchange-alt"></i> Side</label>
+              <div class="btn-group w-100" role="group">
+                <button type="button" (click)="setIntradaySide('long')"
+                  [ngClass]="intradaySide === 'long' ? 'btn btn-success' : 'btn btn-outline-success'">
+                  Long (+ Div)
+                </button>
+                <button type="button" (click)="setIntradaySide('short')"
+                  [ngClass]="intradaySide === 'short' ? 'btn btn-danger' : 'btn btn-outline-danger'">
+                  Short (− Div)
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick filters -->
+            <div class="col-lg-6 col-md-12 mb-3">
+              <label class="form-label fw-bold"><i class="fas fa-filter"></i> Setup Stage</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button type="button" (click)="entryNow()" class="btn btn-success btn-sm">Entry Now</button>
+                <button type="button" (click)="htfReady()" class="btn btn-primary btn-sm">
+                  {{ tradeMode === 'intraday' ? 'Div Ready' : 'HTF Ready' }}
+                </button>
+                <button type="button" (click)="divergenceOnly()" class="btn btn-info btn-sm" *ngIf="tradeMode === 'intraday'">
+                  Divergence
+                </button>
+                <button type="button" (click)="oversoldWatch()" class="btn btn-warning btn-sm" *ngIf="tradeMode === 'swing'">
+                  Oversold &lt;20
+                </button>
+                <button type="button" (click)="pullback()" class="btn btn-secondary btn-sm">Pullback</button>
+                <button type="button" (click)="swingSmaMatch()" class="btn btn-warning btn-sm" *ngIf="tradeMode === 'swing'">
+                  SMA200 + Swing
+                </button>
+                <button type="button" (click)="goodRR()" class="btn btn-dark btn-sm">Good R:R (&ge;2)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-2 pt-3 border-top">
+            <div class="col-12 d-flex flex-wrap gap-2">
+              <button type="button" (click)="addSelectedToWatchlist()" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i> Add Selected to Watchlist
+              </button>
+              <button type="button" (click)="captureTodayMatches()" class="btn btn-warning btn-sm" *ngIf="tradeMode === 'swing'">
+                <i class="fas fa-bookmark"></i> Capture SMA200+Swing Today
+              </button>
+              <button type="button" (click)="onBtnExport()" class="btn btn-dark btn-sm">
+                <i class="fas fa-file-csv"></i> Export CSV
+              </button>
+              <button type="button" (click)="reset()" class="btn btn-danger btn-sm">
+                <i class="fas fa-redo"></i> Reset Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoading && activePanel === 'screener' && (!rowData || rowData.length === 0)" class="text-center py-5">
+    <div class="card">
+      <div class="card-body">
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <p class="text-muted mb-0">No setups found. Try Refresh or change filters.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div *ngIf="!isLoading && activePanel === 'screener' && rowData && rowData.length > 0" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0">
+              <i class="fas fa-table"></i>
+              {{ tradeMode === 'intraday' ? 'Intraday' : 'Swing' }} Results
+            </h5>
+            <span class="badge bg-light text-dark">{{ rowData.length }} stocks · min volume 1L</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ag-grid-angular
+            class="ag-theme-quartz"
+            style="height: 600px; width: 100%"
+            [rowData]="rowData"
+            [rowSelection]="rowSelection"
+            [pagination]="pagination"
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="paginationPageSize"
+            [columnDefs]="colDefs"
+            (gridReady)="onGridReady($event)">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watchlist / Todo -->
+  <div *ngIf="!isLoading && activePanel === 'watchlist'" class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header text-white d-flex justify-content-between align-items-center flex-wrap gap-2"
+          style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+          <h5 class="mb-0"><i class="fas fa-list-check"></i> My Watchlist / Todo</h5>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-light" (click)="clearDoneWatchlist()" *ngIf="doneWatchlist.length">
+              Clear Done
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <p class="p-3 mb-0 small text-muted border-bottom">
+            Stores in your browser (localStorage). Auto-capture adds stocks with <strong>Bullish SMA200 cross today</strong> + swing stage ≥ HTF Ready.
+            Edit notes, entry, stop, target. Delete when done.
+          </p>
+          <div *ngIf="watchlist.length === 0" class="text-center py-5 text-muted">
+            <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+            <p class="mb-0">No items yet. Use <strong>SMA200 + Swing</strong> filter, then <strong>Capture</strong> or <strong>Add Selected</strong>.</p>
+          </div>
+          <div class="table-responsive" *ngIf="watchlist.length > 0">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Done</th>
+                  <th>Stock</th>
+                  <th>Date</th>
+                  <th>Mode</th>
+                  <th>Stage</th>
+                  <th>SMA200</th>
+                  <th>Entry</th>
+                  <th>Stop</th>
+                  <th>Target</th>
+                  <th>R:R</th>
+                  <th>Notes</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of watchlist" [class.table-secondary]="item.status === 'done'">
+                  <td>
+                    <input type="checkbox" [checked]="item.status === 'done'"
+                      (change)="toggleWatchlistStatus(item)">
+                  </td>
+                  <td class="fw-bold">{{ item.symbol }}</td>
+                  <td class="small">{{ item.tradeDate }}</td>
+                  <td class="small text-capitalize">{{ item.tradeMode }}</td>
+                  <td><span class="badge bg-primary">{{ item.stage }}</span></td>
+                  <td class="small">{{ item.sma200Cross }}</td>
+                  <ng-container *ngIf="editingId !== item.id">
+                    <td>{{ item.entry | number:'1.2-2' }}</td>
+                    <td>{{ item.stop | number:'1.2-2' }}</td>
+                    <td>{{ item.target | number:'1.2-2' }}</td>
+                    <td>{{ item.rr | number:'1.1-1' }}</td>
+                    <td class="small">{{ item.notes || '—' }}</td>
+                    <td class="text-nowrap">
+                      <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="startEdit(item)">Edit</button>
+                      <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteWatchlistItem(item.id)">Delete</button>
+                    </td>
+                  </ng-container>
+                  <ng-container *ngIf="editingId === item.id">
+                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="editDraft.entry"></td>
+                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="editDraft.stop"></td>
+                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="editDraft.target"></td>
+                    <td>{{ item.rr | number:'1.1-1' }}</td>
+                    <td><input type="text" class="form-control form-control-sm" [(ngModel)]="editDraft.notes" placeholder="Your notes"></td>
+                    <td class="text-nowrap">
+                      <button type="button" class="btn btn-sm btn-success me-1" (click)="saveEdit()">Save</button>
+                      <button type="button" class="btn btn-sm btn-secondary" (click)="cancelEdit()">Cancel</button>
+                    </td>
+                  </ng-container>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info cards — Swing -->
+  <div class="row mt-4" *ngIf="!isLoading && activePanel === 'screener' && tradeMode === 'swing'">
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #10b981;">
+        <div class="card-body">
+          <h6><i class="fas fa-bolt"></i> ENTRY NOW</h6>
+          <p class="mb-0 small">HTF above EMA100, Stoch&lt;20, above EMA9, LTF reclaimed EMA9.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #3b82f6;">
+        <div class="card-body">
+          <h6><i class="fas fa-hourglass-half"></i> HTF READY</h6>
+          <p class="mb-0 small">HTF conditions met. Wait for LTF close above EMA9.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #f59e0b;">
+        <div class="card-body">
+          <h6><i class="fas fa-chart-area"></i> OVERSOLD / PULLBACK</h6>
+          <p class="mb-0 small">Trend up with Stoch&lt;20 or price below EMA9 — watch trigger.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #8b5cf6;">
+        <div class="card-body">
+          <h6><i class="fas fa-info-circle"></i> Risk</h6>
+          <p class="mb-0 small">Stop = HTF low · Target = pivot · Confirm on chart.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info cards — Intraday -->
+  <div class="row mt-4" *ngIf="!isLoading && activePanel === 'screener' && tradeMode === 'intraday'">
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #10b981;">
+        <div class="card-body">
+          <h6><i class="fas fa-bolt"></i> ENTRY NOW</h6>
+          <p class="mb-0 small">1H divergence + 5m EMA9 trigger (above for long, below for short).</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #3b82f6;">
+        <div class="card-body">
+          <h6><i class="fas fa-code-branch"></i> DIV READY</h6>
+          <p class="mb-0 small">Bullish div (long) or bearish div (short) on 1H — wait 5m EMA9.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #f59e0b;">
+        <div class="card-body">
+          <h6><i class="fas fa-chart-area"></i> Stop / Target</h6>
+          <p class="mb-0 small">Long: stop day low, target day high. Short: stop 1H high, target day low.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="border-left: 5px solid #8b5cf6;">
+        <div class="card-body">
+          <h6><i class="fas fa-info-circle"></i> Note</h6>
+          <p class="mb-0 small">Divergence is scanner proxy (RSI+MACD 1H). Confirm double top/bottom on chart.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

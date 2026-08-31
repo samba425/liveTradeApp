@@ -20,6 +20,7 @@ import { NewsComponent } from './news/news.component';
 import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
 import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
 import { CamarillaComponent } from './camarilla/camarilla.component';
+import { SwingSetupComponent } from './swing-setup/swing-setup.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
@@ -41,7 +42,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     NewsComponent,
     SectorTrackerComponent,
     PositionCalculatorComponent,
-    CamarillaComponent
+    CamarillaComponent,
+    SwingSetupComponent
   ],
   imports: [
     BrowserModule,

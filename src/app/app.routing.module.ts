@@ -13,6 +13,7 @@ import { NewsComponent } from './news/news.component';
 import { SectorTrackerComponent } from './sector-tracker/sector-tracker.component';
 import { PositionCalculatorComponent } from './position-calculator/position-calculator.component';
 import { CamarillaComponent } from './camarilla/camarilla.component';
+import { SwingSetupComponent } from './swing-setup/swing-setup.component';
 import { OptionsReadinessComponent } from './options-readiness/options-readiness.component';
 
 @NgModule({
@@ -35,6 +36,7 @@ import { OptionsReadinessComponent } from './options-readiness/options-readiness
       { path: 'sectors', component: SectorTrackerComponent },
       { path: 'calculator', component: PositionCalculatorComponent },
       { path: 'cross', component: CamarillaComponent },
+      { path: 'swing-setup', component: SwingSetupComponent },
       { path: 'options-readiness', component: OptionsReadinessComponent },
       { path: '**', redirectTo: '/home', pathMatch: 'full' },
     ])
